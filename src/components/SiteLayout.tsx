@@ -77,6 +77,10 @@ function Nav({ onOpenMenu }: { onOpenMenu: () => void }) {
             <a href={h} className={isActive(h) ? "active" : ""}>{l}</a>
           </li>
         ))}
+        <li style={{ opacity: 0.35, userSelect: "none", padding: "0 2px" }} aria-hidden>|</li>
+        <li>
+          <Link to="/programy" className={isActive("/programy") ? "active" : ""}>Moje Programy</Link>
+        </li>
       </ul>
       <div className="nav-actions">
         <button className="theme-toggle" aria-label="Zmień motyw" onClick={toggleTheme}>
@@ -124,6 +128,7 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
       {NAV_LINKS.map(([h, l]) => (
         <a key={h} href={h} onClick={onClose}>{l}</a>
       ))}
+      <Link to="/programy" onClick={onClose}>Moje Programy</Link>
       <a href="/zgloszenie" onClick={onClose}>Zgłoś problem</a>
       <a href="/login" style={{ color: "var(--brand)" }} onClick={onClose}>Zaloguj się →</a>
       <a href="/register" onClick={onClose}>Utwórz konto</a>
@@ -153,6 +158,7 @@ function Footer() {
               <li><Link to="/o-mnie">O mnie</Link></li>
               <li><Link to="/uslugi">Usługi</Link></li>
               <li><Link to="/opinie">Opinie</Link></li>
+              <li><Link to="/programy">Moje Programy</Link></li>
             </ul>
           </div>
           <div>

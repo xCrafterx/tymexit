@@ -20,6 +20,7 @@ import { Route as OpinieRouteImport } from './routes/opinie'
 import { Route as PanelAdminRouteImport } from './routes/panel-admin'
 import { Route as PanelKlientaRouteImport } from './routes/panel-klienta'
 import { Route as PizzaRouteImport } from './routes/pizza'
+import { Route as ProgramyRouteImport } from './routes/programy'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as RetroRouteImport } from './routes/retro'
 import { Route as SekretRouteImport } from './routes/sekret'
@@ -85,6 +86,11 @@ const PanelKlientaRoute = PanelKlientaRouteImport.update({
 const PizzaRoute = PizzaRouteImport.update({
   id: '/pizza',
   path: '/pizza',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProgramyRoute = ProgramyRouteImport.update({
+  id: '/programy',
+  path: '/programy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RegisterRoute = RegisterRouteImport.update({
@@ -155,6 +161,9 @@ export interface FileRoutesByFullPath {
   '/panel-admin': typeof PanelAdminRoute
   '/panel-klienta': typeof PanelKlientaRoute
   '/pizza': typeof PizzaRoute
+  '/programy': typeof ProgramyRoute
+  '/programy': typeof ProgramyRoute
+  '/programy': typeof ProgramyRoute
   '/register': typeof RegisterRoute
   '/retro': typeof RetroRoute
   '/sekret': typeof SekretRoute
@@ -179,6 +188,9 @@ export interface FileRoutesByTo {
   '/panel-admin': typeof PanelAdminRoute
   '/panel-klienta': typeof PanelKlientaRoute
   '/pizza': typeof PizzaRoute
+  '/programy': typeof ProgramyRoute
+  '/programy': typeof ProgramyRoute
+  '/programy': typeof ProgramyRoute
   '/register': typeof RegisterRoute
   '/retro': typeof RetroRoute
   '/sekret': typeof SekretRoute
@@ -204,6 +216,9 @@ export interface FileRoutesById {
   '/panel-admin': typeof PanelAdminRoute
   '/panel-klienta': typeof PanelKlientaRoute
   '/pizza': typeof PizzaRoute
+  '/programy': typeof ProgramyRoute
+  '/programy': typeof ProgramyRoute
+  '/programy': typeof ProgramyRoute
   '/register': typeof RegisterRoute
   '/retro': typeof RetroRoute
   '/sekret': typeof SekretRoute
@@ -230,6 +245,7 @@ export interface FileRouteTypes {
     | '/panel-admin'
     | '/panel-klienta'
     | '/pizza'
+    | '/programy'
     | '/register'
     | '/retro'
     | '/sekret'
@@ -254,6 +270,7 @@ export interface FileRouteTypes {
     | '/panel-admin'
     | '/panel-klienta'
     | '/pizza'
+    | '/programy'
     | '/register'
     | '/retro'
     | '/sekret'
@@ -278,6 +295,7 @@ export interface FileRouteTypes {
     | '/panel-admin'
     | '/panel-klienta'
     | '/pizza'
+    | '/programy'
     | '/register'
     | '/retro'
     | '/sekret'
@@ -498,6 +516,8 @@ const rootRouteChildren: RootRouteChildren = {
   PanelAdminRoute: PanelAdminRoute,
   PanelKlientaRoute: PanelKlientaRoute,
   PizzaRoute: PizzaRoute,
+  ProgramyRoute,
+  ProgramyRoute: ProgramyRoute,
   RegisterRoute: RegisterRoute,
   RetroRoute: RetroRoute,
   SekretRoute: SekretRoute,
