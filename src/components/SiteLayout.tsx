@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { SupportChatWidget } from "@/components/SupportChatWidget";
-import { AdminDebugPanel } from "@/components/AdminDebugPanel";
 import { SoundToggle } from "@/components/SoundToggle";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -229,7 +228,6 @@ export function SiteLayout({ children, hideChrome = false }: { children: React.R
       {children}
       {!hideChrome && <Footer />}
       <SupportChatWidget />
-      <AdminDebugPanel />
     </>
   );
 }
