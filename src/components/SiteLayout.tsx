@@ -74,8 +74,19 @@ function Nav({ onOpenMenu }: { onOpenMenu: () => void }) {
             <a href={h} className={isActive(h) ? "active" : ""} style={{ whiteSpace: "nowrap", padding: "8px 10px" }}>{l}</a>
           </li>
         ))}
-        <li style={{ display: "inline-flex", alignItems: "center", padding: "0 6px", userSelect: "none" }} aria-hidden>
-          <span style={{ display: "inline-block", width: "2px", height: "22px", background: "linear-gradient(180deg, rgba(255,255,255,0.1), rgba(56,189,248,0.8), rgba(255,255,255,0.1))", borderRadius: "2px", boxShadow: "0 0 6px rgba(56,189,248,0.35)" }} />
+        <li style={{ display: "inline-flex", alignItems: "center", padding: "0 8px", userSelect: "none" }} aria-hidden>
+          <span
+            style={{
+              display: "inline-block",
+              width: "3.5px",
+              height: "25px",
+              borderRadius: "3px",
+              background: "linear-gradient(180deg, #ff007a, #7928ca, #0070f3, #00dfd8, #00ff88, #ffea00, #ff007a)",
+              backgroundSize: "100% 300%",
+              animation: "navRgbWaveDown 2.2s linear infinite",
+              boxShadow: "0 0 10px rgba(0, 223, 216, 0.8), 0 0 18px rgba(121, 40, 202, 0.6)"
+            }}
+          />
         </li>
         <li>
           <Link to="/programy" className={isActive("/programy") ? "active" : ""} style={{ whiteSpace: "nowrap", padding: "8px 10px" }}>Moje Programy</Link>
@@ -141,14 +152,18 @@ function Footer() {
       className="footer"
       style={{
         position: "relative",
-        paddingTop: 95,
-        paddingBottom: 60,
+        paddingTop: 100,
+        paddingBottom: 65,
         overflow: "hidden",
         borderTop: "none",
-        background: "linear-gradient(180deg, rgba(8, 12, 24, 0.98) 0%, rgba(5, 7, 15, 0.99) 100%)"
+        background: "linear-gradient(180deg, rgba(10, 15, 30, 0.98) 0%, rgba(5, 7, 15, 0.99) 100%)"
       }}
     >
       <style>{`
+        @keyframes navRgbWaveDown {
+          0% { background-position: 50% 0%; }
+          100% { background-position: 50% 100%; }
+        }
         @keyframes footerRgbLine {
           0% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }
@@ -160,30 +175,30 @@ function Footer() {
             opacity: 0;
           }
           15% {
-            opacity: 0.85;
+            opacity: 0.95;
           }
-          65% {
-            opacity: 0.6;
+          70% {
+            opacity: 0.8;
           }
           100% {
-            transform: translateY(700px);
+            transform: translateY(650px);
             opacity: 0;
           }
         }
       `}</style>
 
-      {/* Gruba, mieniąca się belka RGB na samej górze stopki (4px) */}
+      {/* Gruba, mieniąca się belka RGB na samej górze stopki (6px) z poświatą */}
       <div
         style={{
           position: "absolute",
           top: 0,
           left: 0,
           right: 0,
-          height: 4,
-          background: "linear-gradient(90deg, #ff007a, #7928ca, #0070f3, #00dfd8, #00ff88, #ffcc00, #ff007a)",
+          height: 6,
+          background: "linear-gradient(90deg, #ff007a, #7928ca, #0070f3, #00dfd8, #00ff88, #ffea00, #ff007a)",
           backgroundSize: "300% 100%",
-          animation: "footerRgbLine 5s linear infinite",
-          boxShadow: "0 0 16px rgba(0, 223, 216, 0.7), 0 0 30px rgba(121, 40, 202, 0.5)",
+          animation: "footerRgbLine 4s linear infinite",
+          boxShadow: "0 0 20px rgba(0, 223, 216, 0.9), 0 0 35px rgba(121, 40, 202, 0.7), 0 0 50px rgba(255, 0, 122, 0.4)",
           zIndex: 3
         }}
       />
@@ -207,10 +222,10 @@ function Footer() {
             top: 0,
             left: 0,
             right: 0,
-            height: 220,
-            background: "linear-gradient(180deg, rgba(0, 223, 216, 0.16) 0%, rgba(121, 40, 202, 0.13) 45%, rgba(255, 0, 122, 0.08) 80%, transparent 100%)",
-            filter: "blur(28px)",
-            animation: "footerRgbWaveDown 4.5s cubic-bezier(0.4, 0, 0.2, 1) infinite"
+            height: 260,
+            background: "linear-gradient(180deg, rgba(0, 223, 216, 0.28) 0%, rgba(121, 40, 202, 0.22) 40%, rgba(255, 0, 122, 0.15) 75%, transparent 100%)",
+            filter: "blur(20px)",
+            animation: "footerRgbWaveDown 3.8s cubic-bezier(0.4, 0, 0.2, 1) infinite"
           }}
         />
       </div>
