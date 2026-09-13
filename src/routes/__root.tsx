@@ -7,10 +7,11 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
+import { SiteLayout } from "@/components/SiteLayout";
+import { Toaster } from "@/components/ui/sonner";
+import { AuthProvider } from "@/hooks/useAuth";
 
 function NotFoundComponent() {
   return (
@@ -37,9 +38,6 @@ function NotFoundComponent() {
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
-  useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
-  }, [error]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -77,21 +75,24 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "Tymek informatyk" },
+      { name: "description", content: "React application that revives an existing HTML/CSS/JS site with identical visual style and adds user authentication and role-based access." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "Tymek informatyk" },
+      { property: "og:description", content: "React application that revives an existing HTML/CSS/JS site with identical visual style and adds user authentication and role-based access." },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Tymek informatyk" },
+      { name: "twitter:description", content: "React application that revives an existing HTML/CSS/JS site with identical visual style and adds user authentication and role-based access." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/84524627-d4db-46fd-b494-f9ade08b2d45/id-preview-a59c7ba2--1406b345-cc9f-4fb2-aca7-cd38ba422e8b.lovable.app-1779016107031.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/84524627-d4db-46fd-b494-f9ade08b2d45/id-preview-a59c7ba2--1406b345-cc9f-4fb2-aca7-cd38ba422e8b.lovable.app-1779016107031.png" },
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
   }),
   shellComponent: RootShell,
@@ -100,7 +101,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: ErrorComponent,
 });
 
-function RootShell({ children }: { children: ReactNode }) {
+function RootShell({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
@@ -119,8 +120,12 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <AuthProvider>
+        <SiteLayout>
+          <Outlet />
+        </SiteLayout>
+        <Toaster />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

@@ -10,33 +10,307 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as KawaRouteImport } from './routes/kawa'
+import { Route as KontaktRouteImport } from './routes/kontakt'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as MatrixRouteImport } from './routes/matrix'
+import { Route as OMnieRouteImport } from './routes/o-mnie'
+import { Route as OpinieRouteImport } from './routes/opinie'
+import { Route as PanelAdminRouteImport } from './routes/panel-admin'
+import { Route as PanelKlientaRouteImport } from './routes/panel-klienta'
+import { Route as PizzaRouteImport } from './routes/pizza'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as RetroRouteImport } from './routes/retro'
+import { Route as SekretRouteImport } from './routes/sekret'
+import { Route as UslugiRouteImport } from './routes/uslugi'
+import { Route as ZamowRouteImport } from './routes/zamow'
+import { Route as ZgloszenieRouteImport } from './routes/zgloszenie'
+import { Route as AdminChatRouteImport } from './routes/admin.chat'
+import { Route as AdminCzatyRouteImport } from './routes/admin.czaty'
+import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
+import { Route as ApiPublicOrderNotifyRouteImport } from './routes/api/public/order-notify'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KawaRoute = KawaRouteImport.update({
+  id: '/kawa',
+  path: '/kawa',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KontaktRoute = KontaktRouteImport.update({
+  id: '/kontakt',
+  path: '/kontakt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MatrixRoute = MatrixRouteImport.update({
+  id: '/matrix',
+  path: '/matrix',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OMnieRoute = OMnieRouteImport.update({
+  id: '/o-mnie',
+  path: '/o-mnie',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OpinieRoute = OpinieRouteImport.update({
+  id: '/opinie',
+  path: '/opinie',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PanelAdminRoute = PanelAdminRouteImport.update({
+  id: '/panel-admin',
+  path: '/panel-admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PanelKlientaRoute = PanelKlientaRouteImport.update({
+  id: '/panel-klienta',
+  path: '/panel-klienta',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PizzaRoute = PizzaRouteImport.update({
+  id: '/pizza',
+  path: '/pizza',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RetroRoute = RetroRouteImport.update({
+  id: '/retro',
+  path: '/retro',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SekretRoute = SekretRouteImport.update({
+  id: '/sekret',
+  path: '/sekret',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UslugiRoute = UslugiRouteImport.update({
+  id: '/uslugi',
+  path: '/uslugi',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ZamowRoute = ZamowRouteImport.update({
+  id: '/zamow',
+  path: '/zamow',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ZgloszenieRoute = ZgloszenieRouteImport.update({
+  id: '/zgloszenie',
+  path: '/zgloszenie',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminChatRoute = AdminChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCzatyRoute = AdminCzatyRouteImport.update({
+  id: '/czaty',
+  path: '/czaty',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminDashboardRoute = AdminDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AdminRoute,
+} as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicOrderNotifyRoute = ApiPublicOrderNotifyRouteImport.update({
+  id: '/api/public/order-notify',
+  path: '/api/public/order-notify',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/kawa': typeof KawaRoute
+  '/kontakt': typeof KontaktRoute
+  '/login': typeof LoginRoute
+  '/matrix': typeof MatrixRoute
+  '/o-mnie': typeof OMnieRoute
+  '/opinie': typeof OpinieRoute
+  '/panel-admin': typeof PanelAdminRoute
+  '/panel-klienta': typeof PanelKlientaRoute
+  '/pizza': typeof PizzaRoute
+  '/register': typeof RegisterRoute
+  '/retro': typeof RetroRoute
+  '/sekret': typeof SekretRoute
+  '/uslugi': typeof UslugiRoute
+  '/zamow': typeof ZamowRoute
+  '/zgloszenie': typeof ZgloszenieRoute
+  '/admin/chat': typeof AdminChatRoute
+  '/admin/czaty': typeof AdminCzatyRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/api/chat': typeof ApiChatRoute
+  '/api/public/order-notify': typeof ApiPublicOrderNotifyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/kawa': typeof KawaRoute
+  '/kontakt': typeof KontaktRoute
+  '/login': typeof LoginRoute
+  '/matrix': typeof MatrixRoute
+  '/o-mnie': typeof OMnieRoute
+  '/opinie': typeof OpinieRoute
+  '/panel-admin': typeof PanelAdminRoute
+  '/panel-klienta': typeof PanelKlientaRoute
+  '/pizza': typeof PizzaRoute
+  '/register': typeof RegisterRoute
+  '/retro': typeof RetroRoute
+  '/sekret': typeof SekretRoute
+  '/uslugi': typeof UslugiRoute
+  '/zamow': typeof ZamowRoute
+  '/zgloszenie': typeof ZgloszenieRoute
+  '/admin/chat': typeof AdminChatRoute
+  '/admin/czaty': typeof AdminCzatyRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/api/chat': typeof ApiChatRoute
+  '/api/public/order-notify': typeof ApiPublicOrderNotifyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/kawa': typeof KawaRoute
+  '/kontakt': typeof KontaktRoute
+  '/login': typeof LoginRoute
+  '/matrix': typeof MatrixRoute
+  '/o-mnie': typeof OMnieRoute
+  '/opinie': typeof OpinieRoute
+  '/panel-admin': typeof PanelAdminRoute
+  '/panel-klienta': typeof PanelKlientaRoute
+  '/pizza': typeof PizzaRoute
+  '/register': typeof RegisterRoute
+  '/retro': typeof RetroRoute
+  '/sekret': typeof SekretRoute
+  '/uslugi': typeof UslugiRoute
+  '/zamow': typeof ZamowRoute
+  '/zgloszenie': typeof ZgloszenieRoute
+  '/admin/chat': typeof AdminChatRoute
+  '/admin/czaty': typeof AdminCzatyRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/api/chat': typeof ApiChatRoute
+  '/api/public/order-notify': typeof ApiPublicOrderNotifyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/kawa'
+    | '/kontakt'
+    | '/login'
+    | '/matrix'
+    | '/o-mnie'
+    | '/opinie'
+    | '/panel-admin'
+    | '/panel-klienta'
+    | '/pizza'
+    | '/register'
+    | '/retro'
+    | '/sekret'
+    | '/uslugi'
+    | '/zamow'
+    | '/zgloszenie'
+    | '/admin/chat'
+    | '/admin/czaty'
+    | '/admin/dashboard'
+    | '/api/chat'
+    | '/api/public/order-notify'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/admin'
+    | '/kawa'
+    | '/kontakt'
+    | '/login'
+    | '/matrix'
+    | '/o-mnie'
+    | '/opinie'
+    | '/panel-admin'
+    | '/panel-klienta'
+    | '/pizza'
+    | '/register'
+    | '/retro'
+    | '/sekret'
+    | '/uslugi'
+    | '/zamow'
+    | '/zgloszenie'
+    | '/admin/chat'
+    | '/admin/czaty'
+    | '/admin/dashboard'
+    | '/api/chat'
+    | '/api/public/order-notify'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/kawa'
+    | '/kontakt'
+    | '/login'
+    | '/matrix'
+    | '/o-mnie'
+    | '/opinie'
+    | '/panel-admin'
+    | '/panel-klienta'
+    | '/pizza'
+    | '/register'
+    | '/retro'
+    | '/sekret'
+    | '/uslugi'
+    | '/zamow'
+    | '/zgloszenie'
+    | '/admin/chat'
+    | '/admin/czaty'
+    | '/admin/dashboard'
+    | '/api/chat'
+    | '/api/public/order-notify'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
+  KawaRoute: typeof KawaRoute
+  KontaktRoute: typeof KontaktRoute
+  LoginRoute: typeof LoginRoute
+  MatrixRoute: typeof MatrixRoute
+  OMnieRoute: typeof OMnieRoute
+  OpinieRoute: typeof OpinieRoute
+  PanelAdminRoute: typeof PanelAdminRoute
+  PanelKlientaRoute: typeof PanelKlientaRoute
+  PizzaRoute: typeof PizzaRoute
+  RegisterRoute: typeof RegisterRoute
+  RetroRoute: typeof RetroRoute
+  SekretRoute: typeof SekretRoute
+  UslugiRoute: typeof UslugiRoute
+  ZamowRoute: typeof ZamowRoute
+  ZgloszenieRoute: typeof ZgloszenieRoute
+  ApiChatRoute: typeof ApiChatRoute
+  ApiPublicOrderNotifyRoute: typeof ApiPublicOrderNotifyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +322,190 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kawa': {
+      id: '/kawa'
+      path: '/kawa'
+      fullPath: '/kawa'
+      preLoaderRoute: typeof KawaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kontakt': {
+      id: '/kontakt'
+      path: '/kontakt'
+      fullPath: '/kontakt'
+      preLoaderRoute: typeof KontaktRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/matrix': {
+      id: '/matrix'
+      path: '/matrix'
+      fullPath: '/matrix'
+      preLoaderRoute: typeof MatrixRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/o-mnie': {
+      id: '/o-mnie'
+      path: '/o-mnie'
+      fullPath: '/o-mnie'
+      preLoaderRoute: typeof OMnieRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/opinie': {
+      id: '/opinie'
+      path: '/opinie'
+      fullPath: '/opinie'
+      preLoaderRoute: typeof OpinieRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/panel-admin': {
+      id: '/panel-admin'
+      path: '/panel-admin'
+      fullPath: '/panel-admin'
+      preLoaderRoute: typeof PanelAdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/panel-klienta': {
+      id: '/panel-klienta'
+      path: '/panel-klienta'
+      fullPath: '/panel-klienta'
+      preLoaderRoute: typeof PanelKlientaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pizza': {
+      id: '/pizza'
+      path: '/pizza'
+      fullPath: '/pizza'
+      preLoaderRoute: typeof PizzaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/retro': {
+      id: '/retro'
+      path: '/retro'
+      fullPath: '/retro'
+      preLoaderRoute: typeof RetroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sekret': {
+      id: '/sekret'
+      path: '/sekret'
+      fullPath: '/sekret'
+      preLoaderRoute: typeof SekretRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/uslugi': {
+      id: '/uslugi'
+      path: '/uslugi'
+      fullPath: '/uslugi'
+      preLoaderRoute: typeof UslugiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/zamow': {
+      id: '/zamow'
+      path: '/zamow'
+      fullPath: '/zamow'
+      preLoaderRoute: typeof ZamowRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/zgloszenie': {
+      id: '/zgloszenie'
+      path: '/zgloszenie'
+      fullPath: '/zgloszenie'
+      preLoaderRoute: typeof ZgloszenieRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/chat': {
+      id: '/admin/chat'
+      path: '/chat'
+      fullPath: '/admin/chat'
+      preLoaderRoute: typeof AdminChatRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/czaty': {
+      id: '/admin/czaty'
+      path: '/czaty'
+      fullPath: '/admin/czaty'
+      preLoaderRoute: typeof AdminCzatyRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/dashboard': {
+      id: '/admin/dashboard'
+      path: '/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminDashboardRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/order-notify': {
+      id: '/api/public/order-notify'
+      path: '/api/public/order-notify'
+      fullPath: '/api/public/order-notify'
+      preLoaderRoute: typeof ApiPublicOrderNotifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface AdminRouteChildren {
+  AdminChatRoute: typeof AdminChatRoute
+  AdminCzatyRoute: typeof AdminCzatyRoute
+  AdminDashboardRoute: typeof AdminDashboardRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminChatRoute: AdminChatRoute,
+  AdminCzatyRoute: AdminCzatyRoute,
+  AdminDashboardRoute: AdminDashboardRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
+  KawaRoute: KawaRoute,
+  KontaktRoute: KontaktRoute,
+  LoginRoute: LoginRoute,
+  MatrixRoute: MatrixRoute,
+  OMnieRoute: OMnieRoute,
+  OpinieRoute: OpinieRoute,
+  PanelAdminRoute: PanelAdminRoute,
+  PanelKlientaRoute: PanelKlientaRoute,
+  PizzaRoute: PizzaRoute,
+  RegisterRoute: RegisterRoute,
+  RetroRoute: RetroRoute,
+  SekretRoute: SekretRoute,
+  UslugiRoute: UslugiRoute,
+  ZamowRoute: ZamowRoute,
+  ZgloszenieRoute: ZgloszenieRoute,
+  ApiChatRoute: ApiChatRoute,
+  ApiPublicOrderNotifyRoute: ApiPublicOrderNotifyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
