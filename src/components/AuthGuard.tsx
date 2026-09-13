@@ -18,7 +18,7 @@ export function AuthGuard({
   const waitingForRole = !!requireRole && !!resolvedUser && roleLoading;
   const missingUserAfterLoad = !loading && !resolvedUser;
   const missingRoleAfterLoad = !!requireRole && !!resolvedUser && !roleLoading && role === null;
-  const unauthorized = !!requireRole && !!resolvedUser && !roleLoading && role !== null && role !== requireRole;
+  const unauthorized = !!requireRole && !!resolvedUser && !roleLoading && role !== null && role !== "admin" && role !== requireRole;
 
   useEffect(() => {
     console.info("[auth-debug] guard state", {
