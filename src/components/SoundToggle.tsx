@@ -1,38 +1,35 @@
 import { useEffect, useRef, useState } from "react";
-import { isSoundEnabled, setSoundEnabled } from "@/lib/notify";
+import { setSoundEnabled } from "@/lib/notify";
 
-// Cicha, nastrojowa muzyka w tle (royalty-free chill/ambient)
+// Cicha, klimatyczna muzyka w tle (royalty-free lofi / synth chill)
 const BG_MUSIC_URL = "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3";
 
 export function SoundToggle() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [volume, setVolume] = useState(0.5); // Domyślnie automatycznie 50%
   const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(0.2); // Domyślnie cicho: 20%
-  const [showSlider, setShowSlider] = useState(false);
-  const [userInteracted, setUserInteracted] = useState(false);
 
-  // Inicjalizacja dźwięków
-  useEffect(() => {
-    const notifyEnabled = isSoundEnabled();
-    if (!notifyEnabled) {
-      setVolume(0);
-    }
-  }, []);
-
-  // Synchronizacja poziomu głośności z odtwarzaczem
+  // Ustawienie początkowej głośności 50%
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = volume;
     }
-    const enabled = volume > 0 && isPlaying;
-    setSoundEnabled(enabled);
-  }, [volume, isPlaying]);
+  }, []);
 
-  // Autoodtwarzanie po pierwszej interakcji użytkownika ze stroną (obsługa blokad przeglądarek)
+  // Aktualizacja audio i notify
   useEffect(() => {
-    const startAudio = () => {
-      if (!userInteracted && audioRef.current && !isPlaying) {
-        setUserInteracted(true);
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
+    setSoundEnabled(volume > 0);
+  }, [volume]);
+
+  // Autoodtwarzanie przy pierwszej interakcji ze stroną (kliknięcie / przewijanie / klawisz)
+  useEffect(() => {
+    const playMusic = () => {
+      if (audioRef.current && !isPlaying) {
         audioRef.current.volume = volume;
         audioRef.current
           .play()
@@ -41,39 +38,48 @@ export function SoundToggle() {
       }
     };
 
-    window.addEventListener("pointerdown", startAudio, { once: true });
-    window.addEventListener("keydown", startAudio, { once: true });
+    window.addEventListener("pointerdown", playMusic, { once: true });
+    window.addEventListener("keydown", playMusic, { once: true });
+    window.addEventListener("scroll", playMusic, { once: true });
 
     return () => {
-      window.removeEventListener("pointerdown", startAudio);
-      window.removeEventListener("keydown", startAudio);
+      window.removeEventListener("pointerdown", playMusic);
+      window.removeEventListener("keydown", playMusic);
+      window.removeEventListener("scroll", playMusic);
     };
-  }, [userInteracted, isPlaying, volume]);
+  }, [isPlaying, volume]);
 
-  const togglePlay = () => {
-    if (!audioRef.current) return;
-    setUserInteracted(true);
-    if (isPlaying) {
-      audioRef.current.pause();
-      setIsPlaying(false);
-      setSoundEnabled(false);
-    } else {
-      const targetVol = volume > 0 ? volume : 0.2;
-      setVolume(targetVol);
-      audioRef.current.volume = targetVol;
+  // Zamykanie menu suwaka po kliknięciu poza nim
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
+
+  const handleToggleClick = () => {
+    // Kliknięcie rozwija/zwija suwak głośności
+    setIsOpen((prev) => !prev);
+
+    // Jeśli muzyka nie grała jeszcze, uruchamiamy ją od razu na 50%
+    if (audioRef.current && !isPlaying && volume > 0) {
+      audioRef.current.volume = volume;
       audioRef.current
         .play()
-        .then(() => {
-          setIsPlaying(true);
-          setSoundEnabled(true);
-        })
+        .then(() => setIsPlaying(true))
         .catch(() => {});
     }
   };
 
   const handleVolumeChange = (newVol: number) => {
     setVolume(newVol);
-    setUserInteracted(true);
     if (!audioRef.current) return;
     audioRef.current.volume = newVol;
     if (newVol > 0) {
@@ -83,22 +89,16 @@ export function SoundToggle() {
           .then(() => setIsPlaying(true))
           .catch(() => {});
       }
-      setSoundEnabled(true);
     } else {
       audioRef.current.pause();
       setIsPlaying(false);
-      setSoundEnabled(false);
     }
   };
 
-  const currentPercent = isPlaying ? Math.round(volume * 100) : 0;
+  const percent = Math.round(volume * 100);
 
   return (
-    <div
-      style={{ position: "relative", display: "inline-flex", alignItems: "center" }}
-      onMouseEnter={() => setShowSlider(true)}
-      onMouseLeave={() => setShowSlider(false)}
-    >
+    <div ref={containerRef} style={{ position: "relative", display: "inline-flex", alignItems: "center" }}>
       <audio
         ref={audioRef}
         src={BG_MUSIC_URL}
@@ -106,41 +106,43 @@ export function SoundToggle() {
         preload="auto"
       />
 
+      {/* Przycisk Dźwięki - bez on/off, kliknięcie otwiera suwak */}
       <button
         type="button"
-        onClick={togglePlay}
+        onClick={handleToggleClick}
         className="btn btn-ghost"
         style={{
-          padding: "6px 10px",
-          fontSize: 11,
+          padding: "6px 12px",
+          fontSize: 12,
           display: "inline-flex",
           alignItems: "center",
-          gap: 5,
-          whiteSpace: "nowrap"
+          gap: 6,
+          whiteSpace: "nowrap",
+          background: isOpen ? "rgba(255, 255, 255, 0.08)" : undefined
         }}
-        title={isPlaying ? "Kliknij, aby wyciszyć" : "Kliknij, aby włączyć muzykę w tle"}
+        title="Regulacja głośności muzyki"
       >
-        <span>{isPlaying && volume > 0 ? "🔊" : "🔇"}</span>
-        <span>{isPlaying && volume > 0 ? `${currentPercent}%` : "Dźwięk"}</span>
+        <span>{volume > 0 ? "🔊" : "🔇"}</span>
+        <span>Dźwięki</span>
       </button>
 
-      {/* Pasek regulacji głośności od 0% do 100% */}
-      {showSlider && (
+      {/* Suwak pojawiający się tylko po kliknięciu */}
+      {isOpen && (
         <div
           style={{
             position: "absolute",
-            top: "calc(100% + 6px)",
+            top: "calc(100% + 8px)",
             left: 0,
-            background: "rgba(10, 15, 30, 0.95)",
-            backdropFilter: "blur(12px)",
-            border: "1px solid rgba(255, 255, 255, 0.12)",
-            borderRadius: 8,
-            padding: "8px 12px",
+            background: "rgba(10, 15, 30, 0.96)",
+            backdropFilter: "blur(14px)",
+            border: "1px solid rgba(255, 255, 255, 0.14)",
+            borderRadius: 10,
+            padding: "10px 14px",
             display: "flex",
             alignItems: "center",
-            gap: 8,
-            zIndex: 9999,
-            boxShadow: "0 8px 24px rgba(0,0,0,0.5)"
+            gap: 10,
+            zIndex: 99999,
+            boxShadow: "0 10px 30px rgba(0,0,0,0.6)"
           }}
         >
           <input
@@ -148,16 +150,16 @@ export function SoundToggle() {
             min="0"
             max="1"
             step="0.01"
-            value={isPlaying ? volume : 0}
+            value={volume}
             onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
             style={{
-              width: 90,
+              width: 100,
               accentColor: "#06b6d4",
               cursor: "pointer"
             }}
           />
-          <span style={{ fontSize: 11, minWidth: 32, textAlign: "right", color: "#94a3b8", fontWeight: 600 }}>
-            {currentPercent}%
+          <span style={{ fontSize: 12, minWidth: 36, textAlign: "right", color: "#38bdf8", fontWeight: 700 }}>
+            {percent}%
           </span>
         </div>
       )}
