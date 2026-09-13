@@ -347,7 +347,7 @@ function PanelKlienta() {
               <p className="text-dim">Jeśli sprzęt jest niezbędny do pracy, zaznacz to w opisie — postaram się skontaktować jeszcze dziś.</p>
               <div className="hero-ctas" style={{ marginTop: 16 }}>
                 <a href="tel:+48695560039" className="btn btn-primary">Zadzwoń</a>
-                <a href="mailto:kontakt24@tymek.it" className="btn btn-ghost">E-mail</a>
+                <a href="mailto:tymek2008@protonmail.com" className="btn btn-ghost">E-mail</a>
               </div>
             </div>
           </div>

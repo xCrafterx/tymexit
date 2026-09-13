@@ -41,10 +41,10 @@ function Kontakt() {
                     <div className="who-text"><strong>+48 695 560 039</strong><small>Telefon · pn–nd 8:00–22:00</small></div>
                   </div>
                 </a>
-                <a href="mailto:kontakt24@tymek.it" className="testi reveal" data-delay="1" style={{ textDecoration: "none" }}>
+                <a href="mailto:tymek2008@protonmail.com" className="testi reveal" data-delay="1" style={{ textDecoration: "none" }}>
                   <div className="who">
                     <div className="avatar">✉️</div>
-                    <div className="who-text"><strong>kontakt24@tymek.it</strong><small>E-mail · odpowiadam do 24 h</small></div>
+                    <div className="who-text"><strong>tymek2008@protonmail.com</strong><small>E-mail · odpowiadam do 24 h</small></div>
                   </div>
                 </a>
                 <div className="testi reveal" data-delay="2">
@@ -62,7 +62,7 @@ function Kontakt() {
               </div>
 
               <div className="hero-ctas" style={{ marginTop: 30 }}>
-                <Link to="/zamow" className="btn btn-primary">Zakup usługę →</Link>
+                <Link to="/zgloszenie" className="btn btn-primary">Zakup usługę →</Link>
                 <Link to="/uslugi" className="btn btn-ghost">Zobacz usługi</Link>
               </div>
             </div>

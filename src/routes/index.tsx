@@ -91,7 +91,7 @@ function Index() {
                 robie to z dokładną precyzją aby starannie naprawić problem, a moja jakość usługi jest bezkompromisowa, a klienci są zawsze zadowoleni z mojej pracy.
               </p>
               <div className="hero-ctas reveal" data-delay="3">
-                <Link to="/zamow" className="btn btn-primary">
+                <Link to="/zgloszenie" className="btn btn-primary">
                   Zakup Usługę
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
                 </Link>
@@ -223,7 +223,7 @@ function Index() {
               <span className="eyebrow"><span className="dot"></span> Cennik usługi</span>
               <h2 className="section-title" style={{ marginTop: 18 }}>Plan TymekIT,<br/><span className="grad">w cenie dla każdego.</span></h2>
             </div>
-            <Link to="/zamow" className="btn btn-ghost">Napisz o kupno usługi →</Link>
+            <Link to="/zgloszenie" className="btn btn-ghost">Napisz o kupno usługi →</Link>
           </div>
 
           <div className="pricing-grid" style={{ marginTop: 60 }}>
@@ -389,8 +389,8 @@ function Index() {
             <h2 style={{ marginTop: 18 }}>Gotowy na pomoc specjalistyczną?<br/><span className="text-grad">Jesteśmy gotowi na Ciebie</span><Link to="/kawa" aria-label="." title="" style={{ color: "inherit", textDecoration: "none", cursor: "default" }}>.</Link></h2>
             <p className="text-dim" style={{ maxWidth: 560, margin: "10px auto 28px" }}>Napisz o kupno usługi — a my się odezwiemy.</p>
             <div style={{ display: "inline-flex", gap: 10, flexWrap: "wrap", justifyContent: "center" }}>
-              <Link to="/zamow" className="btn btn-primary">Kup Usługę</Link>
-              <a href="mailto:kontakt24@tymek.it" className="btn btn-ghost">Skontaktuj się</a>
+              <Link to="/zgloszenie" className="btn btn-primary">Kup Usługę</Link>
+              <a href="mailto:tymek2008@protonmail.com" className="btn btn-ghost">Skontaktuj się</a>
             </div>
           </div>
         </div>

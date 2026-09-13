@@ -170,7 +170,7 @@ function Footer() {
             <ul>
               <li>Pomoc zdalna i lokalna<br/>po wcześniejszym ustaleniu</li>
               <li><a href="tel:+48695560039">+48 695 560 039</a></li>
-              <li><a href="mailto:kontakt24@tymek.it">kontakt24@tymek.it</a></li>
+              <li><a href="mailto:tymek2008@protonmail.com">tymek2008@protonmail.com</a></li>
               <li style={{ color: "var(--brand-3)" }}>● Pilna pomoc IT 24/7</li>
             </ul>
           </div>
