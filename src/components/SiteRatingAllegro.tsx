@@ -52,15 +52,15 @@ export function SiteRatingAllegro() {
             backdropFilter: "blur(12px)",
           }}
         >
-          <div style={{ textAlign: "center", marginBottom: "28px" }}>
+          <div style={{ textAlign: "center", marginBottom: "28px", display: "flex", flexDirection: "column", alignItems: "center" }}>
             <span className="eyebrow" style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
               <span className="dot"></span> Społeczność
             </span>
-            <h2 className="section-title" style={{ marginTop: "12px", fontSize: "28px" }}>
+            <h2 className="section-title" style={{ marginTop: "12px", marginBottom: 0, fontSize: "28px", textAlign: "center", marginLeft: "auto", marginRight: "auto" }}>
               Ocena mojej strony <span className="grad">i wyglądu</span>
             </h2>
-            <p className="text-dim" style={{ maxWidth: "560px", margin: "8px auto 0", fontSize: "14px" }}>
-              Oceny odwiedzających w skali od 1 do 10 (jak na Allegro).
+            <p className="text-dim" style={{ maxWidth: "560px", margin: "8px auto 0", fontSize: "14px", textAlign: "center" }}>
+              Oceny odwiedzających w skali od 1 do 10.
             </p>
           </div>
 
