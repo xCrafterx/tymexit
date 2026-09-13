@@ -66,10 +66,7 @@ function Nav({ onOpenMenu }: { onOpenMenu: () => void }) {
     <nav className={`nav${hidden ? " is-hidden" : ""}`} aria-label="Główna nawigacja">
       <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0, flexWrap: "nowrap" }}>
         <BrandMark />
-        {session && <SoundToggle />}
-        {session && role === "admin" && (
-          <Link to="/admin/dashboard" className="btn btn-ghost" style={{ padding: "6px 10px", fontSize: 11, whiteSpace: "nowrap" }}>📊 Dashboard</Link>
-        )}
+        <SoundToggle />
       </div>
       <ul className="nav-links" style={{ whiteSpace: "nowrap", flexWrap: "nowrap" }}>
         {NAV_LINKS.map(([h, l]) => (
