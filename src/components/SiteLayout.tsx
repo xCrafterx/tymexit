@@ -138,15 +138,19 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
 
 function Footer() {
   return (
-    <footer className="footer">
+    <footer className="footer" style={{ paddingTop: 80, paddingBottom: 50, borderTop: "1px solid rgba(255, 255, 255, 0.08)", background: "rgba(5, 7, 15, 0.95)" }}>
       <div className="container">
-        <div className="footer-grid">
+        <div className="footer-grid" style={{ gap: 40, marginBottom: 50 }}>
           <div>
             <BrandMark />
-            <p className="text-dim mt-6" style={{ maxWidth: 340, fontSize: 14 }}>
-              Tymek Informatyk pomaga przy komputerach, laptopach, systemach, czyszczeniu Windowsa, budowie PC i sieciach Wi-Fi.
+            <p className="text-dim mt-6" style={{ maxWidth: 360, fontSize: 14, lineHeight: 1.7 }}>
+              Tymek Informatyk — profesjonalny serwis komputerowy, naprawa laptopów, optymalizacja systemów, konfiguracja sieci Wi-Fi i autorskie oprogramowanie narzędziowe dla każdego.
             </p>
-            <div className="socials">
+            <div style={{ marginTop: 16, display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 14px", borderRadius: 999, background: "rgba(56, 189, 248, 0.08)", border: "1px solid rgba(56, 189, 248, 0.2)", fontSize: 12, color: "var(--brand, #38bdf8)" }}>
+              <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#10b981", display: "inline-block" }}></span>
+              Status serwisu: Przyjmuję zgłoszenia 24/7
+            </div>
+            <div className="socials" style={{ marginTop: 24 }}>
               <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7h-2v-3h2v-2.3c0-2 1.2-3.1 3-3.1.9 0 1.8.2 1.8.2v2h-1c-1 0-1.3.6-1.3 1.3V12h2.2l-.3 3h-1.9v7A10 10 0 0 0 22 12z"/></svg></a>
               <a href="#" aria-label="Twitter"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 5.9c-.7.3-1.5.6-2.3.7.8-.5 1.5-1.3 1.8-2.3-.8.5-1.7.8-2.6 1a4.1 4.1 0 0 0-7 3.7A11.7 11.7 0 0 1 3 4.9a4.1 4.1 0 0 0 1.3 5.5c-.7 0-1.3-.2-1.9-.5v.1c0 2 1.4 3.7 3.3 4-.6.2-1.3.2-1.9.1.5 1.7 2.1 2.9 4 2.9A8.3 8.3 0 0 1 2 18.6a11.7 11.7 0 0 0 6.3 1.8c7.6 0 11.8-6.3 11.8-11.8v-.5c.8-.6 1.5-1.3 2-2.2z"/></svg></a>
               <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></a>
@@ -155,35 +159,51 @@ function Footer() {
           <div>
             <h4>Odkrywaj</h4>
             <ul>
-              <li><Link to="/o-mnie">O mnie</Link></li>
-              <li><Link to="/uslugi">Usługi</Link></li>
-              <li><Link to="/opinie">Opinie</Link></li>
-              <li><Link to="/programy">Moje Programy</Link></li>
+              <li><Link to="/">Strona główna</Link></li>
+              <li><Link to="/o-mnie">O mnie & Doświadczenie</Link></li>
+              <li><Link to="/uslugi">Wszystkie usługi</Link></li>
+              <li><Link to="/programy" style={{ color: "var(--brand, #38bdf8)", fontWeight: 600 }}>Moje Programy & Pliki</Link></li>
+              <li><Link to="/opinie">Opinie klientów</Link></li>
             </ul>
           </div>
           <div>
-            <h4>Konto</h4>
+            <h4>Obsługa zgłoszeń</h4>
             <ul>
-              <li><Link to="/zgloszenie">Zgłoś problem</Link></li>
-              <li><Link to="/login">Logowanie</Link></li>
-              <li><Link to="/register">Rejestracja</Link></li>
-              <li><Link to="/panel-klienta">Panel klienta</Link></li>
-              <li><Link to="/admin">Admin</Link></li>
+              <li><Link to="/zgloszenie">Zgłoś problem online</Link></li>
+              <li><Link to="/login">Logowanie do panelu</Link></li>
+              <li><Link to="/register">Rejestracja konta</Link></li>
+              <li><Link to="/panel-klienta">Panel klienta (statusy)</Link></li>
+              <li><Link to="/admin">Panel administracyjny</Link></li>
             </ul>
           </div>
           <div>
-            <h4>Kontakt</h4>
+            <h4>Godziny & Pomoc</h4>
             <ul>
-              <li>Pomoc zdalna i lokalna<br/>po wcześniejszym ustaleniu</li>
-              <li><a href="tel:+48695560039">+48 695 560 039</a></li>
-              <li><a href="mailto:tymek2008@protonmail.com">tymek2008@protonmail.com</a></li>
-              <li style={{ color: "var(--brand-3)" }}>● Pilna pomoc IT 24/7</li>
+              <li><strong>Poniedziałek – Sobota:</strong> 8:00 – 22:00</li>
+              <li><strong>Niedziela & Święta:</strong> pomoc pilna / online</li>
+              <li>Obsługa stacjonarna oraz zdalna (AnyDesk / TeamViewer)</li>
+              <li style={{ marginTop: 10 }}>
+                <a href="tel:+48695560039" style={{ fontSize: 16, fontWeight: 700, color: "#fff" }}>+48 695 560 039</a>
+              </li>
+              <li>
+                <a href="mailto:tymek2008@protonmail.com" style={{ color: "var(--brand-2, #818cf8)" }}>tymek2008@protonmail.com</a>
+              </li>
             </ul>
           </div>
         </div>
-        <div className="footer-bottom">
-          <span>© {new Date().getFullYear()} TymekIT Tymek. Wszystkie prawa zastrzeżone.</span>
-          <span><a href="#">Prywatność</a> · <a href="#">Regulamin</a></span>
+
+        <div style={{ padding: "28px 0", borderTop: "1px solid rgba(255, 255, 255, 0.06)", display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 16, fontSize: 13, color: "rgba(255, 255, 255, 0.5)" }}>
+          <div>
+            Szybka diagnoza · Przejrzysty cennik · Bezpieczeństwo Twoich danych i sprzętu · Gwarancja na wykonane usługi
+          </div>
+          <div style={{ display: "flex", gap: 18 }}>
+            <span>Płatności: Blik / Przelew / Gotówka</span>
+          </div>
+        </div>
+
+        <div className="footer-bottom" style={{ paddingTop: 20, borderTop: "1px solid rgba(255, 255, 255, 0.05)" }}>
+          <span>© {new Date().getFullYear()} TymekIT — Tymek. Wszelkie prawa zastrzeżone.</span>
+          <span><a href="#">Polityka prywatności</a> · <a href="#">Regulamin serwisu</a> · <a href="/zgloszenie">Kontakt serwisowy</a></span>
         </div>
       </div>
     </footer>
