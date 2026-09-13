@@ -11,7 +11,7 @@ import { TicketProgressBar } from "@/components/TicketProgressBar";
 import { TicketAttachments } from "@/components/TicketAttachments";
 import { TicketChat } from "@/components/TicketChat";
 import { ReputationBadge } from "@/components/ReputationBadge";
-import { ALL_STATUSES, STATUS_META as STATUS_META_LIB, DELETABLE_STATUSES as DEL_LIB, type TicketStatus } from "@/lib/ticket-status";
+import { ALL_STATUSES, STATUS_META, DELETABLE_STATUSES, type TicketStatus } from "@/lib/ticket-status";
 import { notifyMessage } from "@/lib/notify";
 import { AdminLiveChats } from "@/routes/admin.czaty";
 import { AdminReviews } from "@/components/Reviews";
@@ -57,8 +57,6 @@ type Ticket = {
 };
 
 const STATUSES = ALL_STATUSES;
-const DELETABLE_STATUSES = DEL_LIB;
-const STATUS_META = STATUS_META_LIB;
 
 type ConfirmAction =
   | { kind: "soft"; ticket: Ticket }
@@ -116,31 +114,23 @@ export function PanelAdmin() {
   const trashed = useMemo(() => tickets.filter((t) => !!t.deleted_at), [tickets]);
 
   const stats = useMemo(() => ({
-    all: active.length,
     oczekuje: active.filter((t) => t.status === "oczekuje").length,
-    diagnoza: active.filter((t) => t.status === "diagnoza").length,
-    w_trakcie: active.filter((t) => t.status === "w_trakcie").length,
-    czesci: active.filter((t) => t.status === "czesci").length,
-    gotowe: active.filter((t) => t.status === "gotowe").length,
-    zamkniete: active.filter((t) => t.status === "zamkniete").length,
+    zaakceptowane: active.filter((t) => t.status === "zaakceptowane").length,
+    inRepair: active.filter((t) => ["w diagnozie", "w naprawie", "oczekuje na części"].includes(t.status)).length,
+    ready: active.filter((t) => t.status === "gotowe do odbioru").length,
+    zakończone: active.filter((t) => t.status === "zakończone").length,
   }), [active]);
 
-  const filtered = useMemo(() => {
-    if (filter === "all") return active;
-    return active.filter((t) => t.status === filter);
-  }, [active, filter]);
+  const filtered = filter === "all" ? active : active.filter((t) => t.status === filter);
 
-  const updateStatus = async (id: string, newStatus: string) => {
-    const { error } = await supabase
-      .from("tickets")
-      .update({ status: newStatus, updated_at: new Date().toISOString() })
-      .eq("id", id);
+  const updateStatus = async (id: string, status: string) => {
+    const { error } = await supabase.from("tickets").update({ status }).eq("id", id);
     if (error) {
-      toast.error("Błąd zmiany statusu: " + error.message);
+      toast.error(error.message);
       return;
     }
-    toast.success("Zmieniono status na: " + (STATUS_META[newStatus as TicketStatus]?.label ?? newStatus));
-    setTickets((prev) => prev.map((t) => (t.id === id ? { ...t, status: newStatus } : t)));
+    toast.success("Status zaktualizowany");
+    setTickets((prev) => prev.map((t) => (t.id === id ? { ...t, status } : t)));
   };
 
   const togglePriority = async (id: string, current: boolean | null | undefined) => {
@@ -160,96 +150,76 @@ export function PanelAdmin() {
   const saveNote = async (id: string) => {
     const note = editing[id]?.note ?? "";
     setEditing((p) => ({ ...p, [id]: { note, saving: true } }));
-    const { error } = await supabase
-      .from("tickets")
-      .update({ admin_note: note, updated_at: new Date().toISOString() })
-      .eq("id", id);
-    if (error) {
-      toast.error("Błąd zapisu notatki: " + error.message);
-      setEditing((p) => ({ ...p, [id]: { note, saving: false } }));
-      return;
+    const { error } = await supabase.from("tickets").update({ admin_note: note }).eq("id", id);
+    if (error) toast.error(error.message);
+    else {
+      toast.success("Notatka zapisana");
+      setTickets((prev) => prev.map((t) => (t.id === id ? { ...t, admin_note: note } : t)));
     }
-    toast.success("Notatka zapisana");
-    setTickets((prev) => prev.map((t) => (t.id === id ? { ...t, admin_note: note } : t)));
     setEditing((p) => {
-      const copy = { ...p };
-      delete copy[id];
-      return copy;
+      const next = { ...p };
+      delete next[id];
+      return next;
     });
   };
 
   const runConfirm = async () => {
     if (!confirm) return;
     setActing(true);
-    const { kind, ticket } = confirm;
-    try {
-      if (kind === "soft") {
-        const { error } = await supabase
-          .from("tickets")
-          .update({ deleted_at: new Date().toISOString() })
-          .eq("id", ticket.id);
-        if (error) throw error;
-        setTickets((p) => p.map((t) => (t.id === ticket.id ? { ...t, deleted_at: new Date().toISOString() } : t)));
-        toast.success(`Zlecenie #${ticket.id.slice(0, 8)} przeniesione do kosza`);
-      } else if (kind === "restore") {
-        const { error } = await supabase
-          .from("tickets")
-          .update({ deleted_at: null })
-          .eq("id", ticket.id);
-        if (error) throw error;
-        setTickets((p) => p.map((t) => (t.id === ticket.id ? { ...t, deleted_at: null } : t)));
-        toast.success(`Zlecenie #${ticket.id.slice(0, 8)} przywrócone`);
-      } else if (kind === "hard") {
-        await supabase.from("ticket_messages").delete().eq("ticket_id", ticket.id);
-        await supabase.from("ticket_attachments").delete().eq("ticket_id", ticket.id);
-        await supabase.from("ticket_history").delete().eq("ticket_id", ticket.id);
-        const { error } = await supabase.from("tickets").delete().eq("id", ticket.id);
-        if (error) throw error;
-        setTickets((p) => p.filter((t) => t.id !== ticket.id));
-        toast.success(`Zlecenie #${ticket.id.slice(0, 8)} bezpowrotnie usunięte`);
+    const { ticket, kind } = confirm;
+    if (kind === "soft") {
+      if (!(DELETABLE_STATUSES as readonly string[]).includes(ticket.status)) {
+        toast.error("Tylko zlecenia zakończone, odrzucone lub nieaktywne mogą trafić do kosza.");
+        setActing(false);
+        setConfirm(null);
+        return;
       }
-      setConfirm(null);
-    } catch (e: unknown) {
-      toast.error("Operacja nie powiodła się: " + (e instanceof Error ? e.message : String(e)));
-    } finally {
-      setActing(false);
+      const { error } = await supabase
+        .from("tickets")
+        .update({ deleted_at: new Date().toISOString() })
+        .eq("id", ticket.id);
+      if (error) toast.error(error.message);
+      else {
+        toast.success("Zlecenie przeniesiono do kosza");
+        setTickets((prev) => prev.map((t) => (t.id === ticket.id ? { ...t, deleted_at: new Date().toISOString() } : t)));
+      }
+    } else if (kind === "restore") {
+      const { error } = await supabase
+        .from("tickets")
+        .update({ deleted_at: null })
+        .eq("id", ticket.id);
+      if (error) toast.error(error.message);
+      else {
+        toast.success("Zlecenie zostało przywrócone");
+        setTickets((prev) => prev.map((t) => (t.id === ticket.id ? { ...t, deleted_at: null } : t)));
+      }
+    } else if (kind === "hard") {
+      const { error } = await supabase
+        .from("tickets")
+        .delete().eq("id", ticket.id);
+      if (error) toast.error(error.message);
+      else {
+        toast.success("Zlecenie zostało trwale usunięte");
+        setTickets((prev) => prev.filter((t) => t.id !== ticket.id));
+      }
     }
+    setActing(false);
+    setConfirm(null);
   };
 
-  const confirmCopy = useMemo(() => {
-    if (!confirm) return { title: "", desc: "", action: "" };
-    const idShort = `#${confirm.ticket.id.slice(0, 8)}`;
-    switch (confirm.kind) {
-      case "soft":
-        return {
-          title: `Przenieść zlecenie ${idShort} do kosza?`,
-          desc: "Zlecenie nie będzie widoczne na liście aktywnych, ale możesz je w każdej chwili przywrócić z Kosza.",
-          action: "Przenieś do kosza",
-        };
-      case "restore":
-        return {
-          title: `Przywrócić zlecenie ${idShort}?`,
-          desc: "Zlecenie wróci na listę aktywnych z zachowaniem dotychczasowego statusu.",
-          action: "Przywróć",
-        };
-      case "hard":
-        return {
-          title: `Bezpowrotnie usunąć zlecenie ${idShort}?`,
-          desc: "Ta operacja jest nieodwracalna. Zostaną usunięte załączniki, historia zmian i wiadomości z czatu.",
-          action: "Usuń na zawsze",
-        };
-    }
-  }, [confirm]);
+  const confirmCopy = (() => {
+    if (!confirm) return { title: "", desc: "", action: "Potwierdź" };
+    if (confirm.kind === "soft") return { title: "Czy na pewno chcesz usunąć to zlecenie?", desc: "Zlecenie zostanie przeniesione do kosza. Możesz je później przywrócić.", action: "Przenieś do kosza" };
+    if (confirm.kind === "restore") return { title: "Przywrócić zlecenie?", desc: "Zlecenie wróci na główną listę i znów będzie widoczne dla klienta.", action: "Przywróć" };
+    return { title: "Usunąć zlecenie trwale?", desc: "Tej operacji nie można cofnąć. Usunięta zostanie też pełna historia statusów.", action: "Usuń trwale" };
+  })();
 
   return (
     <>
-      <section className="hero-sm">
+      <section className="page-hero">
         <div className="container">
-          <div className="reveal visible" style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 12 }}>
-            <span className="badge badge-accent">Panel administratora</span>
-            <span className="badge badge-cyan">TymekIT Service Hub</span>
-          </div>
-          <h1 className="reveal visible" data-delay="1">Zarządzanie <span className="grad">serwisem.</span></h1>
+          <div className="breadcrumb reveal visible"><Link to="/">Start</Link> <span>/</span> Panel admina</div>
+          <h1 className="reveal visible" data-delay="1">Panel <span className="grad">administratora.</span></h1>
           <p className="reveal visible" data-delay="2">Pełny widok zgłoszeń klientów, zmiana statusu, notatki serwisowe i statystyki warsztatu TymekIT.</p>
         </div>
       </section>
@@ -297,7 +267,8 @@ export function PanelAdmin() {
               {tickets
                 .filter((t) => t.source === "formularz")
                 .map((t) => {
-                  const metaMatch = t.description.match(/--- METADATA ---\s*IP:\s*(.*?)\s*Przeglądarka:\s*(.*?)\s*Data:\s*(.*)/s);
+                  const desc = t.description || "";
+                  const metaMatch = desc.match(/--- METADATA ---\s*IP:\s*(.*?)\s*Przeglądarka:\s*(.*?)\s*Data:\s*(.*)/s);
                   const ip = metaMatch ? metaMatch[1] : "Brak danych (stary wpis)";
                   const browser = metaMatch ? metaMatch[2] : "Brak danych";
                   const sentTime = metaMatch ? metaMatch[3] : new Date(t.created_at).toLocaleString("pl-PL");
@@ -362,90 +333,70 @@ export function PanelAdmin() {
                 </div>
               ) : (
                 <div className="testi-grid" style={{ marginTop: 30 }}>
-                  {trashed.map((t) => (
-                    <article key={t.id} className="testi-card" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                        <span className="badge badge-accent">#{t.id.slice(0, 8)}</span>
-                        <span className="badge badge-ghost">Usunięto {t.deleted_at ? new Date(t.deleted_at).toLocaleDateString("pl-PL") : ""}</span>
+                  {trashed.map((t, i) => {
+                    const meta = STATUS_META[t.status as TicketStatus] ?? { color: "var(--text-mute)", label: t.status, icon: "•" };
+                    return (
+                      <div key={t.id} className="testi reveal visible" data-delay={(i % 3) + 1} style={{ opacity: 0.85 }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                          <span style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "4px 12px", borderRadius: 999, background: "var(--surface-2)", border: "1px solid var(--border)", fontSize: 12, color: meta.color, textTransform: "uppercase", letterSpacing: ".12em" }}>
+                            <span style={{ width: 6, height: 6, borderRadius: "50%", background: meta.color }}></span>{meta.label}
+                          </span>
+                          <small className="text-mute">
+                            Usunięte {t.deleted_at ? new Date(t.deleted_at).toLocaleDateString("pl-PL") : ""}
+                          </small>
+                        </div>
+                        <h3 style={{ marginTop: 14, fontSize: "1.05rem", color: "var(--text)" }}>{t.title}</h3>
+                        <p style={{ marginTop: 6, color: "var(--text-dim)" }}>{t.description}</p>
+                        <div style={{ display: "flex", gap: 8, marginTop: 16, flexWrap: "wrap" }}>
+                          <button type="button" onClick={() => setConfirm({ kind: "restore", ticket: t })} className="btn btn-primary" style={{ padding: "8px 14px", fontSize: 12 }}>Przywróć</button>
+                          <button type="button" onClick={() => setConfirm({ kind: "hard", ticket: t })} className="btn btn-ghost" style={{ padding: "8px 14px", fontSize: 12, color: "#ff6b6b", borderColor: "#ff6b6b55" }}>Usuń trwale</button>
+                        </div>
+                        <div className="who" style={{ marginTop: 16 }}>
+                          <div className="avatar">{t.service_type[0]}</div>
+                          <div className="who-text"><strong>{t.service_type}</strong><small>Klient #{t.user_id.slice(0, 8)} · #{t.id.slice(0, 8)}</small></div>
+                        </div>
                       </div>
-                      <h3 style={{ fontSize: 16, fontWeight: 700 }}>{t.title}</h3>
-                      <p className="text-dim" style={{ fontSize: 13, flex: 1 }}>{t.description}</p>
-                      <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-                        <button
-                          type="button"
-                          className="btn btn-sm btn-outline"
-                          onClick={() => setConfirm({ kind: "restore", ticket: t })}
-                        >
-                          Przywróć
-                        </button>
-                        <button
-                          type="button"
-                          className="btn btn-sm btn-ghost"
-                          style={{ color: "var(--red, #f87171)" }}
-                          onClick={() => setConfirm({ kind: "hard", ticket: t })}
-                        >
-                          Usuń trwale
-                        </button>
-                      </div>
-                    </article>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </>
-          ) : (
-            <>
-          {/* STATYSTYKI */}
-          <div className="stats-row reveal visible" style={{ marginBottom: 30 }}>
-            <div className="stat-card" onClick={() => setFilter("all")} style={{ cursor: "pointer" }}>
-              <span className="stat-num">{stats.all}</span>
-              <span className="stat-label">Wszystkie aktywne</span>
-            </div>
-            <div className="stat-card" onClick={() => setFilter("oczekuje")} style={{ cursor: "pointer" }}>
-              <span className="stat-num" style={{ color: STATUS_META.oczekuje.color }}>{stats.oczekuje}</span>
-              <span className="stat-label">Oczekuje</span>
-            </div>
-            <div className="stat-card" onClick={() => setFilter("diagnoza")} style={{ cursor: "pointer" }}>
-              <span className="stat-num" style={{ color: STATUS_META.diagnoza.color }}>{stats.diagnoza}</span>
-              <span className="stat-label">Diagnoza</span>
-            </div>
-            <div className="stat-card" onClick={() => setFilter("w_trakcie")} style={{ cursor: "pointer" }}>
-              <span className="stat-num" style={{ color: STATUS_META.w_trakcie.color }}>{stats.w_trakcie}</span>
-              <span className="stat-label">W trakcie</span>
-            </div>
-            <div className="stat-card" onClick={() => setFilter("czesci")} style={{ cursor: "pointer" }}>
-              <span className="stat-num" style={{ color: STATUS_META.czesci.color }}>{stats.czesci}</span>
-              <span className="stat-label">Części</span>
-            </div>
-            <div className="stat-card" onClick={() => setFilter("gotowe")} style={{ cursor: "pointer" }}>
-              <span className="stat-num" style={{ color: STATUS_META.gotowe.color }}>{stats.gotowe}</span>
-              <span className="stat-label">Gotowe</span>
-            </div>
-            <div className="stat-card" onClick={() => setFilter("zamkniete")} style={{ cursor: "pointer" }}>
-              <span className="stat-num" style={{ color: STATUS_META.zamkniete.color }}>{stats.zamkniete}</span>
-              <span className="stat-label">Zamknięte</span>
-            </div>
+          ) : (<>
+          <div className="hero-stats reveal visible" style={{ marginTop: 0 }}>
+            <div className="hero-stat"><div className="num">{stats.oczekuje}</div><div className="label">Oczekuje</div></div>
+            <div className="hero-stat"><div className="num">{stats.zaakceptowane}</div><div className="label">Zaakceptowane</div></div>
+            <div className="hero-stat"><div className="num">{stats.inRepair}</div><div className="label">W naprawie</div></div>
+            <div className="hero-stat"><div className="num">{stats.ready}</div><div className="label">Do odbioru</div></div>
+            <div className="hero-stat"><div className="num">{stats.zakończone}</div><div className="label">Zakończone</div></div>
           </div>
 
-          {/* FILTRY */}
-          <div className="reveal visible" style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 24 }}>
+          <div className="reveal visible" style={{ display: "flex", gap: 8, flexWrap: "wrap", margin: "24px 0" }}>
             <button
-              className={`btn btn-sm ${filter === "all" ? "btn-primary" : "btn-outline"}`}
+              type="button"
+              className={`btn ${filter === "all" ? "btn-primary" : "btn-ghost"}`}
+              style={{ padding: "8px 16px", fontSize: 13 }}
               onClick={() => setFilter("all")}
             >
-              Wszystkie ({stats.all})
+              Wszystkie ({active.length})
             </button>
-            {STATUSES.map((s) => (
-              <button
-                key={s}
-                className={`btn btn-sm ${filter === s ? "btn-primary" : "btn-outline"}`}
-                onClick={() => setFilter(s)}
-              >
-                {STATUS_META[s].label} ({stats[s as keyof typeof stats] ?? 0})
-              </button>
-            ))}
+            {STATUSES.map((st) => {
+              const count = active.filter((t) => t.status === st).length;
+              const meta = STATUS_META[st];
+              return (
+                <button
+                  key={st}
+                  type="button"
+                  className={`btn ${filter === st ? "btn-primary" : "btn-ghost"}`}
+                  style={{ padding: "8px 16px", fontSize: 13 }}
+                  onClick={() => setFilter(st)}
+                >
+                  <span style={{ marginRight: 6 }}>{meta?.icon}</span>
+                  {meta?.label ?? st} ({count})
+                </button>
+              );
+            })}
           </div>
 
-          {/* LISTA ZLECEŃ */}
           {loading ? (
             <p className="text-dim">Ładowanie zleceń…</p>
           ) : filtered.length === 0 ? (
@@ -453,65 +404,66 @@ export function PanelAdmin() {
               <p className="text-dim">Brak zleceń w tej kategorii.</p>
             </div>
           ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
               {filtered.map((t) => {
-                const meta = STATUS_META[t.status as TicketStatus] ?? { label: t.status, color: "#fff", bg: "rgba(255,255,255,0.1)" };
-                const noteState = editing[t.id];
-                const currentNote = noteState !== undefined ? noteState.note : (t.admin_note ?? "");
-                const isDeletable = DELETABLE_STATUSES.includes(t.status as TicketStatus);
+                const meta = STATUS_META[t.status as TicketStatus] ?? { color: "var(--brand-2)", label: t.status, icon: "•" };
+                const currentNote = editing[t.id]?.note ?? t.admin_note ?? "";
+                const isDeletable = (DELETABLE_STATUSES as readonly string[]).includes(t.status);
                 const chatOpen = !!openChats[t.id];
 
                 return (
-                  <article key={t.id} className="glass reveal visible" style={{ padding: 24 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, flexWrap: "wrap", marginBottom: 16 }}>
-                      <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-                        <span className="badge badge-accent">#{t.id.slice(0, 8)}</span>
-                        <span className="badge badge-cyan">{t.service_type}</span>
-                        {t.is_priority && (
-                          <span className="badge" style={{ background: "rgba(239, 68, 68, 0.2)", color: "#f87171", border: "1px solid rgba(239, 68, 68, 0.4)" }}>
-                            🔥 Priorytet
-                          </span>
-                        )}
-                        {t.source && <span className="badge badge-ghost">źródło: {t.source}</span>}
-                        <ReputationBadge userId={t.user_id} />
-                        <span style={{ fontSize: 13, color: "var(--dim)" }}>
-                          Utworzono: {new Date(t.created_at).toLocaleString("pl-PL")}
-                        </span>
+                  <article key={t.id} className="glass reveal visible" style={{ padding: 28, borderRadius: "var(--rad)" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, flexWrap: "wrap" }}>
+                      <div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 8 }}>
+                          <span className="badge badge-accent">#{t.id.slice(0, 8)}</span>
+                          <span className="badge badge-cyan">{t.service_type}</span>
+                          {t.is_priority && (
+                            <span className="badge" style={{ background: "rgba(239, 68, 68, 0.2)", color: "#f87171", border: "1px solid rgba(239, 68, 68, 0.4)" }}>
+                              🔥 Priorytet
+                            </span>
+                          )}
+                          {t.source && <span className="badge badge-ghost">źródło: {t.source}</span>}
+                          <ReputationBadge userId={t.user_id} />
+                          <small className="text-mute">
+                            {new Date(t.created_at).toLocaleString("pl-PL")}
+                          </small>
+                        </div>
+                        <h2 style={{ fontSize: "1.3rem", margin: "4px 0 10px", color: "var(--text)" }}>{t.title}</h2>
                       </div>
 
-                      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                      <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
                         <button
                           type="button"
-                          className={`btn btn-sm ${t.is_priority ? "btn-accent" : "btn-outline"}`}
+                          className="btn btn-sm btn-ghost"
                           onClick={() => togglePriority(t.id, t.is_priority)}
                           title="Przełącz status priorytetu"
                         >
-                          {t.is_priority ? "★ Priorytet" : "☆ Priorytet"}
+                          {t.is_priority ? "★ Priorytet" : "☆ Oznacz jako priorytet"}
                         </button>
                         <select
-                          className="status-select"
+                          className="form-control"
                           value={t.status}
                           onChange={(e) => updateStatus(t.id, e.target.value)}
                           style={{
-                            background: meta.bg,
+                            minWidth: 180,
+                            padding: "8px 12px",
+                            fontSize: 13,
+                            borderColor: meta.color,
                             color: meta.color,
-                            border: `1px solid ${meta.color}40`,
-                            borderRadius: 8,
-                            padding: "6px 12px",
                             fontWeight: 600,
-                            cursor: "pointer",
                           }}
                         >
-                          {STATUSES.map((s) => (
-                            <option key={s} value={s} style={{ background: "#0a0a0f", color: "#fff" }}>
-                              {STATUS_META[s].label}
+                          {STATUSES.map((st) => (
+                            <option key={st} value={st} style={{ color: "#fff", background: "#0a0a0f" }}>
+                              {STATUS_META[st]?.label ?? st}
                             </option>
                           ))}
                         </select>
                         <button
                           type="button"
                           className="btn btn-sm btn-ghost"
-                          title={isDeletable ? "Przenieś do kosza" : "Tylko zlecenia gotowe lub zamknięte można przenieść do kosza"}
+                          title={isDeletable ? "Przenieś do kosza" : "Tylko zlecenia zakończone, odrzucone lub nieaktywne można przenieść do kosza"}
                           disabled={!isDeletable}
                           onClick={() => setConfirm({ kind: "soft", ticket: t })}
                           style={{ opacity: isDeletable ? 1 : 0.4 }}
@@ -521,31 +473,40 @@ export function PanelAdmin() {
                       </div>
                     </div>
 
-                    <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>{t.title}</h3>
-                    <p style={{ color: "var(--text-sec)", lineHeight: 1.6, marginBottom: 16 }}>{t.description}</p>
-
-                    <div style={{ marginBottom: 16 }}>
-                      <TicketProgressBar status={t.status} />
+                    <div style={{ marginTop: 12 }}>
+                      <TicketProgressBar status={t.status as TicketStatus} />
                     </div>
 
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16, marginBottom: 16, fontSize: 13, color: "var(--dim)" }}>
-                      <div>
-                        <strong style={{ color: "var(--text)" }}>Klient:</strong> {t.client_name || "—"}<br />
-                        <strong style={{ color: "var(--text)" }}>Email:</strong> {t.client_email || "—"}<br />
-                        <strong style={{ color: "var(--text)" }}>Telefon:</strong> {t.client_phone || "—"}
-                      </div>
-                      <div>
-                        <strong style={{ color: "var(--text)" }}>Preferowany termin:</strong> {t.preferred_date || "—"}<br />
-                        <strong style={{ color: "var(--text)" }}>Przedział:</strong> {t.preferred_slot || "—"}<br />
-                        <strong style={{ color: "var(--text)" }}>ID klienta:</strong> <code style={{ fontSize: 11 }}>{t.user_id.slice(0, 12)}…</code>
-                      </div>
+                    <div style={{ margin: "16px 0", padding: "14px 18px", borderRadius: "calc(var(--rad) - 4px)", background: "rgba(0,0,0,0.3)" }}>
+                      <p style={{ color: "var(--text-sec)", whiteSpace: "pre-wrap", lineHeight: 1.6 }}>{t.description}</p>
                     </div>
 
-                    <div style={{ marginBottom: 16 }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12, margin: "14px 0", fontSize: 13 }}>
+                      <div>
+                        <span className="text-dim">Klient:</span>{" "}
+                        <strong style={{ color: "var(--text)" }}>{t.client_name || "Brak danych"}</strong>
+                      </div>
+                      <div>
+                        <span className="text-dim">Telefon:</span>{" "}
+                        <a href={`tel:${t.client_phone}`} style={{ color: "var(--brand-2)" }}>{t.client_phone || "Brak"}</a>
+                      </div>
+                      <div>
+                        <span className="text-dim">E-mail:</span>{" "}
+                        <a href={`mailto:${t.client_email}`} style={{ color: "var(--brand-2)" }}>{t.client_email || "Brak"}</a>
+                      </div>
+                      {t.preferred_date && (
+                        <div>
+                          <span className="text-dim">Preferowany termin:</span>{" "}
+                          <strong style={{ color: "var(--text)" }}>{t.preferred_date} ({t.preferred_slot || "dowolna pora"})</strong>
+                        </div>
+                      )}
+                    </div>
+
+                    <div style={{ margin: "16px 0" }}>
                       <TicketAttachments ticketId={t.id} />
                     </div>
 
-                    <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+                    <div style={{ marginTop: 16 }}>
                       <button
                         type="button"
                         className="btn btn-sm btn-outline"
@@ -556,30 +517,32 @@ export function PanelAdmin() {
                     </div>
 
                     {chatOpen && (
-                      <div style={{ marginBottom: 16, padding: 12, borderRadius: 8, background: "rgba(0,0,0,0.3)" }}>
+                      <div style={{ marginTop: 16, padding: 16, borderRadius: "calc(var(--rad) - 4px)", background: "rgba(0,0,0,0.35)", border: "1px solid var(--border)" }}>
                         <TicketChat ticketId={t.id} />
                       </div>
                     )}
 
-                    <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 16 }}>
-                      <label style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 0.5, color: "var(--dim)", display: "block", marginBottom: 6 }}>
+                    <div style={{ marginTop: 18, paddingTop: 14, borderTop: "1px solid var(--border)" }}>
+                      <label style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: ".1em", color: "var(--text-dim)", display: "block", marginBottom: 6 }}>
                         Notatka serwisowa (widoczna dla klienta w statusie)
                       </label>
-                      <div style={{ display: "flex", gap: 8 }}>
+                      <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
                         <input
                           type="text"
                           className="form-control"
                           placeholder="np. Czekamy na dostawę ekranu z hurtowni, planowany odbiór: piątek"
                           value={currentNote}
                           onChange={(e) => setEditing((p) => ({ ...p, [t.id]: { note: e.target.value, saving: false } }))}
+                          style={{ flex: 1, minWidth: 260 }}
                         />
                         <button
                           type="button"
-                          className="btn btn-sm btn-primary"
-                          disabled={noteState?.saving}
+                          className="btn btn-primary"
+                          disabled={editing[t.id]?.saving}
                           onClick={() => saveNote(t.id)}
+                          style={{ padding: "8px 18px", fontSize: 13 }}
                         >
-                          {noteState?.saving ? "Zapisuję…" : "Zapisz"}
+                          {editing[t.id]?.saving ? "Zapisywanie…" : "Zapisz notatkę"}
                         </button>
                       </div>
                     </div>
