@@ -78,12 +78,12 @@ function Nav({ onOpenMenu }: { onOpenMenu: () => void }) {
           <span
             style={{
               display: "inline-block",
-              width: "3.5px",
-              height: "25px",
-              borderRadius: "3px",
+              width: "6px",
+              height: "32px",
+              borderRadius: "4px",
               background: "linear-gradient(180deg, #ff007a, #7928ca, #0070f3, #00dfd8, #00ff88, #ffea00, #ff007a)",
               backgroundSize: "100% 300%",
-              animation: "navRgbWaveDown 2.2s linear infinite",
+              animation: "navRgbWaveDown 1.1s linear infinite",
               boxShadow: "0 0 10px rgba(0, 223, 216, 0.8), 0 0 18px rgba(121, 40, 202, 0.6)"
             }}
           />
@@ -181,7 +181,7 @@ function Footer() {
             opacity: 0.8;
           }
           100% {
-            transform: translateY(650px);
+            transform: translateY(750px);
             opacity: 0;
           }
         }
@@ -194,10 +194,10 @@ function Footer() {
           top: 0,
           left: 0,
           right: 0,
-          height: 6,
+          height: 10,
           background: "linear-gradient(90deg, #ff007a, #7928ca, #0070f3, #00dfd8, #00ff88, #ffea00, #ff007a)",
           backgroundSize: "300% 100%",
-          animation: "footerRgbLine 4s linear infinite",
+          animation: "footerRgbLine 2s linear infinite",
           boxShadow: "0 0 20px rgba(0, 223, 216, 0.9), 0 0 35px rgba(121, 40, 202, 0.7), 0 0 50px rgba(255, 0, 122, 0.4)",
           zIndex: 3
         }}
@@ -222,10 +222,10 @@ function Footer() {
             top: 0,
             left: 0,
             right: 0,
-            height: 260,
-            background: "linear-gradient(180deg, rgba(0, 223, 216, 0.28) 0%, rgba(121, 40, 202, 0.22) 40%, rgba(255, 0, 122, 0.15) 75%, transparent 100%)",
+            height: 380,
+            background: "linear-gradient(180deg, rgba(0, 223, 216, 0.32) 0%, rgba(121, 40, 202, 0.26) 40%, rgba(255, 0, 122, 0.18) 75%, transparent 100%)",
             filter: "blur(20px)",
-            animation: "footerRgbWaveDown 3.8s cubic-bezier(0.4, 0, 0.2, 1) infinite"
+            animation: "footerRgbWaveDown 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite"
           }}
         />
       </div>
