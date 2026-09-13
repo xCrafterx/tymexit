@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -44,16 +45,23 @@ const schema = z.object({
   client_name: z.string().trim().min(2, "Podaj imię i nazwisko").max(120),
   client_phone: z.string().trim().min(7, "Podaj numer telefonu").max(40),
   client_email: z.string().trim().email("Niepoprawny e-mail").max(255),
-  password: z.string().min(8, "Hasło min. 8 znaków").max(72),
+  password: z.string().max(72).optional().or(z.literal("")),
   title: z.string().trim().min(3, "Podaj tytuł problemu").max(200),
   service_type: z.string().refine((v) => SERVICES.includes(v), "Wybierz typ usługi"),
   description: z.string().trim().min(10, "Opisz problem (min. 10 znaków)").max(4000),
 });
 
 function ZgloszeniePage() {
+  const { session, user } = useAuth();
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
+  useEffect(() => {
+    if (user?.email) {
+      setForm((f) => ({ ...f, client_email: f.client_email || user.email || "" }));
+    }
+  }, [user]);
+
   const [form, setForm] = useState({
     client_name: "",
     client_phone: "",
@@ -100,35 +108,43 @@ function ZgloszeniePage() {
     const d = parsed.data;
     setSubmitting(true);
 
-    // 1. Konto klienta (lub logowanie istniejącego konta)
-    let userId: string | null = null;
-    const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
-      email: d.client_email,
-      password: d.password,
-      options: { emailRedirectTo: `${window.location.origin}/panel-klienta` },
-    });
+    // 1. Konto klienta (lub istniejąca sesja zalogowanego użytkownika/admina)
+    let userId: string | null = session?.user?.id ?? null;
 
-    if (signUpErr) {
-      const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({
-        email: d.client_email,
-        password: d.password,
-      });
-      if (signInErr) {
-        toast.error(
-          "Konto z tym e-mailem już istnieje. Podaj swoje hasło do konta lub zaloguj się.",
-        );
+    if (!userId) {
+      if (!d.password || d.password.length < 8) {
+        toast.error("Podaj hasło do swojego konta (min. 8 znaków)");
         setSubmitting(false);
         return;
       }
-      userId = signInData.user.id;
-    } else {
-      userId = signUpData.user?.id ?? null;
-      if (!signUpData.session) {
-        const { data: signInData } = await supabase.auth.signInWithPassword({
+      const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
+        email: d.client_email,
+        password: d.password,
+        options: { emailRedirectTo: `${window.location.origin}/panel-klienta` },
+      });
+
+      if (signUpErr) {
+        const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({
           email: d.client_email,
           password: d.password,
         });
-        userId = signInData?.user?.id ?? userId;
+        if (signInErr) {
+          toast.error(
+            "Konto z tym e-mailem już istnieje. Podaj swoje hasło do konta lub zaloguj się.",
+          );
+          setSubmitting(false);
+          return;
+        }
+        userId = signInData.user.id;
+      } else {
+        userId = signUpData.user?.id ?? null;
+        if (!signUpData.session) {
+          const { data: signInData } = await supabase.auth.signInWithPassword({
+            email: d.client_email,
+            password: d.password,
+          });
+          userId = signInData?.user?.id ?? userId;
+        }
       }
     }
 
@@ -198,9 +214,15 @@ function ZgloszeniePage() {
       }
     }
 
-    await supabase.auth.signOut();
-    setSubmitting(false);
-    navigate({ to: "/login", search: { zgloszenie: "1" } });
+    if (session) {
+      toast.success("Zgłoszenie zostało pomyślnie utworzone!");
+      setSubmitting(false);
+      navigate({ to: "/panel-admin" });
+    } else {
+      await supabase.auth.signOut();
+      setSubmitting(false);
+      navigate({ to: "/login", search: { zgloszenie: "1" } });
+    }
   };
 
   return (
