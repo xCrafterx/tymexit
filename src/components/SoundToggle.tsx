@@ -1,36 +1,81 @@
 import { useEffect, useRef, useState } from "react";
 import { setSoundEnabled } from "@/lib/notify";
 
-// Cicha, klimatyczna muzyka w tle (royalty-free lofi / synth chill)
-const BG_MUSIC_URL = "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3";
+// Ciągły, 24/7 spokojny i rytmiczny strumień lo-fi / chillhop beats bez przerw i bez resetowania się
+const BG_MUSIC_STREAM_URL = "https://streams.ilovemusic.de/iloveradio17.mp3";
+
+const STORAGE_KEY = "tymekit_audio_volume";
+const DEFAULT_VOLUME = 0.10; // 10%
 
 export function SoundToggle() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [volume, setVolume] = useState(0.1); // Domyślnie automatycznie 10%
+
+  // Odczyt zapamiętanej głośności lub domyślnie 10%
+  const [volume, setVolume] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved !== null) {
+        const parsed = parseFloat(saved);
+        if (!isNaN(parsed) && parsed >= 0 && parsed <= 1) return parsed;
+      }
+    } catch {}
+    return DEFAULT_VOLUME;
+  });
+
   const [isPlaying, setIsPlaying] = useState(false);
 
-  // Ustawienie początkowej głośności 10%
-  useEffect(() => {
+  // Ustawienie i blokada głośności na elemencie audio
+  const applyVolume = (vol: number) => {
     if (audioRef.current) {
-      audioRef.current.volume = volume;
+      audioRef.current.volume = vol;
     }
-  }, []);
+  };
 
-  // Aktualizacja audio i notify
   useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume;
-    }
+    applyVolume(volume);
     setSoundEnabled(volume > 0);
+    try {
+      localStorage.setItem(STORAGE_KEY, String(volume));
+    } catch {}
   }, [volume]);
 
-  // Autoodtwarzanie przy pierwszej interakcji ze stroną (kliknięcie / przewijanie / klawisz)
+  // Strażnik głośności: przeglądarka przy zmianie utworu / buforowaniu nie może podbić głośności
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const enforce = () => {
+      if (audio.volume !== volume) {
+        audio.volume = volume;
+      }
+    };
+
+    audio.addEventListener("play", enforce);
+    audio.addEventListener("playing", enforce);
+    audio.addEventListener("canplay", enforce);
+    audio.addEventListener("timeupdate", enforce);
+    audio.addEventListener("volumechange", () => {
+      // Zapobiegaj samowolnemu resetowaniu głośności przez przeglądarkę
+      if (Math.abs(audio.volume - volume) > 0.02) {
+        audio.volume = volume;
+      }
+    });
+
+    return () => {
+      audio.removeEventListener("play", enforce);
+      audio.removeEventListener("playing", enforce);
+      audio.removeEventListener("canplay", enforce);
+      audio.removeEventListener("timeupdate", enforce);
+    };
+  }, [volume]);
+
+  // Autoodtwarzanie przy pierwszej interakcji użytkownika (klik, klawisz, scroll)
   useEffect(() => {
     const playMusic = () => {
-      if (audioRef.current && !isPlaying) {
-        audioRef.current.volume = volume;
+      if (audioRef.current && !isPlaying && volume > 0) {
+        applyVolume(volume);
         audioRef.current
           .play()
           .then(() => setIsPlaying(true))
@@ -49,7 +94,7 @@ export function SoundToggle() {
     };
   }, [isPlaying, volume]);
 
-  // Zamykanie menu suwaka po kliknięciu poza nim
+  // Zamykanie menu suwaka po kliknięciu poza komponentem
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
@@ -65,12 +110,10 @@ export function SoundToggle() {
   }, [isOpen]);
 
   const handleToggleClick = () => {
-    // Kliknięcie rozwija/zwija suwak głośności
     setIsOpen((prev) => !prev);
 
-    // Jeśli muzyka nie grała jeszcze, uruchamiamy ją od razu na 10%
     if (audioRef.current && !isPlaying && volume > 0) {
-      audioRef.current.volume = volume;
+      applyVolume(volume);
       audioRef.current
         .play()
         .then(() => setIsPlaying(true))
@@ -80,17 +123,18 @@ export function SoundToggle() {
 
   const handleVolumeChange = (newVol: number) => {
     setVolume(newVol);
-    if (!audioRef.current) return;
-    audioRef.current.volume = newVol;
+    applyVolume(newVol);
     if (newVol > 0) {
-      if (!isPlaying) {
+      if (!isPlaying && audioRef.current) {
         audioRef.current
           .play()
           .then(() => setIsPlaying(true))
           .catch(() => {});
       }
     } else {
-      audioRef.current.pause();
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
       setIsPlaying(false);
     }
   };
@@ -101,12 +145,12 @@ export function SoundToggle() {
     <div ref={containerRef} style={{ position: "relative", display: "inline-flex", alignItems: "center" }}>
       <audio
         ref={audioRef}
-        src={BG_MUSIC_URL}
-        loop
+        src={BG_MUSIC_STREAM_URL}
         preload="auto"
+        loop
       />
 
-      {/* Przycisk Dźwięki - bez on/off, kliknięcie otwiera suwak */}
+      {/* Przycisk Dźwięki - kliknięcie otwiera suwak */}
       <button
         type="button"
         onClick={handleToggleClick}
