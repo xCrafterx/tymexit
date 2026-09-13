@@ -137,8 +137,85 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
 
 function Footer() {
   return (
-    <footer className="footer" style={{ paddingTop: 80, paddingBottom: 50, borderTop: "1px solid rgba(255, 255, 255, 0.08)", background: "rgba(5, 7, 15, 0.95)" }}>
-      <div className="container">
+    <footer
+      className="footer"
+      style={{
+        position: "relative",
+        paddingTop: 95,
+        paddingBottom: 60,
+        overflow: "hidden",
+        borderTop: "none",
+        background: "linear-gradient(180deg, rgba(8, 12, 24, 0.98) 0%, rgba(5, 7, 15, 0.99) 100%)"
+      }}
+    >
+      <style>{`
+        @keyframes footerRgbLine {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        @keyframes footerRgbWaveDown {
+          0% {
+            transform: translateY(-100%);
+            opacity: 0;
+          }
+          15% {
+            opacity: 0.85;
+          }
+          65% {
+            opacity: 0.6;
+          }
+          100% {
+            transform: translateY(700px);
+            opacity: 0;
+          }
+        }
+      `}</style>
+
+      {/* Gruba, mieniąca się belka RGB na samej górze stopki (4px) */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 4,
+          background: "linear-gradient(90deg, #ff007a, #7928ca, #0070f3, #00dfd8, #00ff88, #ffcc00, #ff007a)",
+          backgroundSize: "300% 100%",
+          animation: "footerRgbLine 5s linear infinite",
+          boxShadow: "0 0 16px rgba(0, 223, 216, 0.7), 0 0 30px rgba(121, 40, 202, 0.5)",
+          zIndex: 3
+        }}
+      />
+
+      {/* Efekt fali RGB płynącej z góry na dół */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          pointerEvents: "none",
+          overflow: "hidden",
+          zIndex: 1
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 220,
+            background: "linear-gradient(180deg, rgba(0, 223, 216, 0.16) 0%, rgba(121, 40, 202, 0.13) 45%, rgba(255, 0, 122, 0.08) 80%, transparent 100%)",
+            filter: "blur(28px)",
+            animation: "footerRgbWaveDown 4.5s cubic-bezier(0.4, 0, 0.2, 1) infinite"
+          }}
+        />
+      </div>
+
+      <div className="container" style={{ position: "relative", zIndex: 2 }}>
         <div className="footer-grid" style={{ gap: 40, marginBottom: 50 }}>
           <div>
             <BrandMark />
