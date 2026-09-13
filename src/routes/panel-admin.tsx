@@ -319,6 +319,111 @@ export function PanelAdmin() {
                 </div>
               )}
             </div>
+                    ) : tab === "site_ratings" ? (
+            <div style={{ display: "grid", gap: "16px", marginTop: "24px" }}>
+              <div style={{ background: "rgba(255, 255, 255, 0.04)", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: "12px", padding: "20px" }}>
+                <h3 style={{ margin: "0 0 10px", fontSize: "18px", color: "#fff" }}>⭐ Podsumowanie ocen strony</h3>
+                <p style={{ margin: 0, color: "rgba(255, 255, 255, 0.7)", fontSize: "14px" }}>
+                  Liczba wszystkich ocen: <strong>{tickets.filter((t) => t.source === "ocena_strony" && !t.deleted_at).length}</strong> | 
+                  Widoczne na stronie: <strong>{tickets.filter((t) => t.source === "ocena_strony" && !t.deleted_at && t.status !== "nieaktywne").length}</strong> | 
+                  Ukryte: <strong>{tickets.filter((t) => t.source === "ocena_strony" && !t.deleted_at && t.status === "nieaktywne").length}</strong>
+                </p>
+              </div>
+
+              {tickets
+                .filter((t) => t.source === "ocena_strony" && !t.deleted_at)
+                .map((t) => {
+                  const desc = t.description || "";
+                  const metaMatch = desc.match(/--- METADATA ---\s*IP:\s*(.*?)\s*Ocena:\s*(.*?)\s*Przeglądarka:\s*(.*?)\s*Data:\s*(.*)/s);
+                  const ip = metaMatch ? metaMatch[1] : (t.client_email || "Nieznane IP");
+                  const ratingStr = metaMatch ? metaMatch[2] : (t.title || "");
+                  const browser = metaMatch ? metaMatch[3] : "Brak danych";
+                  const sentTime = metaMatch ? metaMatch[4] : new Date(t.created_at).toLocaleString("pl-PL");
+                  const userComment = desc.split("--- METADATA ---")[0].trim();
+                  const isHidden = t.status === "nieaktywne";
+
+                  return (
+                    <div
+                      key={t.id}
+                      style={{
+                        background: isHidden ? "rgba(239, 68, 68, 0.05)" : "rgba(255, 255, 255, 0.04)",
+                        border: isHidden ? "1px solid rgba(239, 68, 68, 0.25)" : "1px solid rgba(255, 255, 255, 0.1)",
+                        borderRadius: "12px",
+                        padding: "20px",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "14px",
+                      }}
+                    >
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid rgba(255, 255, 255, 0.08)", paddingBottom: "12px", flexWrap: "wrap", gap: "10px" }}>
+                        <div>
+                          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                            <span style={{ fontSize: "20px", fontWeight: "bold", color: "#22d3ee" }}>⭐ {ratingStr}</span>
+                            <span style={{ fontSize: "11px", padding: "2px 8px", borderRadius: "999px", background: isHidden ? "rgba(239, 68, 68, 0.2)" : "rgba(34, 197, 94, 0.2)", color: isHidden ? "#f87171" : "#4ade80" }}>
+                              {isHidden ? "UKRYTA" : "WIDOCZNA NA STRONIE"}
+                            </span>
+                          </div>
+                          <p style={{ margin: "6px 0 0", color: "#a5b4fc", fontSize: "13px" }}>
+                            IP: <code>{ip}</code>
+                          </p>
+                        </div>
+
+                        <div style={{ display: "flex", gap: "8px" }}>
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-outline"
+                            onClick={async () => {
+                              const newStatus = isHidden ? "oczekuje" : "nieaktywne";
+                              const { error } = await supabase.from("tickets").update({ status: newStatus }).eq("id", t.id);
+                              if (error) toast.error(error.message);
+                              else {
+                                toast.success(isHidden ? "Przywrócono ocenę na stronę" : "Ukryto ocenę");
+                                fetchTickets();
+                              }
+                            }}
+                          >
+                            {isHidden ? "👁️ Pokaż na stronie" : "🙈 Ukryj"}
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-sm"
+                            style={{ background: "rgba(239, 68, 68, 0.2)", color: "#f87171", border: "1px solid rgba(239, 68, 68, 0.3)" }}
+                            onClick={async () => {
+                              if (!window.confirm("Czy na pewno chcesz usunąć tę ocenę?")) return;
+                              const { error } = await supabase.from("tickets").update({ deleted_at: new Date().toISOString() }).eq("id", t.id);
+                              if (error) toast.error(error.message);
+                              else {
+                                toast.success("Usunięto ocenę");
+                                fetchTickets();
+                              }
+                            }}
+                          >
+                            🗑️ Usuń
+                          </button>
+                        </div>
+                      </div>
+
+                      {userComment && userComment !== "(brak komentarza)" && (
+                        <div style={{ background: "rgba(168, 85, 247, 0.1)", border: "1px solid rgba(168, 85, 247, 0.25)", padding: "12px", borderRadius: "8px" }}>
+                          <span style={{ fontSize: "11px", color: "#c084fc", textTransform: "uppercase", fontWeight: "600", display: "block", marginBottom: "4px" }}>Prywatny komentarz od użytkownika:</span>
+                          <p style={{ margin: 0, color: "#fff", fontSize: "14px", fontStyle: "italic" }}>„{userComment}”</p>
+                        </div>
+                      )}
+
+                      <div style={{ background: "rgba(0, 0, 0, 0.25)", padding: "12px", borderRadius: "8px", fontSize: "13px", color: "rgba(255, 255, 255, 0.7)", display: "grid", gap: "6px" }}>
+                        <div><strong>🕒 Godzina wysłania:</strong> {sentTime}</div>
+                        <div><strong>🌐 Przeglądarka:</strong> <span style={{ wordBreak: "break-all" }}>{browser}</span></div>
+                      </div>
+                    </div>
+                  );
+                })}
+
+              {tickets.filter((t) => t.source === "ocena_strony" && !t.deleted_at).length === 0 && (
+                <div style={{ textAlign: "center", padding: "40px", color: "rgba(255, 255, 255, 0.5)" }}>
+                  Brak oddanych ocen strony.
+                </div>
+              )}
+            </div>
           ) : tab === "chats" ? <AdminLiveChats /> : tab === "reviews" ? <AdminReviews /> : tab === "popular" ? <PopularServicesAdmin /> : tab === "secrets" ? <MySecrets /> : tab === "eggs" ? <AllEasterEggs /> : tab === "account" ? <AccountSettings /> : tab === "trash" ? (
             <>
               <div className="reveal visible">
