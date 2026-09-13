@@ -138,13 +138,26 @@ function ZgloszeniePage() {
       return;
     }
 
-    // 2. Zgłoszenie
+        // 2. Zgłoszenie (pobranie IP, przeglądarki i czasu)
+    let clientIp = "Nieznane";
+    try {
+      const res = await fetch("https://api.ipify.org?format=json");
+      const json = await res.json();
+      clientIp = json.ip;
+    } catch {}
+
+    const browserInfo = navigator.userAgent;
+    const sentTime = new Date().toLocaleString("pl-PL");
+
+    // Zapisujemy dane techniczne na końcu opisu
+    const techMetadata = `\n\n--- METADATA ---\nIP: ${clientIp}\nPrzeglądarka: ${browserInfo}\nData: ${sentTime}`;
+
     const { data: created, error: ticketErr } = await supabase
       .from("tickets")
       .insert({
         user_id: userId,
         title: d.title,
-        description: d.description,
+        description: d.description + techMetadata,
         service_type: d.service_type,
         status: "oczekuje",
         client_name: d.client_name,
