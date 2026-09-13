@@ -11,7 +11,7 @@ export const Route = createFileRoute("/api/public/site-ratings")({
             .select("title, description, status")
             .eq("source", "ocena_strony")
             .is("deleted_at", null)
-            .neq("status", "ukryta");
+            .neq("status", "nieaktywne");
 
           if (error) {
             return new Response(JSON.stringify({ error: error.message }), {
@@ -102,7 +102,7 @@ export const Route = createFileRoute("/api/public/site-ratings")({
             title: `[Ocena strony] ${rating}/10`,
             description: fullDesc,
             service_type: "ocena_strony",
-            status: "widoczna",
+            status: "oczekuje",
             client_name: `Ocena: ${rating}/10`,
             client_email: clientIp,
             source: "ocena_strony",
