@@ -71,7 +71,7 @@ export function SiteRatingPrompt() {
         borderLeft: "4px solid #6366f1",
         borderRadius: "14px",
         padding: "16px 20px",
-        margin: "14px auto",
+        margin: "88px auto 20px auto",
         maxWidth: "960px",
         boxShadow: "0 10px 30px rgba(0, 0, 0, 0.4)",
         position: "relative",
