@@ -328,7 +328,7 @@ export function AdminReviews() {
   const [saving, setSaving] = useState<string | null>(null);
 
   // Formularz dodawania nowej opinii przez admina
-  const [showAddForm, setShowAddForm] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(true);
   const [newFirstName, setNewFirstName] = useState("");
   const [newLastName, setNewLastName] = useState("");
   const [newRating, setNewRating] = useState(5);
@@ -423,14 +423,14 @@ export function AdminReviews() {
           className="btn btn-primary"
           style={{ padding: "10px 18px", display: "inline-flex", alignItems: "center", gap: 8, marginTop: 10 }}
         >
-          {showAddForm ? "✕ Anuluj dodawanie" : "+ Dodaj nową opinię"}
+          {showAddForm ? "✕ Zwiń formularz" : "+ Rozwiń formularz dodawania"}
         </button>
       </div>
 
       {showAddForm && (
         <form onSubmit={handleAddReview} className="glass reveal visible" style={{ padding: 22, display: "grid", gap: 14, border: "1px solid rgba(56, 189, 248, 0.35)", borderRadius: 12 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <strong style={{ fontSize: 16 }}>Dodaj nową opinię klienta</strong>
+            <strong style={{ fontSize: 17, color: "#38bdf8" }}>➕ Dodaj nową opinię klienta (zapis bezpośrednio do bazy)</strong>
             <span style={{ background: "rgba(56, 189, 248, 0.15)", color: "#38bdf8", padding: "4px 10px", borderRadius: 6, fontSize: 11, fontWeight: 600 }}>
               Panel administratora
             </span>
