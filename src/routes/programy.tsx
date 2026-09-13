@@ -25,31 +25,22 @@ export interface ToolItem {
   badge: string;
   desc: string;
   details: string;
-  // Nazwa pliku do pobrania
   fileName: string;
-  // Bezpośrednia ścieżka do Twojego pliku .exe (np. "/pliki/plan-zadan.exe" lub "/narzedzia.exe")
-  // Jeśli podasz tu link lub wrzucisz plik do folderu public, pobierze się bezpośrednio Twój plik .exe!
-  exeUrl?: string;
-  // Ścieżka do ikony lub element React
+  exeUrl: string;
   iconSrc?: string;
   iconSvg?: React.ReactNode;
+  warningNote?: React.ReactNode;
 }
 
-// =========================================================================
-// KONFIGURACJA PLIKÓW DO POBRANIA:
-// Aby Twój plik .exe się pobierał:
-// 1. Wrzuć plik .exe do folderu 'public/' (np. public/narzedzia.exe)
-// 2. Wpisz poniżej w 'exeUrl' jego ścieżkę: "/narzedzia.exe"
-// =========================================================================
 const TOOLS: ToolItem[] = [
   {
     id: "plan-zadan",
     title: "Plan Zadań",
     badge: "Organizacja",
-    desc: "Aplikacja i narzędzie do planowania oraz organizacji codziennych zadań.",
-    details: "Ułatwia zarządzanie priorytetami, terminami i listą zadań serwisowych lub domowych.",
-    fileName: "Plan-Zadan.exe",
-    exeUrl: "/Plan-Zadan.exe",
+    desc: "Program służący do mediów społecznościowych",
+    details: "Program tworzy overlay i wiele innych rzeczy",
+    fileName: "PlanZadan.exe",
+    exeUrl: "https://github.com/xCrafterx/tymexit/releases/download/TymexIT/PlanZadan.exe",
     iconSvg: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 32, height: 32 }}>
         <path d="M9 11l3 3L22 4" />
@@ -63,8 +54,8 @@ const TOOLS: ToolItem[] = [
     badge: "Windows & Diagnostyka",
     desc: "Zestaw skryptów do diagnostyki, konserwacji i optymalizacji Windows.",
     details: "Naprawa typowych błędów systemowych, czyszczenie pamięci podręcznej i przyspieszanie działania komputera.",
-    fileName: "Narzedzia-Systemowe.exe",
-    exeUrl: "/Narzedzia-Systemowe.exe",
+    fileName: "Narzedzia.Systemowe.exe",
+    exeUrl: "https://github.com/xCrafterx/tymexit/releases/download/tymekIT/Narzedzia.Systemowe.exe",
     iconSrc: "/narzedzia.ico",
   },
   {
@@ -73,58 +64,51 @@ const TOOLS: ToolItem[] = [
     badge: "Android & Mobile",
     desc: "Optymalizacja i usuwanie zbędnych procesów oraz plików tymczasowych na Androidzie.",
     details: "Pakiet narzędziowy pozwalający odzyskać pamięć i poprawić płynność działania smartfona.",
-    fileName: "Czyszczenie-Androida.exe",
-    exeUrl: "/Czyszczenie-Androida.exe",
+    fileName: "Czyszczenie.Androida.exe",
+    exeUrl: "https://github.com/xCrafterx/tymexit/releases/download/TymixIT/Czyszczenie.Androida.exe",
     iconSrc: "/android.ico",
+    warningNote: (
+      <div
+        style={{
+          marginTop: 14,
+          marginBottom: 16,
+          padding: "10px 14px",
+          borderRadius: 10,
+          background: "rgba(239, 68, 68, 0.12)",
+          border: "1px solid rgba(239, 68, 68, 0.35)",
+          color: "#f87171",
+          fontSize: 12.5,
+          lineHeight: 1.5,
+          fontWeight: 600,
+          textAlign: "center",
+        }}
+      >
+        ⚠️ Wymagano pobranie adb (
+        <a
+          href="https://tinyurl.com/3ddc658h"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: "#fca5a5", textDecoration: "underline", fontWeight: 700 }}
+        >
+          https://tinyurl.com/3ddc658h
+        </a>
+        ) oraz wrzucenie programu do plików adb!
+      </div>
+    ),
   },
 ];
 
 function ProgramyPage() {
-  const handleDownload = async (tool: ToolItem) => {
-    // 1. Sprawdzamy czy plik .exe istnieje pod podaną ścieżką
-    if (tool.exeUrl) {
-      try {
-        const response = await fetch(tool.exeUrl, { method: "HEAD" });
-        if (response.ok) {
-          const a = document.createElement("a");
-          a.href = tool.exeUrl;
-          a.download = tool.fileName;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          toast.success(`Rozpoczęto pobieranie pliku: ${tool.fileName}`);
-          return;
-        }
-      } catch {
-        // Fallback jeśli nie wrzucono jeszcze fizycznego pliku na serwer
-      }
-    }
-
-    // 2. Jeśli plik .exe nie został jeszcze fizycznie wrzucony, generujemy plik informacyjny .bat / .exe wrapper
-    const placeholderText = `@echo off
-echo =======================================================
-echo ${tool.title} - TymekIT
-echo =======================================================
-echo Autor: Tymek
-echo Kontakt: tymek2008@protonmail.com
-echo.
-echo Opis: ${tool.desc}
-echo.
-echo Aby zaktualizowac do najnowszej wersji .exe,
-echo skontaktuj sie z Tymkiem lub pobierz bezposrednio z panelu.
-echo =======================================================
-pause
-`;
-    const blob = new Blob([placeholderText], { type: "application/octet-stream" });
-    const url = URL.createObjectURL(blob);
+  const handleDownload = (tool: ToolItem) => {
+    toast.info(`Rozpoczęto pobieranie pliku: ${tool.fileName}`);
     const a = document.createElement("a");
-    a.href = url;
+    a.href = tool.exeUrl;
     a.download = tool.fileName;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    toast.success(`Pobrano plik: ${tool.fileName}`);
   };
 
   return (
@@ -225,18 +209,25 @@ pause
                     {tool.title}
                   </h3>
 
-                  <p style={{ fontSize: 14, color: "var(--text-dim)", lineHeight: 1.55, margin: "0 0 12px" }}>
+                  <p style={{ fontSize: 14.5, color: "#f3f4f6", lineHeight: 1.55, margin: "0 0 12px", fontWeight: 500 }}>
                     {tool.desc}
                   </p>
 
-                  <p style={{ fontSize: 12, color: "rgba(255, 255, 255, 0.45)", lineHeight: 1.45, margin: "0 0 24px" }}>
+                  <p style={{ fontSize: 13, color: "rgba(255, 255, 255, 0.55)", lineHeight: 1.45, margin: "0 0 16px" }}>
                     {tool.details}
                   </p>
                 </div>
 
                 <div>
-                  <button
-                    onClick={() => handleDownload(tool)}
+                  {/* Ostrzeżenie na czerwono nad pobieraniem jeśli zdefiniowane */}
+                  {tool.warningNote}
+
+                  <a
+                    href={tool.exeUrl}
+                    download={tool.fileName}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => toast.info(`Pobieranie ${tool.fileName}...`)}
                     className="btn btn-primary"
                     style={{
                       width: "100%",
@@ -245,6 +236,9 @@ pause
                       padding: "13px 22px",
                       fontSize: 14,
                       fontWeight: 600,
+                      textDecoration: "none",
+                      display: "inline-flex",
+                      alignItems: "center",
                     }}
                   >
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 18, height: 18 }}>
@@ -253,7 +247,7 @@ pause
                       <line x1="12" y1="15" x2="12" y2="3" />
                     </svg>
                     Pobierz {tool.fileName}
-                  </button>
+                  </a>
                 </div>
               </div>
             ))}
