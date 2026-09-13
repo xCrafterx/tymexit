@@ -74,7 +74,9 @@ function Nav({ onOpenMenu }: { onOpenMenu: () => void }) {
             <a href={h} className={isActive(h) ? "active" : ""} style={{ whiteSpace: "nowrap", padding: "8px 10px" }}>{l}</a>
           </li>
         ))}
-        <li style={{ opacity: 0.35, userSelect: "none", padding: "0 2px" }} aria-hidden>|</li>
+        <li style={{ display: "inline-flex", alignItems: "center", padding: "0 6px", userSelect: "none" }} aria-hidden>
+          <span style={{ display: "inline-block", width: "2px", height: "22px", background: "linear-gradient(180deg, rgba(255,255,255,0.1), rgba(56,189,248,0.8), rgba(255,255,255,0.1))", borderRadius: "2px", boxShadow: "0 0 6px rgba(56,189,248,0.35)" }} />
+        </li>
         <li>
           <Link to="/programy" className={isActive("/programy") ? "active" : ""} style={{ whiteSpace: "nowrap", padding: "8px 10px" }}>Moje Programy</Link>
         </li>
