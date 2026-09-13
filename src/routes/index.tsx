@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { ReviewsList } from "@/components/Reviews";
+import { ReviewsList, ReviewForm } from "@/components/Reviews";
 import { SiteRatingPrompt } from "@/components/SiteRatingPrompt";
 import { SiteRatingAllegro } from "@/components/SiteRatingAllegro";
 import { supabase } from "@/integrations/supabase/client";
@@ -376,13 +376,25 @@ function Index() {
       {/* TESTIMONIALS */}
       <section className="section" id="opinie">
         <div className="container">
-          <div className="reveal">
-            <span className="eyebrow"><span className="dot"></span> Opinie</span>
-            <h2 className="section-title" style={{ marginTop: 18 }}>opinie zadowolonych <span className="grad">klientów TymekIT.</span></h2>
+          <div className="reveal" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 14 }}>
+            <div>
+              <span className="eyebrow"><span className="dot"></span> Opinie</span>
+              <h2 className="section-title" style={{ marginTop: 18 }}>Opinie zadowolonych <span className="grad">klientów TymekIT.</span></h2>
+            </div>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <Link to="/opinie" className="btn btn-primary" style={{ padding: "10px 18px" }}>
+                + Wystaw nową opinię
+              </Link>
+              <Link to="/opinie" className="btn btn-ghost" style={{ padding: "10px 18px" }}>
+                Zobacz wszystkie opinie →
+              </Link>
+            </div>
           </div>
           <ReviewsList limit={6} />
-          <div style={{ marginTop: 28, textAlign: "center" }}>
-            <Link to="/opinie" className="btn btn-ghost">Zobacz wszystkie opinie / dodaj swoją</Link>
+          <div style={{ marginTop: 32, textAlign: "center" }}>
+            <Link to="/opinie" className="btn btn-primary" style={{ padding: "12px 24px", fontSize: 14 }}>
+              ✍️ Kliknij tutaj, aby dodać swoją opinię o TymekIT
+            </Link>
           </div>
         </div>
       </section>
