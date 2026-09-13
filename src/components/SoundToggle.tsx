@@ -8,10 +8,10 @@ export function SoundToggle() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [volume, setVolume] = useState(0.5); // Domyślnie automatycznie 50%
+  const [volume, setVolume] = useState(0.1); // Domyślnie automatycznie 10%
   const [isPlaying, setIsPlaying] = useState(false);
 
-  // Ustawienie początkowej głośności 50%
+  // Ustawienie początkowej głośności 10%
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = volume;
@@ -68,7 +68,7 @@ export function SoundToggle() {
     // Kliknięcie rozwija/zwija suwak głośności
     setIsOpen((prev) => !prev);
 
-    // Jeśli muzyka nie grała jeszcze, uruchamiamy ją od razu na 50%
+    // Jeśli muzyka nie grała jeszcze, uruchamiamy ją od razu na 10%
     if (audioRef.current && !isPlaying && volume > 0) {
       audioRef.current.volume = volume;
       audioRef.current
