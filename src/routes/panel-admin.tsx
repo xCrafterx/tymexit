@@ -110,7 +110,7 @@ export function PanelAdmin() {
     return () => { supabase.removeChannel(ch); };
   }, [session]);
 
-  const active = useMemo(() => tickets.filter((t) => !t.deleted_at), [tickets]);
+  const active = useMemo(() => tickets.filter((t) => !t.deleted_at && t.source !== "ocena_strony"), [tickets]);
   const trashed = useMemo(() => tickets.filter((t) => !!t.deleted_at), [tickets]);
 
   const stats = useMemo(() => ({
@@ -235,7 +235,6 @@ export function PanelAdmin() {
                 items: [
                   { key: "tickets", label: "Zgłoszenia", icon: "📋" },
                   { key: "form_logs", label: "Logi formularzy", icon: "🌐", badge: tickets.filter((t) => t.source === "formularz").length || undefined },
-                  { key: "site_ratings", label: "Oceny strony", icon: "⭐", badge: tickets.filter((t) => t.source === "ocena_strony").length || undefined },
                   { key: "chats", label: "Czat na żywo", icon: "💬" },
                   { key: "trash", label: "Kosz", icon: "🗑", badge: trashed.length || undefined },
                 ],
@@ -246,6 +245,7 @@ export function PanelAdmin() {
                 icon: "✨",
                 items: [
                   { key: "reviews", label: "Opinie", icon: "⭐" },
+                  { key: "site_ratings", label: "Oceny strony", icon: "📊", badge: tickets.filter((t) => t.source === "ocena_strony").length || undefined },
                   { key: "popular", label: "Popularne usługi", icon: "★" },
                 ],
               },
