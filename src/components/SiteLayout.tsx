@@ -64,22 +64,22 @@ function Nav({ onOpenMenu }: { onOpenMenu: () => void }) {
 
   return (
     <nav className={`nav${hidden ? " is-hidden" : ""}`} aria-label="Główna nawigacja">
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0, flexWrap: "nowrap" }}>
         <BrandMark />
         {session && <SoundToggle />}
         {session && role === "admin" && (
-          <Link to="/admin/dashboard" className="btn btn-ghost" style={{ padding: "6px 12px", fontSize: 11 }}>📊 Dashboard</Link>
+          <Link to="/admin/dashboard" className="btn btn-ghost" style={{ padding: "6px 10px", fontSize: 11, whiteSpace: "nowrap" }}>📊 Dashboard</Link>
         )}
       </div>
-      <ul className="nav-links">
+      <ul className="nav-links" style={{ whiteSpace: "nowrap", flexWrap: "nowrap" }}>
         {NAV_LINKS.map(([h, l]) => (
           <li key={h}>
-            <a href={h} className={isActive(h) ? "active" : ""}>{l}</a>
+            <a href={h} className={isActive(h) ? "active" : ""} style={{ whiteSpace: "nowrap", padding: "8px 10px" }}>{l}</a>
           </li>
         ))}
         <li style={{ opacity: 0.35, userSelect: "none", padding: "0 2px" }} aria-hidden>|</li>
         <li>
-          <Link to="/programy" className={isActive("/programy") ? "active" : ""}>Moje Programy</Link>
+          <Link to="/programy" className={isActive("/programy") ? "active" : ""} style={{ whiteSpace: "nowrap", padding: "8px 10px" }}>Moje Programy</Link>
         </li>
       </ul>
       <div className="nav-actions">
