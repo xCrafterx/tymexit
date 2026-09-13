@@ -72,7 +72,7 @@ export function PanelAdmin() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("all");
   const [editing, setEditing] = useState<Record<string, { note: string; saving: boolean }>>({});
-  const [tab, setTab] = useState<"tickets" | "trash" | "chats" | "reviews" | "popular" | "secrets" | "eggs" | "account">("tickets");
+  const [tab, setTab] = useState<"tickets" | "form_logs" | "trash" | "chats" | "reviews" | "popular" | "secrets" | "eggs" | "account">("tickets");
   const [confirm, setConfirm] = useState<ConfirmAction>(null);
   const [acting, setActing] = useState(false);
   const [openChats, setOpenChats] = useState<Record<string, boolean>>({});
