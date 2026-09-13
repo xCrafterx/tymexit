@@ -70,7 +70,7 @@ export function PanelAdmin() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("all");
   const [editing, setEditing] = useState<Record<string, { note: string; saving: boolean }>>({});
-  const [tab, setTab] = useState<"tickets" | "form_logs" | "trash" | "chats" | "reviews" | "popular" | "secrets" | "eggs" | "account">("tickets");
+  const [tab, setTab] = useState<"tickets" | "form_logs" | "site_ratings" | "trash" | "chats" | "reviews" | "popular" | "secrets" | "eggs" | "account">("tickets");
   const [confirm, setConfirm] = useState<ConfirmAction>(null);
   const [acting, setActing] = useState(false);
   const [openChats, setOpenChats] = useState<Record<string, boolean>>({});
@@ -235,6 +235,7 @@ export function PanelAdmin() {
                 items: [
                   { key: "tickets", label: "Zgłoszenia", icon: "📋" },
                   { key: "form_logs", label: "Logi formularzy", icon: "🌐", badge: tickets.filter((t) => t.source === "formularz").length || undefined },
+                  { key: "site_ratings", label: "Oceny strony", icon: "⭐", badge: tickets.filter((t) => t.source === "ocena_strony").length || undefined },
                   { key: "chats", label: "Czat na żywo", icon: "💬" },
                   { key: "trash", label: "Kosz", icon: "🗑", badge: trashed.length || undefined },
                 ],

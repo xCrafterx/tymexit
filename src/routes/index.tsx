@@ -1,6 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { ReviewsList } from "@/components/Reviews";
+import { SiteRatingPrompt } from "@/components/SiteRatingPrompt";
+import { SiteRatingAllegro } from "@/components/SiteRatingAllegro";
 import { supabase } from "@/integrations/supabase/client";
 
 
@@ -73,6 +75,10 @@ function Index() {
 
   return (
     <>
+      <div className="container" style={{ position: "relative", zIndex: 50 }}>
+        <SiteRatingPrompt />
+      </div>
+
       {/* HERO */}
       <section className="hero">
         <div className="container">
@@ -380,6 +386,9 @@ function Index() {
           </div>
         </div>
       </section>
+
+      {/* OCENA STRONY I WYGLĄDU (ALLEGRO STYLE) */}
+      <SiteRatingAllegro />
 
       {/* CTA + KONTAKT */}
       <section className="section-sm" id="kontakt">

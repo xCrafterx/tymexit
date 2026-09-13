@@ -32,6 +32,7 @@ import { Route as AdminCzatyRouteImport } from './routes/admin.czaty'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as ApiPublicOrderNotifyRouteImport } from './routes/api/public/order-notify'
+import { Route as ApiPublicSiteRatingsRouteImport } from './routes/api/public/site-ratings'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -174,7 +175,8 @@ export interface FileRoutesByFullPath {
   '/admin/czaty': typeof AdminCzatyRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/api/chat': typeof ApiChatRoute
-  '/api/public/order-notify': typeof ApiPublicOrderNotifyRoute
+  '/api/public/order-notify': typeof ApiPublicOrderNotifyRoute,
+  '/api/public/site-ratings': typeof ApiPublicSiteRatingsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -201,7 +203,8 @@ export interface FileRoutesByTo {
   '/admin/czaty': typeof AdminCzatyRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/api/chat': typeof ApiChatRoute
-  '/api/public/order-notify': typeof ApiPublicOrderNotifyRoute
+  '/api/public/order-notify': typeof ApiPublicOrderNotifyRoute,
+  '/api/public/site-ratings': typeof ApiPublicSiteRatingsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -229,7 +232,8 @@ export interface FileRoutesById {
   '/admin/czaty': typeof AdminCzatyRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/api/chat': typeof ApiChatRoute
-  '/api/public/order-notify': typeof ApiPublicOrderNotifyRoute
+  '/api/public/order-notify': typeof ApiPublicOrderNotifyRoute,
+  '/api/public/site-ratings': typeof ApiPublicSiteRatingsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
