@@ -322,12 +322,61 @@ export function MyReviews() {
 }
 
 export function AdminReviews() {
-  const { reviews, loading } = useReviewsRealtime(false);
+  const { user } = useAuth();
+  const { reviews, loading, refetch } = useReviewsRealtime(false);
   const [editing, setEditing] = useState<Record<string, Partial<Review>>>({});
   const [saving, setSaving] = useState<string | null>(null);
 
+  // Formularz dodawania nowej opinii przez admina
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newFirstName, setNewFirstName] = useState("");
+  const [newLastName, setNewLastName] = useState("");
+  const [newRating, setNewRating] = useState(5);
+  const [newServiceType, setNewServiceType] = useState("");
+  const [newContent, setNewContent] = useState("");
+  const [newDate, setNewDate] = useState("");
+  const [isAdding, setIsAdding] = useState(false);
+
   const patch = (id: string, p: Partial<Review>) =>
     setEditing((e) => ({ ...e, [id]: { ...e[id], ...p } }));
+
+  const handleAddReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user?.id) return toast.error("Brak aktywnej sesji administratora");
+    const fn = newFirstName.trim();
+    const ln = newLastName.trim();
+    const c = newContent.trim();
+    if (!fn || !ln) return toast.error("Podaj imię i nazwisko");
+    if (!c) return toast.error("Treść opinii nie może być pusta");
+    if (newRating < 1 || newRating > 5) return toast.error("Ocena musi wynosić od 1 do 5");
+
+    setIsAdding(true);
+    const reviewDate = newDate ? new Date(newDate).toISOString() : new Date().toISOString();
+    const { error } = await supabase.from("reviews").insert({
+      user_id: user.id,
+      first_name: fn,
+      last_name: ln,
+      rating: newRating,
+      content: c,
+      service_type: newServiceType || null,
+      review_date: reviewDate,
+      is_visible: true,
+    });
+    setIsAdding(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Opinia została pomyślnie dodana");
+    setNewFirstName("");
+    setNewLastName("");
+    setNewRating(5);
+    setNewServiceType("");
+    setNewContent("");
+    setNewDate("");
+    setShowAddForm(false);
+    refetch();
+  };
 
   const save = async (r: Review) => {
     const patchData = editing[r.id];
@@ -362,11 +411,70 @@ export function AdminReviews() {
 
   return (
     <div style={{ display: "grid", gap: 16 }}>
-      <div className="reveal visible">
-        <span className="eyebrow"><span className="dot"></span> Opinie</span>
-        <h2 className="section-title" style={{ marginTop: 18 }}>Zarządzanie <span className="grad">opiniami.</span></h2>
-        <p className="text-dim" style={{ marginTop: 10 }}>Edytuj treść, ocenę, datę, ukrywaj lub usuwaj opinie klientów.</p>
+      <div className="reveal visible" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 14 }}>
+        <div>
+          <span className="eyebrow"><span className="dot"></span> Opinie</span>
+          <h2 className="section-title" style={{ marginTop: 18 }}>Zarządzanie <span className="grad">opiniami.</span></h2>
+          <p className="text-dim" style={{ marginTop: 10 }}>Edytuj treść, ocenę, datę, ukrywaj, usuwaj lub dodawaj nowe opinie.</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setShowAddForm((v) => !v)}
+          className="btn btn-primary"
+          style={{ padding: "10px 18px", display: "inline-flex", alignItems: "center", gap: 8, marginTop: 10 }}
+        >
+          {showAddForm ? "✕ Anuluj dodawanie" : "+ Dodaj nową opinię"}
+        </button>
       </div>
+
+      {showAddForm && (
+        <form onSubmit={handleAddReview} className="glass reveal visible" style={{ padding: 22, display: "grid", gap: 14, border: "1px solid rgba(56, 189, 248, 0.35)", borderRadius: 12 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <strong style={{ fontSize: 16 }}>Dodaj nową opinię klienta</strong>
+            <span style={{ background: "rgba(56, 189, 248, 0.15)", color: "#38bdf8", padding: "4px 10px", borderRadius: 6, fontSize: 11, fontWeight: 600 }}>
+              Panel administratora
+            </span>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <label style={{ display: "grid", gap: 6, fontSize: 12 }}>
+              <span className="text-dim">Imię</span>
+              <input className="form-control" value={newFirstName} onChange={(e) => setNewFirstName(e.target.value)} placeholder="np. Tomasz" maxLength={80} required />
+            </label>
+            <label style={{ display: "grid", gap: 6, fontSize: 12 }}>
+              <span className="text-dim">Nazwisko</span>
+              <input className="form-control" value={newLastName} onChange={(e) => setNewLastName(e.target.value)} placeholder="np. Nowak" maxLength={80} required />
+            </label>
+          </div>
+          <div style={{ display: "flex", gap: 14, alignItems: "center", flexWrap: "wrap" }}>
+            <div style={{ display: "grid", gap: 6 }}>
+              <span className="text-dim" style={{ fontSize: 12 }}>Ocena (gwiazdki)</span>
+              <Stars value={newRating} size={26} interactive onChange={(v) => setNewRating(v)} />
+            </div>
+            <div style={{ display: "grid", gap: 6, flex: 1, minWidth: 180 }}>
+              <span className="text-dim" style={{ fontSize: 12 }}>Typ usługi</span>
+              <select className="form-control" value={newServiceType} onChange={(e) => setNewServiceType(e.target.value)}>
+                <option value="">— wybierz lub zostaw puste —</option>
+                {SERVICES.map((s) => <option key={s} value={s}>{s}</option>)}
+              </select>
+            </div>
+            <div style={{ display: "grid", gap: 6, minWidth: 200 }}>
+              <span className="text-dim" style={{ fontSize: 12 }}>Data wystawienia opinii (opcjonalnie)</span>
+              <input className="form-control" type="datetime-local" value={newDate} onChange={(e) => setNewDate(e.target.value)} />
+            </div>
+          </div>
+          <label style={{ display: "grid", gap: 6, fontSize: 12 }}>
+            <span className="text-dim">Treść opinii</span>
+            <textarea className="form-control" rows={3} value={newContent} onChange={(e) => setNewContent(e.target.value)} placeholder="Wpisz treść opinii..." maxLength={2000} required />
+          </label>
+          <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 4 }}>
+            <button type="button" className="btn btn-ghost" onClick={() => setShowAddForm(false)}>Anuluj</button>
+            <button type="submit" className="btn btn-primary" disabled={isAdding}>
+              {isAdding ? "Dodawanie…" : "Zapisz i opublikuj opinię"}
+            </button>
+          </div>
+        </form>
+      )}
+
       {reviews.length === 0 ? (
         <div className="glass" style={{ padding: 30, textAlign: "center" }}>
           <p className="text-dim">Brak opinii.</p>
