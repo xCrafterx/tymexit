@@ -344,30 +344,56 @@ export function SiteLayout({ children, hideChrome = false }: { children: React.R
     if (saved === "light") document.documentElement.setAttribute("data-theme", "light");
   }, []);
 
-  // scroll reveal on every route change
+  // Scroll to top upon navigating to a page without a hash
   useEffect(() => {
-    const els = document.querySelectorAll(".reveal:not(.visible)");
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((en) => {
-          if (en.isIntersecting) {
-            en.target.classList.add("visible");
-            io.unobserve(en.target);
-          }
-        });
-      },
-      { threshold: 0.12, rootMargin: "0px 0px -60px 0px" }
-    );
-    els.forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  }, [pathname]);
+    if (!hash) {
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    }
+  }, [pathname, hash]);
+
+  // scroll reveal on every route change (with safe timeout to wait for children to mount)
+  useEffect(() => {
+    let io: IntersectionObserver | null = null;
+    const runReveal = () => {
+      const els = document.querySelectorAll(".reveal:not(.visible)");
+      io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((en) => {
+            if (en.isIntersecting) {
+              en.target.classList.add("visible");
+              io?.unobserve(en.target);
+            }
+          });
+        },
+        { threshold: 0.05, rootMargin: "0px 0px 50px 0px" }
+      );
+      els.forEach((el) => {
+        const rect = el.getBoundingClientRect();
+        // If element is already in the viewport or above, reveal it immediately
+        if (rect.top <= (window.innerHeight || document.documentElement.clientHeight) + 50) {
+          el.classList.add("visible");
+        } else {
+          io?.observe(el);
+        }
+      });
+    };
+
+    // Run immediately and after a short tick to capture newly mounted route components
+    runReveal();
+    const timer = setTimeout(runReveal, 80);
+
+    return () => {
+      clearTimeout(timer);
+      io?.disconnect();
+    };
+  }, [pathname, hash]);
 
   // smooth-scroll to hash after navigation
   useEffect(() => {
     if (!hash) return;
     const id = hash.replace("#", "");
     const el = document.getElementById(id);
-    if (el) setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+    if (el) setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
   }, [hash, pathname]);
 
   return (
