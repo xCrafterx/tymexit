@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/programy")({
@@ -99,16 +100,38 @@ const TOOLS: ToolItem[] = [
 ];
 
 function ProgramyPage() {
-  const handleDownload = (tool: ToolItem) => {
-    toast.info(`Rozpoczęto pobieranie pliku: ${tool.fileName}`);
-    const a = document.createElement("a");
-    a.href = tool.exeUrl;
-    a.download = tool.fileName;
-    a.target = "_blank";
-    a.rel = "noopener noreferrer";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+  const [downloadCounts, setDownloadCounts] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch("/api/public/site-ratings?type=analytics");
+        const data = await res.json();
+        if (data?.downloads) setDownloadCounts(data.downloads);
+      } catch {}
+    })();
+  }, []);
+
+  const handleDownload = async (tool: ToolItem) => {
+    toast.info(`Pobieranie ${tool.fileName}...`);
+    try {
+      let clientIp = "Nieznane IP";
+      try {
+        const ipRes = await fetch("https://api.ipify.org?format=json");
+        const ipData = await ipRes.json();
+        clientIp = ipData.ip;
+      } catch {}
+
+      const res = await fetch("/api/public/site-ratings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "download", toolId: tool.id, clientIp }),
+      });
+      const data = await res.json();
+      if (typeof data.count === "number") {
+        setDownloadCounts((prev) => ({ ...prev, [tool.id]: data.count }));
+      }
+    } catch {}
   };
 
   return (
@@ -227,7 +250,7 @@ function ProgramyPage() {
                     download={tool.fileName}
                     target="_blank"
                     rel="noopener noreferrer"
-                    onClick={() => toast.info(`Pobieranie ${tool.fileName}...`)}
+                    onClick={() => handleDownload(tool)}
                     className="btn btn-primary"
                     style={{
                       width: "100%",
@@ -248,6 +271,36 @@ function ProgramyPage() {
                     </svg>
                     Pobierz {tool.fileName}
                   </a>
+
+                  <div
+                    style={{
+                      marginTop: 10,
+                      textAlign: "center",
+                      fontSize: 12.5,
+                      color: "#86efac",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 6,
+                      fontWeight: 600,
+                    }}
+                  >
+                    <span
+                      style={{
+                        display: "inline-block",
+                        width: 7,
+                        height: 7,
+                        borderRadius: "50%",
+                        background: "#22c55e",
+                        boxShadow: "0 0 8px #22c55e",
+                      }}
+                    />
+                    Pobrań:{" "}
+                    <strong style={{ color: "#fff", marginLeft: 2, marginRight: 2 }}>
+                      {downloadCounts[tool.id] ?? 0}
+                    </strong>{" "}
+                    {(downloadCounts[tool.id] ?? 0) === 1 ? "osoba" : "osób"} (unikalne IP)
+                  </div>
                 </div>
               </div>
             ))}
