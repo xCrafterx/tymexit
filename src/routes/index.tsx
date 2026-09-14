@@ -238,7 +238,7 @@ function Index() {
             {[
               {
                 h: "Naprawa komputera",
-                p: "30 - 70 zł",
+                p: "od 50 zł",
                 d: "Kompleksowa diagnoza i naprawa komputerów stacjonarnych.",
                 items: [
                   "Diagnoza usterki sprzętu i systemu",
@@ -249,7 +249,7 @@ function Index() {
               },
               {
                 h: "Czyszczenie i optymalizacja",
-                p: "40 - 60 zł",
+                p: "od 50 zł",
                 d: "Przywrócenie kultury pracy i wydajności sprzętu.",
                 items: [
                   "Czyszczenie wnętrza i układu chłodzenia",
@@ -260,7 +260,7 @@ function Index() {
               },
               {
                 h: "Instalacja systemu",
-                p: "50 - 80 zł",
+                p: "od 60 zł",
                 d: "Czysta instalacja systemu z pełną konfiguracją.",
                 items: [
                   "Instalacja Windows 10/11 lub Linux",
@@ -271,7 +271,7 @@ function Index() {
               },
               {
                 h: "Komputer na zamówienie",
-                p: "indywidualnie (do 100 zł)",
+                p: "od 50 zł",
                 d: "Zestaw PC dopasowany do Twoich potrzeb i budżetu.",
                 items: [
                   "Dobór podzespołów (gaming, biuro, praca twórcza)",
@@ -282,7 +282,7 @@ function Index() {
               },
               {
                 h: "Naprawa laptopa",
-                p: "40 - 80 zł",
+                p: "od 60 zł",
                 d: "Serwis laptopów wszystkich popularnych marek.",
                 items: [
                   "Diagnoza problemów z uruchamianiem",
@@ -293,7 +293,7 @@ function Index() {
               },
               {
                 h: "Modernizacja sprzętu",
-                p: "30 - 60 zł",
+                p: "od 45 zł",
                 d: "Przyspiesz starszy komputer bez kupowania nowego.",
                 items: [
                   "Doradztwo w wyborze podzespołów",
@@ -304,7 +304,7 @@ function Index() {
               },
               {
                 h: "Sieć Wi-Fi",
-                p: "30 - 50 zł",
+                p: "od 40 zł",
                 d: "Stabilna i bezpieczna sieć w domu lub firmie.",
                 items: [
                   "Konfiguracja routera i hasła sieci",
@@ -315,7 +315,7 @@ function Index() {
               },
               {
                 h: "Pomoc zdalna",
-                p: "20 - 40 zł",
+                p: "od 30 zł",
                 d: "Szybka pomoc bez wychodzenia z domu.",
                 items: [
                   "Połączenie przez AnyDesk lub TeamViewer",
