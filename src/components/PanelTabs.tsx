@@ -151,13 +151,18 @@ export function PanelTabs({ groups, active, onChange }: Props) {
                         <span className="panel-tabs__item-label">{item.label}</span>
                         {hasBadge ? (
                           <span
-                            className={`panel-tabs__badge ${item.badgeVariant === "danger" ? "panel-tabs__badge--danger" : ""}`}
-                            style={item.badgeVariant === "danger" ? {
-                              background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
-                              color: "#fff",
-                              boxShadow: "0 0 10px rgba(239, 68, 68, 0.7)",
-                              animation: "redBadgePulse 2s ease-in-out infinite",
-                            } : undefined}
+                            className={`panel-tabs__badge ${item.badgeVariant === "danger" ? "panel-tabs__badge--danger" : item.badgeVariant === "success" ? "panel-tabs__badge--success" : ""}`}
+                            style={
+                              item.badgeVariant === "danger" ? {
+                                background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
+                                color: "#fff",
+                                boxShadow: "0 0 10px rgba(239, 68, 68, 0.7)",
+                              } : item.badgeVariant === "success" ? {
+                                background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                                color: "#fff",
+                                boxShadow: "0 0 8px rgba(16, 185, 129, 0.5)",
+                              } : undefined
+                            }
                           >
                             {item.badge}
                           </span>
