@@ -4,8 +4,38 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 export const Route = createFileRoute("/api/public/site-ratings")({
   server: {
     handlers: {
-      GET: async () => {
+      GET: async ({ request }: { request: Request }) => {
         try {
+          const url = new URL(request.url);
+          if (url.searchParams.get("type") === "analytics") {
+            // Licznik unikalnych wizyt
+            const { count: visitsCount } = await supabaseAdmin
+              .from("tickets")
+              .select("id", { count: "exact", head: true })
+              .eq("source", "odwiedziny_strony")
+              .is("deleted_at", null);
+
+            // Liczniki pobrań programów
+            const { data: downloadRows } = await supabaseAdmin
+              .from("tickets")
+              .select("service_type")
+              .eq("source", "pobranie_programu")
+              .is("deleted_at", null);
+
+            const downloads: Record<string, number> = {};
+            (downloadRows || []).forEach((row: any) => {
+              const key = (row.service_type || "").replace("pobranie_", "");
+              if (key) {
+                downloads[key] = (downloads[key] || 0) + 1;
+              }
+            });
+
+            return new Response(
+              JSON.stringify({ visits: visitsCount || 0, downloads }),
+              { status: 200, headers: { "Content-Type": "application/json" } }
+            );
+          }
+
           const { data, error } = await supabaseAdmin
             .from("tickets")
             .select("title, description, status")
@@ -55,13 +85,92 @@ export const Route = createFileRoute("/api/public/site-ratings")({
         }
       },
 
-      POST: async ({ request }) => {
+      POST: async ({ request }: { request: Request }) => {
         try {
           let body: any = {};
           try {
             body = await request.json();
           } catch {}
 
+          // 1. Rejestracja unikalnej wizyty (1 na IP)
+          if (body.type === "visit") {
+            const clientIp = String(body.clientIp || "").trim();
+            if (clientIp && clientIp !== "Nieznane IP") {
+              const { data: existing } = await supabaseAdmin
+                .from("tickets")
+                .select("id")
+                .eq("source", "odwiedziny_strony")
+                .eq("client_email", clientIp)
+                .limit(1);
+
+              if (!existing || existing.length === 0) {
+                await supabaseAdmin.from("tickets").insert({
+                  user_id: "10bfa389-afad-426e-887d-c98c2145a466",
+                  title: `[Odwiedziny] ${clientIp}`,
+                  description: `Unikalna wizyta ze strony głównej. IP: ${clientIp}`,
+                  service_type: "odwiedziny",
+                  status: "oczekuje",
+                  client_name: "Odwiedzający",
+                  client_email: clientIp,
+                  source: "odwiedziny_strony",
+                });
+              }
+            }
+
+            const { count: visitsCount } = await supabaseAdmin
+              .from("tickets")
+              .select("id", { count: "exact", head: true })
+              .eq("source", "odwiedziny_strony")
+              .is("deleted_at", null);
+
+            return new Response(JSON.stringify({ ok: true, visits: visitsCount || 0 }), {
+              status: 200,
+              headers: { "Content-Type": "application/json" },
+            });
+          }
+
+          // 2. Rejestracja unikalnego pobrania programu (1 na IP dla danego programu)
+          if (body.type === "download") {
+            const toolId = String(body.toolId || "").trim();
+            const clientIp = String(body.clientIp || "").trim();
+            if (toolId && clientIp && clientIp !== "Nieznane IP") {
+              const serviceType = `pobranie_${toolId}`;
+              const { data: existing } = await supabaseAdmin
+                .from("tickets")
+                .select("id")
+                .eq("source", "pobranie_programu")
+                .eq("service_type", serviceType)
+                .eq("client_email", clientIp)
+                .limit(1);
+
+              if (!existing || existing.length === 0) {
+                await supabaseAdmin.from("tickets").insert({
+                  user_id: "10bfa389-afad-426e-887d-c98c2145a466",
+                  title: `[Pobranie] ${toolId}`,
+                  description: `Unikalne pobranie programu ${toolId} z IP: ${clientIp}`,
+                  service_type: serviceType,
+                  status: "oczekuje",
+                  client_name: `Pobranie: ${toolId}`,
+                  client_email: clientIp,
+                  source: "pobranie_programu",
+                });
+              }
+            }
+
+            const { count: toolDownloads } = await supabaseAdmin
+              .from("tickets")
+              .select("id", { count: "exact", head: true })
+              .eq("source", "pobranie_programu")
+              .eq("service_type", `pobranie_${body.toolId}`)
+              .is("deleted_at", null);
+
+            return new Response(JSON.stringify({ ok: true, count: toolDownloads || 0 }), {
+              status: 200,
+              headers: { "Content-Type": "application/json" },
+            });
+          }
+
+          // 3. Ocena strony
           const rating = Number(body.rating);
           if (!rating || rating < 1 || rating > 10) {
             return new Response(
@@ -74,7 +183,6 @@ export const Route = createFileRoute("/api/public/site-ratings")({
           const comment = String(body.comment || "").slice(0, 1000).trim();
           const browser = String(body.browser || "").slice(0, 300);
 
-          // Sprawdzamy czy z tego IP już oddano ocenę
           if (clientIp && clientIp !== "Nieznane IP") {
             const { data: existing } = await supabaseAdmin
               .from("tickets")
@@ -96,7 +204,6 @@ export const Route = createFileRoute("/api/public/site-ratings")({
           const techMetadata = `\n\n--- METADATA ---\nIP: ${clientIp}\nOcena: ${rating}/10\nPrzeglądarka: ${browser}\nData: ${sentTime}`;
           const fullDesc = (comment || "(brak komentarza)") + techMetadata;
 
-          // Wstawiamy jako ticket z source = 'ocena_strony'
           const { error: insertErr } = await supabaseAdmin.from("tickets").insert({
             user_id: "10bfa389-afad-426e-887d-c98c2145a466",
             title: `[Ocena strony] ${rating}/10`,
