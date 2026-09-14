@@ -479,8 +479,17 @@ export function PanelAdmin() {
           <div className="reveal visible" style={{ display: "flex", gap: 8, flexWrap: "wrap", margin: "24px 0" }}>
             <button
               type="button"
-              className={`btn ${filter === "all" ? "btn-primary" : "btn-ghost"}`}
-              style={{ padding: "8px 16px", fontSize: 13 }}
+              className={`btn ${filter === "all" ? "" : "btn-ghost"}`}
+              style={{
+                padding: "8px 16px",
+                fontSize: 13,
+                fontWeight: filter === "all" ? 700 : 500,
+                background: filter === "all" ? "rgba(34, 211, 238, 0.22)" : undefined,
+                color: filter === "all" ? "#22d3ee" : undefined,
+                borderColor: filter === "all" ? "rgba(34, 211, 238, 0.6)" : undefined,
+                boxShadow: filter === "all" ? "0 0 16px rgba(34, 211, 238, 0.45)" : undefined,
+                transition: "all 0.2s ease",
+              }}
               onClick={() => setFilter("all")}
             >
               Wszystkie ({active.length})
@@ -488,12 +497,22 @@ export function PanelAdmin() {
             {STATUSES.map((st) => {
               const count = active.filter((t) => t.status === st).length;
               const meta = STATUS_META[st];
+              const isActive = filter === st;
               return (
                 <button
                   key={st}
                   type="button"
-                  className={`btn ${filter === st ? "btn-primary" : "btn-ghost"}`}
-                  style={{ padding: "8px 16px", fontSize: 13 }}
+                  className={`btn ${isActive ? "" : "btn-ghost"}`}
+                  style={{
+                    padding: "8px 16px",
+                    fontSize: 13,
+                    fontWeight: isActive ? 700 : 500,
+                    background: isActive ? meta.bg : undefined,
+                    color: isActive ? meta.color : undefined,
+                    borderColor: isActive ? meta.border : undefined,
+                    boxShadow: isActive ? meta.glow : undefined,
+                    transition: "all 0.2s ease",
+                  }}
                   onClick={() => setFilter(st)}
                 >
                   <span style={{ marginRight: 6 }}>{meta?.icon}</span>
