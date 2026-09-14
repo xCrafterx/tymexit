@@ -7,7 +7,7 @@ export type PanelTabItem = {
   label: string;
   icon: string;
   badge?: number;
-  badgeVariant?: "default" | "danger";
+  badgeVariant?: "default" | "danger" | "success";
   excludeFromGroupBadge?: boolean;
 };
 
@@ -48,6 +48,28 @@ const dangerPulseStyle = `
   position: relative;
   z-index: 2;
 }
+@keyframes greenBadgePulse {
+  0%, 100% {
+    box-shadow: 0 0 3px rgba(16, 185, 129, 0.3);
+    filter: brightness(0.88);
+    transform: scale(0.96);
+    opacity: 0.78;
+  }
+  50% {
+    box-shadow: 0 0 8px #10b981, 0 0 16px rgba(16, 185, 129, 0.6);
+    filter: brightness(1.2);
+    transform: scale(1.06);
+    opacity: 1;
+  }
+}
+.panel-tabs__badge--success {
+  animation: greenBadgePulse 2.2s ease-in-out infinite !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 999px !important;
+}
+
 `;
 
 export function PanelTabs({ groups, active, onChange }: Props) {
