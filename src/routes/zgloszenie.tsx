@@ -173,7 +173,7 @@ function ZgloszeniePage() {
       .insert({
         user_id: userId,
         title: d.title,
-        description: d.description + techMetadata,
+        description: d.description,
         service_type: d.service_type,
         status: "oczekuje",
         client_name: d.client_name,
