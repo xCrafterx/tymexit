@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+const VISITED_KEY = "tymekit_visitor_logged_v1";
+
 export function VisitorCounterBadge() {
   const [count, setCount] = useState<number | null>(null);
 
@@ -7,7 +9,7 @@ export function VisitorCounterBadge() {
     let mounted = true;
 
     const registerAndFetch = async () => {
-      // 1. Natychmiast pobierz aktualny stan analityki
+      // 1. Zawsze natychmiast pobierz aktualną liczbę unikalnych osób
       try {
         const initialRes = await fetch("/api/public/site-ratings?type=analytics");
         const initialData = await initialRes.json();
@@ -16,7 +18,13 @@ export function VisitorCounterBadge() {
         }
       } catch {}
 
-      // 2. Spróbuj zarejestrować nowe unikalne wejście
+      // 2. Jeśli ta przeglądarka już została policzona, nie wysyłaj ponownego zgłoszenia
+      const alreadyLogged = localStorage.getItem(VISITED_KEY);
+      if (alreadyLogged) {
+        return;
+      }
+
+      // 3. Pobierz IP i wyślij pierwsze unikalne wejście
       try {
         let clientIp = "";
         try {
@@ -26,9 +34,7 @@ export function VisitorCounterBadge() {
           clearTimeout(timer);
           const ipData = await ipRes.json();
           clientIp = ipData.ip || "";
-        } catch {
-          // fallback bez zewnętrznego IP - serwer może odczytać nagłówek
-        }
+        } catch {}
 
         const res = await fetch("/api/public/site-ratings", {
           method: "POST",
@@ -36,6 +42,9 @@ export function VisitorCounterBadge() {
           body: JSON.stringify({ type: "visit", clientIp: clientIp || undefined }),
         });
         const data = await res.json();
+        if (data?.ok) {
+          localStorage.setItem(VISITED_KEY, "1");
+        }
         if (mounted && typeof data.visits === "number") {
           setCount(Math.max(1, data.visits));
         }
@@ -49,7 +58,6 @@ export function VisitorCounterBadge() {
     };
   }, []);
 
-  // Pokazuj zawsze (jeśli jeszcze nie załadowano, min. 1)
   const displayCount = count ?? 1;
 
   return (
@@ -78,7 +86,7 @@ export function VisitorCounterBadge() {
         pointerEvents: "auto",
         animation: "badgeFloat 3s ease-in-out infinite",
       }}
-      title="Liczba unikalnych osób, które odwiedziły stronę (1 wejście na 1 IP)"
+      title="Liczba unikalnych osób, które odwiedziły stronę (1 wejście na 1 urządzenie i IP)"
     >
       <style>{`
         @keyframes badgeFloat {
