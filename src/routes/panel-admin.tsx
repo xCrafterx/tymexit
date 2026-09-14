@@ -234,7 +234,7 @@ export function PanelAdmin() {
                 icon: "🛠",
                 items: [
                   { key: "tickets", label: "Zgłoszenia", icon: "📋", badge: active.length, badgeVariant: "success", excludeFromGroupBadge: true },
-                  { key: "form_logs", label: "Logi formularzy", icon: "🌐", badge: tickets.filter((t) => t.source === "formularz").length || undefined },
+                  { key: "form_logs", label: "Logi formularzy", icon: "🌐", badgeDot: tickets.some((t) => t.source === "formularz") },
                   { key: "chats", label: "Czat na żywo", icon: "💬" },
                   { key: "trash", label: "Kosz", icon: "🗑", badge: trashed.length, badgeVariant: "danger", excludeFromGroupBadge: true },
                 ],
@@ -468,6 +468,13 @@ export function PanelAdmin() {
               )}
             </>
           ) : (<>
+          <div className="reveal visible" style={{ marginBottom: 18 }}>
+            <span className="eyebrow" style={{ borderColor: "rgba(16, 185, 129, 0.35)", color: "#10b981" }}>
+              <span className="dot" style={{ background: "#10b981", boxShadow: "0 0 12px #10b981", animation: "greenBadgePulse 2.2s ease-in-out infinite" }}></span>
+              Zgłoszenia ({active.length})
+            </span>
+          </div>
+
           <div className="hero-stats reveal visible" style={{ marginTop: 0 }}>
             <div className="hero-stat"><div className="num">{stats.oczekuje}</div><div className="label">Oczekuje</div></div>
             <div className="hero-stat"><div className="num">{stats.zaakceptowane}</div><div className="label">Zaakceptowane</div></div>
