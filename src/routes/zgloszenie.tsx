@@ -35,6 +35,7 @@ const SERVICES = [
   "Modernizacja sprzętu",
   "Sieć Wi-Fi",
   "Pomoc zdalna",
+  "Inna",
 ];
 
 const ALLOWED = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
@@ -56,6 +57,7 @@ function ZgloszeniePage() {
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
+  const [otherServiceType, setOtherServiceType] = useState("");
   useEffect(() => {
     if (user?.email) {
       setForm((f) => ({ ...f, client_email: f.client_email || user.email || "" }));
@@ -174,7 +176,7 @@ function ZgloszeniePage() {
         user_id: userId,
         title: d.title,
         description: d.description,
-        service_type: d.service_type,
+        service_type: d.service_type === "Inna" && otherServiceType.trim() ? `Inne - ${otherServiceType.trim()}` : d.service_type,
         status: "oczekuje",
         client_name: d.client_name,
         client_phone: d.client_phone,
@@ -327,6 +329,21 @@ function ZgloszeniePage() {
                     </option>
                   ))}
                 </select>
+                {form.service_type === "Inna" && (
+                  <div style={{ marginTop: 8 }}>
+                    <label style={{ fontSize: 12, color: "var(--brand-2, #f5b042)", display: "block", marginBottom: 4 }}>
+                      Jaki to typ usługi? (opcjonalnie, maks. 100 znaków)
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      maxLength={100}
+                      placeholder="np. naprawa telefonu, czyszczenie konsoli..."
+                      value={otherServiceType}
+                      onChange={(e) => setOtherServiceType(e.target.value)}
+                    />
+                  </div>
+                )}
               </div>
             </div>
 
