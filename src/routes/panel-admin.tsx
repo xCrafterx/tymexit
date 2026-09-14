@@ -468,12 +468,6 @@ export function PanelAdmin() {
               )}
             </>
           ) : (<>
-          <div className="reveal visible" style={{ marginBottom: 18 }}>
-            <span className="eyebrow" style={{ borderColor: "rgba(16, 185, 129, 0.35)", color: "#10b981" }}>
-              <span className="dot" style={{ background: "#10b981", boxShadow: "0 0 12px #10b981", animation: "greenBadgePulse 2.2s ease-in-out infinite" }}></span>
-              Zgłoszenia ({active.length})
-            </span>
-          </div>
 
           <div className="hero-stats reveal visible" style={{ marginTop: 0 }}>
             <div className="hero-stat"><div className="num">{stats.oczekuje}</div><div className="label">Oczekuje</div></div>
