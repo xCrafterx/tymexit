@@ -12,10 +12,13 @@ export function SoundToggle() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 
-  // Odczyt zapamiętanej głośności lub domyślnie 10%
+  // Odczyt zapamiętanej głośności z sesji karty (sessionStorage).
+  // Po odświeżeniu (F5) 0% zostaje zachowane, a po całkowitym zamknięciu karty resetuje się do domyślnych 10%.
   const [volume, setVolume] = useState(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
+      // Usuwamy ewentualny stary wpis z localStorage, aby nie zakłócał sesji
+      localStorage.removeItem(STORAGE_KEY);
+      const saved = sessionStorage.getItem(STORAGE_KEY);
       if (saved !== null) {
         const parsed = parseFloat(saved);
         if (!isNaN(parsed) && parsed >= 0 && parsed <= 1) return parsed;
@@ -37,7 +40,7 @@ export function SoundToggle() {
     applyVolume(volume);
     setSoundEnabled(volume > 0);
     try {
-      localStorage.setItem(STORAGE_KEY, String(volume));
+      sessionStorage.setItem(STORAGE_KEY, String(volume));
     } catch {}
   }, [volume]);
 
