@@ -209,7 +209,7 @@ export function PanelTabs({ groups, active, onChange }: Props) {
                             {item.badge}
                           </span>
                         ) : null}
-                        {isActive && <span className="panel-tabs__item-dot" aria-hidden />}
+                        {isActive && !hasBadge && !item.badgeDot && <span className="panel-tabs__item-dot" aria-hidden />}
                       </button>
                     );
                   })}
