@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { ReviewsList, ReviewForm } from "@/components/Reviews";
 import { SiteRatingPrompt } from "@/components/SiteRatingPrompt";
+import { VisitorCounterBadge } from "@/components/VisitorCounterBadge";
 import { SiteRatingAllegro } from "@/components/SiteRatingAllegro";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -77,6 +78,7 @@ function Index() {
     <>
       <div className="container" style={{ position: "relative", zIndex: 50 }}>
         <SiteRatingPrompt />
+      <VisitorCounterBadge />
       </div>
 
       {/* HERO */}
