@@ -13,8 +13,8 @@ type Attachment = {
   created_at: string;
 };
 
-const ALLOWED = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
-const MAX_FILE = 10 * 1024 * 1024;
+const ALLOWED = ["image/jpeg", "image/png", "image/webp", "application/pdf", "video/mp4", "video/webm", "video/quicktime"];
+const MAX_FILE = 25 * 1024 * 1024;
 const MAX_FILES = 5;
 
 export function TicketAttachments({
