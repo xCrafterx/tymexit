@@ -233,7 +233,7 @@ export function PanelAdmin() {
                 label: "Obsługa klienta",
                 icon: "🛠",
                 items: [
-                  { key: "tickets", label: "Zgłoszenia", icon: "📋" },
+                  { key: "tickets", label: "Zgłoszenia", icon: "📋", badge: active.length, badgeVariant: "success", excludeFromGroupBadge: true },
                   { key: "form_logs", label: "Logi formularzy", icon: "🌐", badge: tickets.filter((t) => t.source === "formularz").length || undefined },
                   { key: "chats", label: "Czat na żywo", icon: "💬" },
                   { key: "trash", label: "Kosz", icon: "🗑", badge: trashed.length, badgeVariant: "danger", excludeFromGroupBadge: true },
