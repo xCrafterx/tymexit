@@ -125,7 +125,7 @@ export function PanelTabs({ groups, active, onChange }: Props) {
         </span>
         {activeItem?.badgeDot ? (
           <span className="panel-tabs__badge-dot" style={{ marginRight: 8 }} />
-        ) : typeof activeItem?.badge === "number" ? (
+        ) : typeof activeItem?.badge === "number" && activeItem.badge > 0 ? (
           <span
             className={`panel-tabs__badge ${activeItem.badgeVariant === "danger" ? "panel-tabs__badge--danger" : activeItem.badgeVariant === "success" ? "panel-tabs__badge--success" : ""}`}
             style={
@@ -179,7 +179,7 @@ export function PanelTabs({ groups, active, onChange }: Props) {
                 <div className="panel-tabs__menu-inner">
                   {group.items.map((item) => {
                     const isActive = item.key === active;
-                    const hasBadge = typeof item.badge === "number";
+                    const hasBadge = typeof item.badge === "number" && item.badge > 0;
                     return (
                       <button
                         key={item.key}
