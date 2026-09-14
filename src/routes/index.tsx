@@ -257,7 +257,7 @@ function Index() {
               },
               {
                 h: "Czyszczenie i optymalizacja",
-                p: "od 50 zł",
+                p: "od 30 zł",
                 d: "Przywrócenie kultury pracy i wydajności sprzętu.",
                 items: [
                   "Czyszczenie wnętrza i układu chłodzenia",
@@ -268,7 +268,7 @@ function Index() {
               },
               {
                 h: "Instalacja systemu",
-                p: "od 60 zł",
+                p: "od 50 zł",
                 d: "Czysta instalacja systemu z pełną konfiguracją.",
                 items: [
                   "Instalacja Windows 10/11 lub Linux",
@@ -279,7 +279,7 @@ function Index() {
               },
               {
                 h: "Komputer na zamówienie",
-                p: "od 50 zł",
+                p: "od 30 zł",
                 d: "Zestaw PC dopasowany do Twoich potrzeb i budżetu.",
                 items: [
                   "Dobór podzespołów (gaming, biuro, praca twórcza)",
@@ -290,7 +290,7 @@ function Index() {
               },
               {
                 h: "Naprawa laptopa",
-                p: "od 60 zł",
+                p: "od 40 zł",
                 d: "Serwis laptopów wszystkich popularnych marek.",
                 items: [
                   "Diagnoza problemów z uruchamianiem",
@@ -301,7 +301,7 @@ function Index() {
               },
               {
                 h: "Modernizacja sprzętu",
-                p: "od 45 zł",
+                p: "od 40 zł",
                 d: "Przyspiesz starszy komputer bez kupowania nowego.",
                 items: [
                   "Doradztwo w wyborze podzespołów",
@@ -312,7 +312,7 @@ function Index() {
               },
               {
                 h: "Sieć Wi-Fi",
-                p: "od 40 zł",
+                p: "od 30 zł",
                 d: "Stabilna i bezpieczna sieć w domu lub firmie.",
                 items: [
                   "Konfiguracja routera i hasła sieci",
@@ -323,7 +323,7 @@ function Index() {
               },
               {
                 h: "Pomoc zdalna",
-                p: "od 30 zł",
+                p: "od 20 zł",
                 d: "Szybka pomoc bez wychodzenia z domu.",
                 items: [
                   "Połączenie przez AnyDesk lub TeamViewer",
