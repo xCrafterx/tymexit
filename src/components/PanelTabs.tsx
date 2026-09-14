@@ -24,6 +24,30 @@ type Props = {
   onChange: (key: PanelTabKey) => void;
 };
 
+const dangerPulseStyle = `
+@keyframes redBadgePulse {
+  0%, 100% {
+    box-shadow: 0 0 4px rgba(239, 68, 68, 0.4), 0 0 0 0 rgba(239, 68, 68, 0.2);
+    filter: brightness(0.85);
+    opacity: 0.7;
+    transform: scale(0.94);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(239, 68, 68, 0.95), 0 0 28px rgba(239, 68, 68, 0.8), 0 0 0 5px rgba(239, 68, 68, 0.35);
+    filter: brightness(1.3);
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+.panel-tabs__badge--danger {
+  animation: redBadgePulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 999px !important;
+}
+`;
+
 export function PanelTabs({ groups, active, onChange }: Props) {
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -48,6 +72,7 @@ export function PanelTabs({ groups, active, onChange }: Props) {
 
   return (
     <div ref={rootRef} className="panel-tabs reveal visible">
+      <style>{dangerPulseStyle}</style>
       {/* Mobile trigger */}
       <button
         type="button"
@@ -101,11 +126,10 @@ export function PanelTabs({ groups, active, onChange }: Props) {
                         <span className="panel-tabs__item-label">{item.label}</span>
                         {item.badge ? (
                           <span
-                            className="panel-tabs__badge"
+                            className={`panel-tabs__badge ${item.badgeVariant === "danger" ? "panel-tabs__badge--danger" : ""}`}
                             style={item.badgeVariant === "danger" ? {
                               background: "linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)",
                               color: "#fff",
-                              boxShadow: "0 0 10px rgba(239, 68, 68, 0.6)"
                             } : undefined}
                           >
                             {item.badge}
