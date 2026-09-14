@@ -561,7 +561,7 @@ export function PanelAdmin() {
                             </span>
                           )}
                           {t.source && <span className="badge badge-ghost">źródło: {t.source}</span>}
-                          <ReputationBadge userId={t.user_id} />
+                          <ReputationBadge userId={t.user_id} editable={true} />
                           <small className="text-mute">
                             {new Date(t.created_at).toLocaleString("pl-PL")}
                           </small>
@@ -615,7 +615,7 @@ export function PanelAdmin() {
                     </div>
 
                     <div style={{ margin: "16px 0", padding: "14px 18px", borderRadius: "calc(var(--rad) - 4px)", background: "rgba(0,0,0,0.3)" }}>
-                      <p style={{ color: "var(--text-sec)", whiteSpace: "pre-wrap", lineHeight: 1.6 }}>{t.description}</p>
+                      <p style={{ color: "var(--text-sec)", whiteSpace: "pre-wrap", lineHeight: 1.6 }}>{(t.description || "").split("--- METADATA ---")[0].trim()}</p>
                     </div>
 
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12, margin: "14px 0", fontSize: 13 }}>
