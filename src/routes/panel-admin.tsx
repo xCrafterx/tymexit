@@ -236,7 +236,7 @@ export function PanelAdmin() {
                   { key: "tickets", label: "Zgłoszenia", icon: "📋" },
                   { key: "form_logs", label: "Logi formularzy", icon: "🌐", badge: tickets.filter((t) => t.source === "formularz").length || undefined },
                   { key: "chats", label: "Czat na żywo", icon: "💬" },
-                  { key: "trash", label: "Kosz", icon: "🗑", badge: trashed.length || undefined, badgeVariant: "danger", excludeFromGroupBadge: true },
+                  { key: "trash", label: "Kosz", icon: "🗑", badge: trashed.length, badgeVariant: "danger", excludeFromGroupBadge: true },
                 ],
               },
               {
@@ -427,7 +427,7 @@ export function PanelAdmin() {
           ) : tab === "chats" ? <AdminLiveChats /> : tab === "reviews" ? <AdminReviews /> : tab === "popular" ? <PopularServicesAdmin /> : tab === "secrets" ? <MySecrets /> : tab === "eggs" ? <AllEasterEggs /> : tab === "account" ? <AccountSettings /> : tab === "trash" ? (
             <>
               <div className="reveal visible">
-                <span className="eyebrow"><span className="dot"></span> Kosz</span>
+                <span className="eyebrow" style={{ borderColor: "rgba(239, 68, 68, 0.3)" }}><span className="dot" style={{ background: "#ef4444", boxShadow: "0 0 14px #ef4444", animation: "redBadgePulse 2s ease-in-out infinite" }}></span> Kosz ({trashed.length})</span>
                 <h2 className="section-title" style={{ marginTop: 18 }}>Usunięte <span className="grad">zlecenia.</span></h2>
                 <p className="text-dim" style={{ marginTop: 10 }}>Możesz przywrócić zlecenie lub usunąć je trwale wraz z historią statusów.</p>
               </div>
