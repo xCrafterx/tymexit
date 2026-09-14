@@ -142,6 +142,9 @@ export function SiteRatingPrompt() {
 
         {/* Opcjonalny komentarz */}
         <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+          <label style={{ color: "#ef4444", fontSize: "13px", fontWeight: "600", display: "block" }}>
+            Napisz tutaj co mam dodać lub zmienić.
+          </label>
           <input
             type="text"
             value={comment}
