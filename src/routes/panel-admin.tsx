@@ -110,7 +110,7 @@ export function PanelAdmin() {
     return () => { supabase.removeChannel(ch); };
   }, [session]);
 
-  const active = useMemo(() => tickets.filter((t) => !t.deleted_at && t.source !== "ocena_strony"), [tickets]);
+  const active = useMemo(() => tickets.filter((t) => !t.deleted_at && !["ocena_strony", "odwiedziny_strony", "pobranie_programu"].includes(t.source || "")), [tickets]);
   const trashed = useMemo(() => tickets.filter((t) => !!t.deleted_at), [tickets]);
 
   const stats = useMemo(() => ({
