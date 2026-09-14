@@ -10,7 +10,7 @@ import { AccountSettings } from "@/components/AccountSettings";
 import { TicketProgressBar } from "@/components/TicketProgressBar";
 import { TicketAttachments } from "@/components/TicketAttachments";
 import { TicketChat } from "@/components/TicketChat";
-import { STATUS_META, type TicketStatus } from "@/lib/ticket-status";
+import { ALL_STATUSES, STATUS_META, type TicketStatus } from "@/lib/ticket-status";
 import { notifyStatus } from "@/lib/notify";
 import { ReviewForm, MyReviews } from "@/components/Reviews";
 
@@ -64,6 +64,7 @@ function PanelKlienta() {
   const [form, setForm] = useState({ title: "", service_type: SERVICES[0], description: "" });
   const [files, setFiles] = useState<File[]>([]);
   const [tab, setTab] = useState<"tickets" | "review" | "secrets" | "account">("tickets");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [openChats, setOpenChats] = useState<Record<string, boolean>>({});
 
   const ALLOWED_MIME = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
@@ -357,6 +358,54 @@ function PanelKlienta() {
             <h2 className="section-title" style={{ marginTop: 18 }}>Twoje <span className="grad">zgłoszenia.</span></h2>
           </div>
 
+          {tickets.length > 0 && (
+            <div className="reveal visible" style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 20 }}>
+              <button
+                type="button"
+                className={`btn ${statusFilter === "all" ? "" : "btn-ghost"}`}
+                style={{
+                  padding: "8px 16px",
+                  fontSize: 13,
+                  fontWeight: statusFilter === "all" ? 700 : 500,
+                  background: statusFilter === "all" ? "rgba(34, 211, 238, 0.22)" : undefined,
+                  color: statusFilter === "all" ? "#22d3ee" : undefined,
+                  borderColor: statusFilter === "all" ? "rgba(34, 211, 238, 0.6)" : undefined,
+                  boxShadow: statusFilter === "all" ? "0 0 16px rgba(34, 211, 238, 0.45)" : undefined,
+                  transition: "all 0.2s ease",
+                }}
+                onClick={() => setStatusFilter("all")}
+              >
+                Wszystkie ({tickets.length})
+              </button>
+              {ALL_STATUSES.filter((st) => tickets.some((t) => t.status === st)).map((st) => {
+                const count = tickets.filter((t) => t.status === st).length;
+                const meta = STATUS_META[st];
+                const isActive = statusFilter === st;
+                return (
+                  <button
+                    key={st}
+                    type="button"
+                    className={`btn ${isActive ? "" : "btn-ghost"}`}
+                    style={{
+                      padding: "8px 16px",
+                      fontSize: 13,
+                      fontWeight: isActive ? 700 : 500,
+                      background: isActive ? meta.bg : undefined,
+                      color: isActive ? meta.color : undefined,
+                      borderColor: isActive ? meta.border : undefined,
+                      boxShadow: isActive ? meta.glow : undefined,
+                      transition: "all 0.2s ease",
+                    }}
+                    onClick={() => setStatusFilter(st)}
+                  >
+                    <span style={{ marginRight: 6 }}>{meta?.icon}</span>
+                    {meta?.label ?? st} ({count})
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
           {loading ? (
             <p className="text-dim" style={{ marginTop: 30 }}>Ładowanie…</p>
           ) : tickets.length === 0 ? (
@@ -365,7 +414,7 @@ function PanelKlienta() {
             </div>
           ) : (
             <div className="testi-grid" style={{ marginTop: 30 }}>
-              {tickets.map((t, i) => {
+              {tickets.filter((t) => statusFilter === "all" || t.status === statusFilter).map((t, i) => {
                 const meta = STATUS_META[t.status as TicketStatus] ?? { color: "var(--text-mute)", label: t.status, icon: "•" };
                 const chatOpen = openChats[t.id];
                 const canUpload = ["oczekuje", "zaakceptowane", "w diagnozie", "w naprawie", "oczekuje na części"].includes(t.status);
@@ -378,7 +427,7 @@ function PanelKlienta() {
                             🛒 Zamówienie usługi
                           </span>
                         )}
-                        <span style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "4px 12px", borderRadius: 999, background: "var(--surface-2)", border: "1px solid var(--border)", fontSize: 12, color: meta.color, textTransform: "uppercase", letterSpacing: ".12em" }}>
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 14px", borderRadius: 999, background: meta.bg ?? "var(--surface-2)", border: `1px solid ${meta.border ?? "var(--border)"}`, boxShadow: meta.glow, fontSize: 12, fontWeight: 700, color: meta.color, textTransform: "uppercase", letterSpacing: ".08em" }}>
                           <span>{meta.icon}</span>{meta.label}
                         </span>
                       </div>
