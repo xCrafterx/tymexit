@@ -7,6 +7,7 @@ export type PanelTabItem = {
   label: string;
   icon: string;
   badge?: number;
+  badgeDot?: boolean;
   badgeVariant?: "default" | "danger" | "success";
   excludeFromGroupBadge?: boolean;
 };
@@ -48,17 +49,18 @@ const dangerPulseStyle = `
   position: relative;
   z-index: 2;
 }
+
 @keyframes greenBadgePulse {
   0%, 100% {
-    box-shadow: 0 0 3px rgba(16, 185, 129, 0.3);
-    filter: brightness(0.88);
-    transform: scale(0.96);
-    opacity: 0.78;
+    box-shadow: 0 0 2px rgba(16, 185, 129, 0.3);
+    filter: brightness(0.75);
+    transform: scale(0.94);
+    opacity: 0.65;
   }
   50% {
-    box-shadow: 0 0 8px #10b981, 0 0 16px rgba(16, 185, 129, 0.6);
-    filter: brightness(1.2);
-    transform: scale(1.06);
+    box-shadow: 0 0 10px #10b981, 0 0 22px #059669, 0 0 45px rgba(16, 185, 129, 0.8), inset 0 0 6px rgba(255, 255, 255, 0.7);
+    filter: brightness(1.5) drop-shadow(0 0 12px rgba(16, 185, 129, 0.9));
+    transform: scale(1.18);
     opacity: 1;
   }
 }
@@ -68,8 +70,20 @@ const dangerPulseStyle = `
   align-items: center !important;
   justify-content: center !important;
   border-radius: 999px !important;
+  position: relative;
+  z-index: 2;
 }
 
+.panel-tabs__badge-dot {
+  width: 8px;
+  height: 8px;
+  min-width: 8px;
+  border-radius: 50%;
+  background: #22d3ee;
+  box-shadow: 0 0 8px #22d3ee, 0 0 14px rgba(34, 211, 238, 0.6);
+  display: inline-block;
+  margin-left: 6px;
+}
 `;
 
 export function PanelTabs({ groups, active, onChange }: Props) {
@@ -109,6 +123,32 @@ export function PanelTabs({ groups, active, onChange }: Props) {
           <small>{activeGroup?.label ?? "Menu"}</small>
           <strong>{activeItem?.label ?? "Wybierz"}</strong>
         </span>
+        {activeItem?.badgeDot ? (
+          <span className="panel-tabs__badge-dot" style={{ marginRight: 8 }} />
+        ) : typeof activeItem?.badge === "number" ? (
+          <span
+            className={`panel-tabs__badge ${activeItem.badgeVariant === "danger" ? "panel-tabs__badge--danger" : activeItem.badgeVariant === "success" ? "panel-tabs__badge--success" : ""}`}
+            style={
+              activeItem.badgeVariant === "danger"
+                ? {
+                    background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
+                    color: "#fff",
+                    boxShadow: "0 0 10px rgba(239, 68, 68, 0.7)",
+                    marginRight: 8,
+                  }
+                : activeItem.badgeVariant === "success"
+                ? {
+                    background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                    color: "#fff",
+                    boxShadow: "0 0 10px rgba(16, 185, 129, 0.6)",
+                    marginRight: 8,
+                  }
+                : { marginRight: 8 }
+            }
+          >
+            {activeItem.badge}
+          </span>
+        ) : null}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6"/></svg>
       </button>
 
@@ -149,7 +189,9 @@ export function PanelTabs({ groups, active, onChange }: Props) {
                       >
                         <span className="panel-tabs__item-icon">{item.icon}</span>
                         <span className="panel-tabs__item-label">{item.label}</span>
-                        {hasBadge ? (
+                        {item.badgeDot ? (
+                          <span className="panel-tabs__badge-dot" />
+                        ) : hasBadge ? (
                           <span
                             className={`panel-tabs__badge ${item.badgeVariant === "danger" ? "panel-tabs__badge--danger" : item.badgeVariant === "success" ? "panel-tabs__badge--success" : ""}`}
                             style={
@@ -160,7 +202,7 @@ export function PanelTabs({ groups, active, onChange }: Props) {
                               } : item.badgeVariant === "success" ? {
                                 background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
                                 color: "#fff",
-                                boxShadow: "0 0 8px rgba(16, 185, 129, 0.5)",
+                                boxShadow: "0 0 10px rgba(16, 185, 129, 0.6)",
                               } : undefined
                             }
                           >
