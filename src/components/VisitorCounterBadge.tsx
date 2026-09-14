@@ -5,42 +5,52 @@ export function VisitorCounterBadge() {
 
   useEffect(() => {
     let mounted = true;
-    (async () => {
+
+    const registerAndFetch = async () => {
+      // 1. Natychmiast pobierz aktualny stan analityki
       try {
-        let clientIp = "Nieznane IP";
+        const initialRes = await fetch("/api/public/site-ratings?type=analytics");
+        const initialData = await initialRes.json();
+        if (mounted && typeof initialData.visits === "number") {
+          setCount(Math.max(1, initialData.visits));
+        }
+      } catch {}
+
+      // 2. Spróbuj zarejestrować nowe unikalne wejście
+      try {
+        let clientIp = "";
         try {
-          const ipRes = await fetch("https://api.ipify.org?format=json");
+          const ctrl = new AbortController();
+          const timer = setTimeout(() => ctrl.abort(), 2000);
+          const ipRes = await fetch("https://api.ipify.org?format=json", { signal: ctrl.signal });
+          clearTimeout(timer);
           const ipData = await ipRes.json();
-          clientIp = ipData.ip;
-        } catch {}
+          clientIp = ipData.ip || "";
+        } catch {
+          // fallback bez zewnętrznego IP - serwer może odczytać nagłówek
+        }
 
         const res = await fetch("/api/public/site-ratings", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ type: "visit", clientIp }),
+          body: JSON.stringify({ type: "visit", clientIp: clientIp || undefined }),
         });
         const data = await res.json();
         if (mounted && typeof data.visits === "number") {
-          setCount(data.visits);
-          return;
+          setCount(Math.max(1, data.visits));
         }
       } catch {}
+    };
 
-      try {
-        const res = await fetch("/api/public/site-ratings?type=analytics");
-        const data = await res.json();
-        if (mounted && typeof data.visits === "number") {
-          setCount(data.visits);
-        }
-      } catch {}
-    })();
+    registerAndFetch();
 
     return () => {
       mounted = false;
     };
   }, []);
 
-  if (count === null) return null;
+  // Pokazuj zawsze (jeśli jeszcze nie załadowano, min. 1)
+  const displayCount = count ?? 1;
 
   return (
     <aside
@@ -49,27 +59,33 @@ export function VisitorCounterBadge() {
         position: "fixed",
         bottom: 24,
         left: 24,
-        zIndex: 99,
+        zIndex: 99999,
         display: "inline-flex",
         alignItems: "center",
         gap: 10,
         padding: "10px 18px",
         borderRadius: 999,
-        background: "rgba(10, 25, 18, 0.9)",
-        backdropFilter: "blur(14px)",
-        WebkitBackdropFilter: "blur(14px)",
-        border: "1.5px solid rgba(34, 197, 94, 0.6)",
-        boxShadow: "0 0 24px rgba(34, 197, 94, 0.4), 0 8px 32px rgba(0, 0, 0, 0.55)",
+        background: "rgba(10, 25, 18, 0.92)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+        border: "1.5px solid rgba(34, 197, 94, 0.65)",
+        boxShadow: "0 0 25px rgba(34, 197, 94, 0.45), 0 8px 32px rgba(0, 0, 0, 0.65)",
         color: "#f0fdf4",
         fontSize: 13,
         fontWeight: 600,
         letterSpacing: "0.02em",
         userSelect: "none",
         pointerEvents: "auto",
-        transition: "transform 0.2s ease",
+        animation: "badgeFloat 3s ease-in-out infinite",
       }}
       title="Liczba unikalnych osób, które odwiedziły stronę (1 wejście na 1 IP)"
     >
+      <style>{`
+        @keyframes badgeFloat {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-5px); }
+        }
+      `}</style>
       <span
         style={{
           display: "inline-block",
@@ -82,9 +98,9 @@ export function VisitorCounterBadge() {
       />
       <span>
         <strong style={{ color: "#4ade80", fontWeight: 700, marginRight: 5 }}>
-          {count}
+          {displayCount}
         </strong>
-        {count === 1 ? "osoba odwiedziła stronę" : "osób odwiedziło stronę"}
+        {displayCount === 1 ? "osoba odwiedziła stronę" : "osób odwiedziło stronę"}
       </span>
     </aside>
   );
