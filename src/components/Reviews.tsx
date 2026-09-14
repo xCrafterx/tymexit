@@ -132,6 +132,7 @@ export function ReviewForm({ onSubmitted }: { onSubmitted?: () => void }) {
   const [rating, setRating] = useState(5);
   const [content, setContent] = useState("");
   const [serviceType, setServiceType] = useState<string>("");
+  const [extraService, setExtraService] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -164,13 +165,21 @@ export function ReviewForm({ onSubmitted }: { onSubmitted?: () => void }) {
     if (!c) return toast.error("Treść opinii nie może być pusta");
     if (rating < 1 || rating > 5) return toast.error("Ocena musi być od 1 do 5");
     setSubmitting(true);
+    let finalService: string | null = null;
+    if (serviceType) {
+      const extra = extraService.trim();
+      finalService = extra ? `${serviceType} + ${extra}` : `${serviceType} + nie ma nic dodatkowego`;
+    } else if (extraService.trim()) {
+      finalService = extraService.trim();
+    }
+
     const { error } = await supabase.from("reviews").insert({
       user_id: user!.id,
       first_name: fn,
       last_name: ln,
       rating,
       content: c,
-      service_type: serviceType || null,
+      service_type: finalService,
       review_date: new Date().toISOString(),
     });
     setSubmitting(false);
@@ -182,6 +191,7 @@ export function ReviewForm({ onSubmitted }: { onSubmitted?: () => void }) {
     setContent("");
     setRating(5);
     setServiceType("");
+    setExtraService("");
     onSubmitted?.();
   };
 
@@ -201,13 +211,28 @@ export function ReviewForm({ onSubmitted }: { onSubmitted?: () => void }) {
         <span className="text-dim">Twoja ocena</span>
         <Stars value={rating} size={28} interactive onChange={setRating} />
       </label>
-      <label style={{ display: "grid", gap: 6, fontSize: 12 }}>
-        <span className="text-dim">Typ usługi (opcjonalnie)</span>
-        <select className="form-control" value={serviceType} onChange={(e) => setServiceType(e.target.value)}>
-          <option value="">— wybierz —</option>
-          {SERVICES.map((s) => <option key={s} value={s}>{s}</option>)}
-        </select>
-      </label>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12 }}>
+        <label style={{ display: "grid", gap: 6, fontSize: 12 }}>
+          <span className="text-dim">Główny typ usługi (opcjonalnie)</span>
+          <select className="form-control" value={serviceType} onChange={(e) => setServiceType(e.target.value)}>
+            <option value="">— wybierz —</option>
+            {SERVICES.map((s) => <option key={s} value={s}>{s}</option>)}
+          </select>
+        </label>
+        <label style={{ display: "grid", gap: 6, fontSize: 12 }}>
+          <span className="text-dim">Dodatkowa usługa ręcznie (opcjonalnie)</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <span style={{ fontWeight: 700, color: "var(--brand-2, #f5b042)", fontSize: 16 }}>+</span>
+            <input
+              className="form-control"
+              value={extraService}
+              onChange={(e) => setExtraService(e.target.value)}
+              placeholder="np. wymiana dysku"
+              maxLength={80}
+            />
+          </div>
+        </label>
+      </div>
       <label style={{ display: "grid", gap: 6, fontSize: 12 }}>
         <span className="text-dim">Twoja opinia</span>
         <textarea className="form-control" rows={5} maxLength={2000} value={content} onChange={(e) => setContent(e.target.value)} required />
@@ -333,6 +358,7 @@ export function AdminReviews() {
   const [newLastName, setNewLastName] = useState("");
   const [newRating, setNewRating] = useState(5);
   const [newServiceType, setNewServiceType] = useState("");
+  const [newExtraService, setNewExtraService] = useState("");
   const [newContent, setNewContent] = useState("");
   const [newDate, setNewDate] = useState("");
   const [isAdding, setIsAdding] = useState(false);
@@ -352,13 +378,21 @@ export function AdminReviews() {
 
     setIsAdding(true);
     const reviewDate = newDate ? new Date(newDate).toISOString() : new Date().toISOString();
+    let finalService: string | null = null;
+    if (newServiceType) {
+      const extra = newExtraService.trim();
+      finalService = extra ? `${newServiceType} + ${extra}` : `${newServiceType} + nie ma nic dodatkowego`;
+    } else if (newExtraService.trim()) {
+      finalService = newExtraService.trim();
+    }
+
     const { error } = await supabase.from("reviews").insert({
       user_id: user.id,
       first_name: fn,
       last_name: ln,
       rating: newRating,
       content: c,
-      service_type: newServiceType || null,
+      service_type: finalService,
       review_date: reviewDate,
       is_visible: true,
     });
@@ -372,6 +406,7 @@ export function AdminReviews() {
     setNewLastName("");
     setNewRating(5);
     setNewServiceType("");
+    setNewExtraService("");
     setNewContent("");
     setNewDate("");
     setShowAddForm(false);
@@ -450,12 +485,25 @@ export function AdminReviews() {
               <span className="text-dim" style={{ fontSize: 12 }}>Ocena (gwiazdki)</span>
               <Stars value={newRating} size={26} interactive onChange={(v) => setNewRating(v)} />
             </div>
-            <div style={{ display: "grid", gap: 6, flex: 1, minWidth: 180 }}>
-              <span className="text-dim" style={{ fontSize: 12 }}>Typ usługi</span>
+            <div style={{ display: "grid", gap: 6, flex: 1, minWidth: 160 }}>
+              <span className="text-dim" style={{ fontSize: 12 }}>Główny typ usługi</span>
               <select className="form-control" value={newServiceType} onChange={(e) => setNewServiceType(e.target.value)}>
                 <option value="">— wybierz lub zostaw puste —</option>
                 {SERVICES.map((s) => <option key={s} value={s}>{s}</option>)}
               </select>
+            </div>
+            <div style={{ display: "grid", gap: 6, flex: 1, minWidth: 160 }}>
+              <span className="text-dim" style={{ fontSize: 12 }}>Dodatkowa usługa ręcznie</span>
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <span style={{ fontWeight: 700, color: "#38bdf8", fontSize: 16 }}>+</span>
+                <input
+                  className="form-control"
+                  value={newExtraService}
+                  onChange={(e) => setNewExtraService(e.target.value)}
+                  placeholder="np. wymiana dysku"
+                  maxLength={80}
+                />
+              </div>
             </div>
             <div style={{ display: "grid", gap: 6, minWidth: 200 }}>
               <span className="text-dim" style={{ fontSize: 12 }}>Data wystawienia opinii (opcjonalnie)</span>
