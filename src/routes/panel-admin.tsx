@@ -236,7 +236,7 @@ export function PanelAdmin() {
                   { key: "tickets", label: "Zgłoszenia", icon: "📋" },
                   { key: "form_logs", label: "Logi formularzy", icon: "🌐", badge: tickets.filter((t) => t.source === "formularz").length || undefined },
                   { key: "chats", label: "Czat na żywo", icon: "💬" },
-                  { key: "trash", label: "Kosz", icon: "🗑", badge: trashed.length || undefined },
+                  { key: "trash", label: "Kosz", icon: "🗑", badge: trashed.length || undefined, badgeVariant: "danger", excludeFromGroupBadge: true },
                 ],
               },
               {
