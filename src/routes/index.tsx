@@ -223,7 +223,15 @@ function Index() {
         </div>
       </section>
 
-      {/* PRICING */}
+      
+        {/* EFEKTY WIZUALNE I STATYSTYKI */}
+        <WeeklySlotsBanner />
+        <LiveRepairStats />
+        <BeforeAfterSlider />
+        <DiagnosticTerminal />
+        <AvailabilityWidget />
+
+        {/* PRICING */}
       <section className="section" id="cennik">
         <div className="container">
           <div className="reveal" style={{ display: "flex", justifyContent: "space-between", alignItems: "end", flexWrap: "wrap", gap: 20 }}>
