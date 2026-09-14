@@ -137,7 +137,7 @@ export function PanelAdmin() {
     const next = !current;
     const { error } = await supabase
       .from("tickets")
-      .update({ is_priority: next, updated_at: new Date().toISOString() })
+      .update({ is_priority: next, updated_at: new Date().toISOString() } as any)
       .eq("id", id);
     if (error) {
       toast.error("Błąd: " + error.message);
@@ -609,7 +609,7 @@ export function PanelAdmin() {
                     </div>
 
                     <div style={{ margin: "16px 0" }}>
-                      <TicketAttachments ticketId={t.id} />
+                      <TicketAttachments ticketId={t.id} ownerId={t.user_id || session?.user?.id || ""} canUpload={true} />
                     </div>
 
                     <div style={{ marginTop: 16 }}>
@@ -624,7 +624,7 @@ export function PanelAdmin() {
 
                     {chatOpen && (
                       <div style={{ marginTop: 16, padding: 16, borderRadius: "calc(var(--rad) - 4px)", background: "rgba(0,0,0,0.35)", border: "1px solid var(--border)" }}>
-                        <TicketChat ticketId={t.id} />
+                        <TicketChat ticketId={t.id} currentUserId={session?.user?.id || ""} isAdminView={true} />
                       </div>
                     )}
 
