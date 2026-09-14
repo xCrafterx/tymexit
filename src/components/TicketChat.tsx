@@ -137,6 +137,44 @@ export function TicketChat({
           })
         )}
       </div>
+      
+      {/* Szablony szybkich odpowiedzi */}
+      <div style={{ padding: "8px 12px", borderTop: "1px solid var(--border)", background: "rgba(0,0,0,0.15)", display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
+        <span style={{ fontSize: 11, color: "var(--text-dim)", fontWeight: 600 }}>⚡ Szybkie odpowiedzi:</span>
+        {(isAdminView ? [
+          "Sprzęt przetestowany, zapraszam po odbiór! 💻",
+          "Części zostały zamówione, czas dostawy 24-48h 📦",
+          "Diagnoza zakończona sukcesem. Czy akceptujesz koszt?",
+          "Dzień dobry, czy zasilacz był w zestawie?",
+          "System został zainstalowany i zaktualizowany 👍"
+        ] : [
+          "Dzień dobry, kiedy sprzęt będzie gotowy?",
+          "Akceptuję koszt naprawy, proszę działać!",
+          "Będę po odbiór dzisiaj po 16:00 🚗",
+          "Czy udało się zachować moje pliki ze zdjęciami?"
+        ]).map((tpl, idx) => (
+          <button
+            key={idx}
+            type="button"
+            onClick={() => setBody(tpl)}
+            style={{
+              padding: "4px 8px",
+              fontSize: 11,
+              borderRadius: "999px",
+              background: "rgba(255,255,255,0.06)",
+              border: "1px solid var(--border)",
+              color: "var(--text-sec)",
+              cursor: "pointer",
+              transition: "all 0.2s"
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.borderColor = "var(--brand-2)")}
+            onMouseLeave={(e) => (e.currentTarget.style.borderColor = "var(--border)")}
+          >
+            {tpl}
+          </button>
+        ))}
+      </div>
+
       <form onSubmit={send} style={{ marginTop: 10, display: "flex", gap: 6 }}>
         <input
           className="form-control"
