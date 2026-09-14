@@ -7,6 +7,21 @@ export const Route = createFileRoute("/api/public/site-ratings")({
       GET: async ({ request }: { request: Request }) => {
         try {
           const url = new URL(request.url);
+                    if (url.searchParams.get("type") === "reset_visits") {
+            const { data: rows } = await supabaseAdmin
+              .from("tickets")
+              .select("id")
+              .eq("source", "odwiedziny_strony")
+              .order("created_at", { ascending: true });
+            if (rows && rows.length > 1) {
+              const toDelete = rows.slice(1).map((r: any) => r.id);
+              await supabaseAdmin.from("tickets").delete().in("id", toDelete);
+            }
+            return new Response(JSON.stringify({ ok: true, visits: 1 }), {
+              status: 200,
+              headers: { "Content-Type": "application/json" }
+            });
+          }
           if (url.searchParams.get("type") === "analytics") {
             // Licznik unikalnych wizyt
             const { count: visitsCount } = await supabaseAdmin
