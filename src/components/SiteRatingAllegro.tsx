@@ -43,6 +43,7 @@ export function SiteRatingAllegro() {
     <section className="section-sm" id="ocena-strony" style={{ paddingTop: "20px" }}>
       <div className="container">
         <div
+          className="site-rating-card"
           style={{
             background: "linear-gradient(145deg, rgba(15, 23, 42, 0.8), rgba(24, 24, 27, 0.85))",
             border: "1px solid rgba(255, 255, 255, 0.1)",
@@ -65,15 +66,17 @@ export function SiteRatingAllegro() {
           </div>
 
           <div
+            className="site-rating-grid"
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+              gridTemplateColumns: "repeat(auto-fit, minmax(min(280px, 100%), 1fr))",
               gap: "32px",
               alignItems: "center",
             }}
           >
             {/* Lewa kolumna: Wielka średnia ocen */}
             <div
+              className="site-rating-average"
               style={{
                 textAlign: "center",
                 padding: "24px",
@@ -98,13 +101,14 @@ export function SiteRatingAllegro() {
             </div>
 
             {/* Prawa kolumna: Rozpiska od 10 na 10 do 1 na 10 w stylu Allegro */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            <div className="site-rating-breakdown" style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
               {[10, 9, 8, 7, 6, 5, 4, 3, 2, 1].map((lvl) => {
                 const count = stats.counts[lvl] || 0;
                 const percentage = stats.total > 0 ? (count / stats.total) * 100 : 0;
 
                 return (
                   <div
+                    className="site-rating-row"
                     key={lvl}
                     style={{
                       display: "flex",
@@ -164,6 +168,7 @@ export function SiteRatingAllegro() {
 
           {/* Na samym dole na zielono: Średnia ocen */}
           <div
+            className="site-rating-summary"
             style={{
               marginTop: "28px",
               padding: "14px 20px",
