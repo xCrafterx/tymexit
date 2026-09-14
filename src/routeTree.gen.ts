@@ -27,6 +27,8 @@ import { Route as SekretRouteImport } from './routes/sekret'
 import { Route as UslugiRouteImport } from './routes/uslugi'
 import { Route as ZamowRouteImport } from './routes/zamow'
 import { Route as ZgloszenieRouteImport } from './routes/zgloszenie'
+import { Route as WycenaRouteImport } from './routes/wycena'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as AdminChatRouteImport } from './routes/admin.chat'
 import { Route as AdminCzatyRouteImport } from './routes/admin.czaty'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
@@ -124,6 +126,16 @@ const ZgloszenieRoute = ZgloszenieRouteImport.update({
   path: '/zgloszenie',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WycenaRoute = WycenaRouteImport.update({
+  id: '/wycena',
+  path: '/wycena',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminChatRoute = AdminChatRouteImport.update({
   id: '/chat',
   path: '/chat',
@@ -174,6 +186,10 @@ export interface FileRoutesByFullPath {
   '/uslugi': typeof UslugiRoute
   '/zamow': typeof ZamowRoute
   '/zgloszenie': typeof ZgloszenieRoute
+  '/wycena': typeof WycenaRoute
+  '/faq': typeof FaqRoute
+  '/wycena': typeof WycenaRoute
+  '/faq': typeof FaqRoute
   '/admin/chat': typeof AdminChatRoute
   '/admin/czaty': typeof AdminCzatyRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -200,6 +216,10 @@ export interface FileRoutesByTo {
   '/uslugi': typeof UslugiRoute
   '/zamow': typeof ZamowRoute
   '/zgloszenie': typeof ZgloszenieRoute
+  '/wycena': typeof WycenaRoute
+  '/faq': typeof FaqRoute
+  '/wycena': typeof WycenaRoute
+  '/faq': typeof FaqRoute
   '/admin/chat': typeof AdminChatRoute
   '/admin/czaty': typeof AdminCzatyRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -227,6 +247,10 @@ export interface FileRoutesById {
   '/uslugi': typeof UslugiRoute
   '/zamow': typeof ZamowRoute
   '/zgloszenie': typeof ZgloszenieRoute
+  '/wycena': typeof WycenaRoute
+  '/faq': typeof FaqRoute
+  '/wycena': typeof WycenaRoute
+  '/faq': typeof FaqRoute
   '/admin/chat': typeof AdminChatRoute
   '/admin/czaty': typeof AdminCzatyRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -255,6 +279,8 @@ export interface FileRouteTypes {
     | '/uslugi'
     | '/zamow'
     | '/zgloszenie'
+    | '/wycena'
+    | '/faq'
     | '/admin/chat'
     | '/admin/czaty'
     | '/admin/dashboard'
@@ -281,6 +307,8 @@ export interface FileRouteTypes {
     | '/uslugi'
     | '/zamow'
     | '/zgloszenie'
+    | '/wycena'
+    | '/faq'
     | '/admin/chat'
     | '/admin/czaty'
     | '/admin/dashboard'
@@ -307,6 +335,8 @@ export interface FileRouteTypes {
     | '/uslugi'
     | '/zamow'
     | '/zgloszenie'
+    | '/wycena'
+    | '/faq'
     | '/admin/chat'
     | '/admin/czaty'
     | '/admin/dashboard'
@@ -333,7 +363,9 @@ export interface RootRouteChildren {
   SekretRoute: typeof SekretRoute
   UslugiRoute: typeof UslugiRoute
   ZamowRoute: typeof ZamowRoute
-  ZgloszenieRoute: typeof ZgloszenieRoute
+  ZgloszenieRoute: typeof ZgloszenieRoute,
+  WycenaRoute: typeof WycenaRoute,
+  FaqRoute: typeof FaqRoute
   ApiChatRoute: typeof ApiChatRoute
   ApiPublicOrderNotifyRoute: typeof ApiPublicOrderNotifyRoute
   ApiPublicSiteRatingsRoute: typeof ApiPublicSiteRatingsRoute
