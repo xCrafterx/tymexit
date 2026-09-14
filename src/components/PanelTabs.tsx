@@ -27,20 +27,20 @@ type Props = {
 const dangerPulseStyle = `
 @keyframes redBadgePulse {
   0%, 100% {
-    box-shadow: 0 0 4px rgba(239, 68, 68, 0.4), 0 0 0 0 rgba(239, 68, 68, 0.2);
+    box-shadow: 0 0 4px #ef4444, 0 0 8px rgba(239, 68, 68, 0.4);
     filter: brightness(0.85);
-    opacity: 0.7;
     transform: scale(0.94);
+    opacity: 0.75;
   }
   50% {
-    box-shadow: 0 0 16px rgba(239, 68, 68, 0.95), 0 0 28px rgba(239, 68, 68, 0.8), 0 0 0 5px rgba(239, 68, 68, 0.35);
-    filter: brightness(1.3);
+    box-shadow: 0 0 18px #ef4444, 0 0 32px rgba(239, 68, 68, 0.95), 0 0 45px rgba(239, 68, 68, 0.6);
+    filter: brightness(1.35);
+    transform: scale(1.12);
     opacity: 1;
-    transform: scale(1.08);
   }
 }
 .panel-tabs__badge--danger {
-  animation: redBadgePulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;
+  animation: redBadgePulse 2s ease-in-out infinite !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -115,6 +115,7 @@ export function PanelTabs({ groups, active, onChange }: Props) {
                 <div className="panel-tabs__menu-inner">
                   {group.items.map((item) => {
                     const isActive = item.key === active;
+                    const hasBadge = typeof item.badge === "number";
                     return (
                       <button
                         key={item.key}
@@ -124,12 +125,14 @@ export function PanelTabs({ groups, active, onChange }: Props) {
                       >
                         <span className="panel-tabs__item-icon">{item.icon}</span>
                         <span className="panel-tabs__item-label">{item.label}</span>
-                        {item.badge ? (
+                        {hasBadge ? (
                           <span
                             className={`panel-tabs__badge ${item.badgeVariant === "danger" ? "panel-tabs__badge--danger" : ""}`}
                             style={item.badgeVariant === "danger" ? {
-                              background: "linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)",
+                              background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
                               color: "#fff",
+                              boxShadow: "0 0 10px rgba(239, 68, 68, 0.7)",
+                              animation: "redBadgePulse 2s ease-in-out infinite",
                             } : undefined}
                           >
                             {item.badge}
