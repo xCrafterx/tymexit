@@ -7,6 +7,8 @@ export type PanelTabItem = {
   label: string;
   icon: string;
   badge?: number;
+  badgeVariant?: "default" | "danger";
+  excludeFromGroupBadge?: boolean;
 };
 
 export type PanelTabGroup = {
@@ -65,7 +67,7 @@ export function PanelTabs({ groups, active, onChange }: Props) {
         {groups.map((group) => {
           const isActiveGroup = activeGroup?.id === group.id;
           const isOpen = openGroup === group.id;
-          const groupBadge = group.items.reduce((s, i) => s + (i.badge ?? 0), 0);
+          const groupBadge = group.items.reduce((s, i) => s + (i.excludeFromGroupBadge ? 0 : (i.badge ?? 0)), 0);
           return (
             <div
               key={group.id}
@@ -97,7 +99,18 @@ export function PanelTabs({ groups, active, onChange }: Props) {
                       >
                         <span className="panel-tabs__item-icon">{item.icon}</span>
                         <span className="panel-tabs__item-label">{item.label}</span>
-                        {item.badge ? <span className="panel-tabs__badge">{item.badge}</span> : null}
+                        {item.badge ? (
+                          <span
+                            className="panel-tabs__badge"
+                            style={item.badgeVariant === "danger" ? {
+                              background: "linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)",
+                              color: "#fff",
+                              boxShadow: "0 0 10px rgba(239, 68, 68, 0.6)"
+                            } : undefined}
+                          >
+                            {item.badge}
+                          </span>
+                        ) : null}
                         {isActive && <span className="panel-tabs__item-dot" aria-hidden />}
                       </button>
                     );
