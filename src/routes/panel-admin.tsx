@@ -139,7 +139,7 @@ export function PanelAdmin() {
     const next = !current;
     const { error } = await supabase
       .from("tickets")
-      .update({ is_priority: next, updated_at: new Date().toISOString() } as any)
+      .update({ is_priority: next } as any)
       .eq("id", id);
     if (error) {
       toast.error("Błąd: " + error.message);
