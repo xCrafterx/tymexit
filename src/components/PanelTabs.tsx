@@ -27,24 +27,26 @@ type Props = {
 const dangerPulseStyle = `
 @keyframes redBadgePulse {
   0%, 100% {
-    box-shadow: 0 0 4px #ef4444, 0 0 8px rgba(239, 68, 68, 0.4);
-    filter: brightness(0.85);
-    transform: scale(0.94);
-    opacity: 0.75;
+    box-shadow: 0 0 2px rgba(239, 68, 68, 0.3);
+    filter: brightness(0.65);
+    transform: scale(0.92);
+    opacity: 0.55;
   }
   50% {
-    box-shadow: 0 0 18px #ef4444, 0 0 32px rgba(239, 68, 68, 0.95), 0 0 45px rgba(239, 68, 68, 0.6);
-    filter: brightness(1.35);
-    transform: scale(1.12);
+    box-shadow: 0 0 14px #ff1a1a, 0 0 30px #ef4444, 0 0 60px rgba(255, 30, 30, 0.9), 0 0 90px rgba(239, 68, 68, 0.7), inset 0 0 8px rgba(255, 255, 255, 0.8);
+    filter: brightness(1.7) drop-shadow(0 0 16px rgba(255, 0, 0, 0.95));
+    transform: scale(1.22);
     opacity: 1;
   }
 }
 .panel-tabs__badge--danger {
-  animation: redBadgePulse 2s ease-in-out infinite !important;
+  animation: redBadgePulse 1.8s ease-in-out infinite !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
   border-radius: 999px !important;
+  position: relative;
+  z-index: 2;
 }
 `;
 
