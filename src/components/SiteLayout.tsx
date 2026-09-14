@@ -173,6 +173,8 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
         <a key={h} href={h} className={isActive(h) ? "active" : ""} onClick={onClose}>{l}</a>
       ))}
       <Link to="/programy" className={isActive("/programy") ? "active" : ""} onClick={onClose}>Moje Programy</Link>
+      <Link to="/wycena" className={isActive("/wycena") ? "active" : ""} onClick={onClose}>Kalkulator Wyceny</Link>
+      <Link to="/faq" className={isActive("/faq") ? "active" : ""} onClick={onClose}>FAQ & Pomoc</Link>
       <Link to="/zgloszenie" className={isActive("/zgloszenie") ? "active" : ""} onClick={onClose}>Zgłoś problem</Link>
       <div className="mobile-menu-actions">
         {session ? (
@@ -299,6 +301,8 @@ function Footer() {
               <li><Link to="/o-mnie">O mnie & Doświadczenie</Link></li>
               <li><Link to="/uslugi">Wszystkie usługi</Link></li>
               <li><Link to="/programy" style={{ color: "var(--brand, #38bdf8)", fontWeight: 600 }}>Moje Programy & Pliki</Link></li>
+              <li><Link to="/wycena">⚙️ Kalkulator Wyceny</Link></li>
+              <li><Link to="/faq">💡 Baza Wiedzy (FAQ)</Link></li>
               <li><Link to="/opinie">Opinie klientów</Link></li>
             </ul>
           </div>
