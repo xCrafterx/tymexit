@@ -27,9 +27,17 @@ function BrandMark() {
 
 function Nav({ onOpenMenu }: { onOpenMenu: () => void }) {
   const [hidden, setHidden] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const { pathname, hash } = useLocation();
   const { session, role } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth <= 960);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   useEffect(() => {
     let lastY = window.scrollY;
@@ -66,9 +74,10 @@ function Nav({ onOpenMenu }: { onOpenMenu: () => void }) {
     <nav className={`nav${hidden ? " is-hidden" : ""}`} aria-label="Główna nawigacja">
       <div className="nav-leading">
         <BrandMark />
-        <div className="nav-sound"><SoundToggle /></div>
+        {!isMobile && <div className="nav-sound"><SoundToggle /></div>}
       </div>
-      <ul className="nav-links">
+      {!isMobile && (
+        <ul className="nav-links">
         {NAV_LINKS.map(([h, l]) => (
           <li key={h}>
             <a href={h} className={isActive(h) ? "active" : ""} style={{ whiteSpace: "nowrap", padding: "8px 10px" }}>{l}</a>
@@ -92,38 +101,41 @@ function Nav({ onOpenMenu }: { onOpenMenu: () => void }) {
           <Link to="/programy" className={isActive("/programy") ? "active" : ""} style={{ whiteSpace: "nowrap", padding: "8px 10px" }}>Moje Programy</Link>
         </li>
       </ul>
+      )}
       <div className="nav-actions">
         <button className="theme-toggle" aria-label="Zmień motyw" onClick={toggleTheme}>
           <svg className="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
           <svg className="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
         </button>
-        <Link to="/zgloszenie" className="btn btn-ghost nav-desktop-action" style={{ padding: "10px 16px", fontSize: 13 }}>
-          Zgłoś problem
-        </Link>
-        {session ? (
+        {!isMobile && (
           <>
-            <Link
-              to={role === "admin" ? "/panel-admin" : "/panel-klienta"}
-              className="btn btn-ghost nav-desktop-action"
-              style={{ padding: "10px 16px", fontSize: 13 }}
-            >
-              Panel
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12l2-2 7 7 7-7 2 2"/></svg>
+            <Link to="/zgloszenie" className="btn btn-ghost nav-desktop-action" style={{ padding: "10px 16px", fontSize: 13 }}>
+              Zgłoś problem
             </Link>
-            <button onClick={handleLogout} className="btn btn-primary nav-desktop-action" style={{ padding: "10px 18px", fontSize: 13 }}>
-            Wyloguj
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-            </button>
-          </>
-        ) : (
-          <>
-          <Link to="/login" className="btn btn-primary nav-desktop-action" style={{ padding: "10px 18px", fontSize: 13 }}>
-            Zaloguj
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-          </Link>
+            {session ? (
+              <>
+                <Link
+                  to={role === "admin" ? "/panel-admin" : "/panel-klienta"}
+                  className="btn btn-ghost nav-desktop-action"
+                  style={{ padding: "10px 16px", fontSize: 13 }}
+                >
+                  Panel
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12l2-2 7 7 7-7 2 2"/></svg>
+                </Link>
+                <button onClick={handleLogout} className="btn btn-primary nav-desktop-action" style={{ padding: "10px 18px", fontSize: 13 }}>
+                Wyloguj
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+                </button>
+              </>
+            ) : (
+              <Link to="/login" className="btn btn-primary nav-desktop-action" style={{ padding: "10px 18px", fontSize: 13 }}>
+                Zaloguj
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+              </Link>
+            )}
           </>
         )}
-        <button className="nav-burger" aria-label="Otwórz menu" onClick={onOpenMenu}>
+        <button className="nav-burger" aria-label="Otwórz menu" onClick={onOpenMenu} style={isMobile ? { display: "inline-flex" } : undefined}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
         </button>
       </div>
