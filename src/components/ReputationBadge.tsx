@@ -157,7 +157,7 @@ export function ReputationBadge({
             padding: "4px 12px",
             borderRadius: 999,
             background: "var(--surface-2)",
-            border: ,
+            border: `1px solid ${color}55`,
             fontSize: 11,
             color,
             textTransform: "uppercase",
