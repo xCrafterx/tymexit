@@ -64,6 +64,7 @@ export function SiteRatingPrompt() {
 
   return (
     <div
+      className="site-rating-prompt"
       style={{
         background: "linear-gradient(135deg, rgba(17, 24, 39, 0.95), rgba(30, 41, 59, 0.95))",
         backdropFilter: "blur(16px)",
@@ -98,8 +99,8 @@ export function SiteRatingPrompt() {
         ✕
       </button>
 
-      <div style={{ paddingRight: "30px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+      <div className="site-rating-prompt-content" style={{ paddingRight: "30px" }}>
+        <div className="site-rating-prompt-title" style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
           <span style={{ fontSize: "18px" }}>⭐</span>
           <h4 style={{ margin: 0, fontSize: "16px", fontWeight: "600", color: "#fff" }}>
             Na ile ta strona jest ładna i ogarnięta? (od 1 do 10)

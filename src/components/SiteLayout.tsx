@@ -64,17 +64,17 @@ function Nav({ onOpenMenu }: { onOpenMenu: () => void }) {
 
   return (
     <nav className={`nav${hidden ? " is-hidden" : ""}`} aria-label="Główna nawigacja">
-      <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0, flexWrap: "nowrap" }}>
+      <div className="nav-leading">
         <BrandMark />
-        <SoundToggle />
+        <div className="nav-sound"><SoundToggle /></div>
       </div>
-      <ul className="nav-links" style={{ whiteSpace: "nowrap", flexWrap: "nowrap" }}>
+      <ul className="nav-links">
         {NAV_LINKS.map(([h, l]) => (
           <li key={h}>
             <a href={h} className={isActive(h) ? "active" : ""} style={{ whiteSpace: "nowrap", padding: "8px 10px" }}>{l}</a>
           </li>
         ))}
-        <li style={{ display: "inline-flex", alignItems: "center", padding: "0 8px", userSelect: "none" }} aria-hidden>
+        <li className="nav-rgb-separator" aria-hidden>
           <span
             style={{
               display: "inline-block",
@@ -97,27 +97,27 @@ function Nav({ onOpenMenu }: { onOpenMenu: () => void }) {
           <svg className="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
           <svg className="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
         </button>
-        <Link to="/zgloszenie" className="btn btn-ghost" style={{ padding: "10px 16px", fontSize: 13 }}>
+        <Link to="/zgloszenie" className="btn btn-ghost nav-desktop-action" style={{ padding: "10px 16px", fontSize: 13 }}>
           Zgłoś problem
         </Link>
         {session ? (
           <>
             <Link
               to={role === "admin" ? "/panel-admin" : "/panel-klienta"}
-              className="btn btn-ghost"
+              className="btn btn-ghost nav-desktop-action"
               style={{ padding: "10px 16px", fontSize: 13 }}
             >
               Panel
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12l2-2 7 7 7-7 2 2"/></svg>
             </Link>
-            <button onClick={handleLogout} className="btn btn-primary" style={{ padding: "10px 18px", fontSize: 13 }}>
+            <button onClick={handleLogout} className="btn btn-primary nav-desktop-action" style={{ padding: "10px 18px", fontSize: 13 }}>
             Wyloguj
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
             </button>
           </>
         ) : (
           <>
-          <Link to="/login" className="btn btn-primary" style={{ padding: "10px 18px", fontSize: 13 }}>
+          <Link to="/login" className="btn btn-primary nav-desktop-action" style={{ padding: "10px 18px", fontSize: 13 }}>
             Zaloguj
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
           </Link>
@@ -132,16 +132,49 @@ function Nav({ onOpenMenu }: { onOpenMenu: () => void }) {
 }
 
 function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { pathname, hash } = useLocation();
+  const { session, role } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [open]);
+
+  const isActive = (href: string) => {
+    if (href === "/") return pathname === "/" && !hash;
+    if (href.startsWith("/#")) return pathname === "/" && hash === href.slice(1);
+    return pathname === href;
+  };
+
+  const handleMobileLogout = async () => {
+    await supabase.auth.signOut();
+    toast.success("Wylogowano");
+    onClose();
+    navigate({ to: "/" });
+  };
+
   return (
-    <div className={`mobile-menu${open ? " is-open" : ""}`}>
+    <div className={`mobile-menu${open ? " is-open" : ""}`} aria-hidden={!open}>
       <button className="close" aria-label="Zamknij menu" onClick={onClose}>✕</button>
       {NAV_LINKS.map(([h, l]) => (
-        <a key={h} href={h} onClick={onClose}>{l}</a>
+        <a key={h} href={h} className={isActive(h) ? "active" : ""} onClick={onClose}>{l}</a>
       ))}
-      <Link to="/programy" onClick={onClose}>Moje Programy</Link>
-      <a href="/zgloszenie" onClick={onClose}>Zgłoś problem</a>
-      <a href="/login" style={{ color: "var(--brand)" }} onClick={onClose}>Zaloguj się →</a>
-      <a href="/register" onClick={onClose}>Utwórz konto</a>
+      <Link to="/programy" className={isActive("/programy") ? "active" : ""} onClick={onClose}>Moje Programy</Link>
+      <Link to="/zgloszenie" className={isActive("/zgloszenie") ? "active" : ""} onClick={onClose}>Zgłoś problem</Link>
+      <div className="mobile-menu-actions">
+        {session ? (
+          <>
+            <Link to={role === "admin" ? "/panel-admin" : "/panel-klienta"} onClick={onClose}>Panel</Link>
+            <button type="button" onClick={handleMobileLogout}>Wyloguj</button>
+          </>
+        ) : (
+          <>
+            <Link to="/login" onClick={onClose}>Zaloguj się</Link>
+            <Link to="/register" onClick={onClose}>Utwórz konto</Link>
+          </>
+        )}
+      </div>
     </div>
   );
 }
@@ -231,7 +264,7 @@ function Footer() {
       </div>
 
       <div className="container" style={{ position: "relative", zIndex: 2 }}>
-        <div className="footer-grid" style={{ gap: 40, marginBottom: 50 }}>
+        <div className="footer-grid">
           <div>
             <BrandMark />
             <p className="text-dim mt-6" style={{ maxWidth: 360, fontSize: 14, lineHeight: 1.7 }}>
@@ -283,7 +316,7 @@ function Footer() {
           </div>
         </div>
 
-        <div style={{ padding: "28px 0", borderTop: "1px solid rgba(255, 255, 255, 0.06)", display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 16, fontSize: 13, color: "rgba(255, 255, 255, 0.5)" }}>
+        <div className="footer-service-summary">
           <div>
             Szybka diagnoza · Przejrzysty cennik · Bezpieczeństwo Twoich danych i sprzętu · Gwarancja na wykonane usługi
           </div>
