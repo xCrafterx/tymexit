@@ -10,6 +10,8 @@ import { AccountSettings } from "@/components/AccountSettings";
 import { TicketProgressBar } from "@/components/TicketProgressBar";
 import { TicketAttachments } from "@/components/TicketAttachments";
 import { TicketChat } from "@/components/TicketChat";
+import { printTicketProtocol } from "@/components/PrintProtocol";
+import { openProtonMail } from "@/lib/protonMail";
 import { ReputationBadge } from "@/components/ReputationBadge";
 import { ALL_STATUSES, STATUS_META, DELETABLE_STATUSES, type TicketStatus } from "@/lib/ticket-status";
 import { notifyMessage } from "@/lib/notify";
@@ -641,13 +643,32 @@ export function PanelAdmin() {
                       <TicketAttachments ticketId={t.id} ownerId={t.user_id || session?.user?.id || ""} canUpload={true} />
                     </div>
 
-                    <div style={{ marginTop: 16 }}>
+                    <div style={{ marginTop: 16, display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
                       <button
                         type="button"
                         className="btn btn-sm btn-outline"
                         onClick={() => setOpenChats((p) => ({ ...p, [t.id]: !p[t.id] }))}
                       >
                         💬 {chatOpen ? "Ukryj czat" : "Pokaż czat z klientem"}
+                      </button>
+
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline"
+                        style={{ color: "#38bdf8", borderColor: "rgba(56, 189, 248, 0.4)" }}
+                        onClick={() => printTicketProtocol(t)}
+                      >
+                        📄 Drukuj protokół PDF
+                      </button>
+
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline"
+                        style={{ color: "#a855f7", borderColor: "rgba(168, 85, 247, 0.4)" }}
+                        onClick={() => openProtonMail(t)}
+                        title="Otwórz ProtonMail z gotową wiadomością do tego klienta"
+                      >
+                        📧 Wyślij z ProtonMail
                       </button>
                     </div>
 
