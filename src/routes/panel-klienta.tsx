@@ -62,6 +62,7 @@ function PanelKlienta() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({ title: "", service_type: SERVICES[0], description: "" });
+  const [otherServiceType, setOtherServiceType] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [tab, setTab] = useState<"tickets" | "review" | "secrets" | "account">("tickets");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -137,7 +138,7 @@ function PanelKlienta() {
         user_id: session.user.id,
         title: parsed.data.title,
         description: parsed.data.description,
-        service_type: parsed.data.service_type,
+        service_type: (parsed.data.service_type === "Inne" || parsed.data.service_type === "Inna") && otherServiceType.trim() ? `Inne - ${otherServiceType.trim()}` : parsed.data.service_type,
         status: "oczekuje",
       })
       .select("id")
@@ -257,6 +258,21 @@ function PanelKlienta() {
                   >
                     {SERVICES.map((s) => <option key={s} value={s}>{s}</option>)}
                   </select>
+                  {(form.service_type === "Inne" || form.service_type === "Inna") && (
+                    <div style={{ marginTop: 8 }}>
+                      <label style={{ fontSize: 12, color: "var(--brand-2, #f5b042)", display: "block", marginBottom: 4 }}>
+                        Jaki to typ usługi? (opcjonalnie, maks. 100 znaków)
+                      </label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        maxLength={100}
+                        placeholder="np. naprawa telefonu, czyszczenie konsoli..."
+                        value={otherServiceType}
+                        onChange={(e) => setOtherServiceType(e.target.value)}
+                      />
+                    </div>
+                  )}
                 </div>
                 <div className="form-group">
                   <label>Opis problemu</label>
