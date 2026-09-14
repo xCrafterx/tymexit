@@ -299,7 +299,7 @@ function ProgramyPage() {
                     <strong style={{ color: "#fff", marginLeft: 2, marginRight: 2 }}>
                       {downloadCounts[tool.id] ?? 0}
                     </strong>{" "}
-                    {(downloadCounts[tool.id] ?? 0) === 1 ? "osoba" : "osób"} (unikalne IP)
+                    {(downloadCounts[tool.id] ?? 0) === 1 ? "osoba" : "osób"}
                   </div>
                 </div>
               </div>
