@@ -70,7 +70,7 @@ export function PanelAdmin() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("all");
   const [editing, setEditing] = useState<Record<string, { note: string; saving: boolean }>>({});
-  const [tab, setTab] = useState<"tickets" | "form_logs" | "site_ratings" | "trash" | "chats" | "reviews" | "popular" | "secrets" | "eggs" | "account">("tickets");
+  const [tab, setTab] = useState<"tickets" | "form_logs" | "site_ratings" | "trash" | "chats" | "reviews" | "popular" | "secrets" | "eggs" | "account" | "reset_visitors" | "reset_downloads">("tickets");
   const [confirm, setConfirm] = useState<ConfirmAction>(null);
   const [acting, setActing] = useState(false);
   const [openChats, setOpenChats] = useState<Record<string, boolean>>({});
@@ -250,6 +250,15 @@ export function PanelAdmin() {
                 ],
               },
               {
+                id: "ustawienia",
+                label: "Ustawienia Strony",
+                icon: "⚙️",
+                items: [
+                  { key: "reset_visitors", label: "Reset Odwiedzających", icon: "👥" },
+                  { key: "reset_downloads", label: "Reset Pobrań", icon: "📥" },
+                ],
+              },
+              {
                 id: "konto",
                 label: "Konto i profil",
                 icon: "👤",
@@ -424,7 +433,7 @@ export function PanelAdmin() {
                 </div>
               )}
             </div>
-          ) : tab === "chats" ? <AdminLiveChats /> : tab === "reviews" ? <AdminReviews /> : tab === "popular" ? <PopularServicesAdmin /> : tab === "secrets" ? <MySecrets /> : tab === "eggs" ? <AllEasterEggs /> : tab === "account" ? <AccountSettings /> : tab === "trash" ? (
+          ) : tab === "chats" ? <AdminLiveChats /> : tab === "reviews" ? <AdminReviews /> : tab === "popular" ? <PopularServicesAdmin /> : tab === "secrets" ? <MySecrets /> : tab === "eggs" ? <AllEasterEggs /> : tab === "account" ? <AccountSettings /> : tab === "reset_visitors" ? <AdminResetVisitors /> : tab === "reset_downloads" ? <AdminResetDownloads /> : tab === "trash" ? (
             <>
               <div className="reveal visible">
                 <span className="eyebrow" style={{ borderColor: "rgba(239, 68, 68, 0.3)" }}><span className="dot" style={{ background: "#ef4444", boxShadow: "0 0 14px #ef4444", animation: "redBadgePulse 2s ease-in-out infinite" }}></span> Kosz ({trashed.length})</span>
@@ -700,3 +709,204 @@ export function PanelAdmin() {
 }
 
 export default PanelAdmin;
+
+
+function AdminResetVisitors() {
+  const [visits, setVisits] = useState<number | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const fetchVisits = async () => {
+    try {
+      const res = await fetch("/api/public/site-ratings?type=analytics");
+      const data = await res.json();
+      setVisits(data?.visits ?? 0);
+    } catch {}
+  };
+
+  useEffect(() => {
+    fetchVisits();
+  }, []);
+
+  const handleReset = async () => {
+    if (!confirm("Czy na pewno chcesz zresetować licznik wejść do 0?")) return;
+    setLoading(true);
+    try {
+      const res = await fetch("/api/public/site-ratings?type=reset_visits");
+      const data = await res.json();
+      if (data?.ok) {
+        setVisits(0);
+        toast.success("Licznik odwiedzających został zresetowany do 0!");
+      } else {
+        toast.error("Nie udało się zresetować licznika.");
+      }
+    } catch {
+      toast.error("Błąd podczas resetowania licznika.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="reveal visible" style={{ marginTop: "24px" }}>
+      <div className="glass" style={{ padding: "30px", borderRadius: "14px", border: "1px solid rgba(255, 255, 255, 0.1)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
+          <span style={{ fontSize: "28px" }}>👥</span>
+          <div>
+            <h3 style={{ margin: 0, fontSize: "20px", color: "#fff" }}>Reset Odwiedzających</h3>
+            <p className="text-dim" style={{ margin: 0, fontSize: "14px" }}>Zarządzaj licznikiem unikalnych wejść na stronę główną.</p>
+          </div>
+        </div>
+
+        <div style={{ margin: "24px 0", padding: "20px", background: "rgba(0, 0, 0, 0.25)", borderRadius: "12px", border: "1px solid rgba(255, 255, 255, 0.08)" }}>
+          <p style={{ margin: "0 0 8px 0", fontSize: "14px", color: "rgba(255, 255, 255, 0.7)" }}>Aktualny stan licznika wejść w bazie danych:</p>
+          <div style={{ fontSize: "36px", fontWeight: "700", color: "#10b981" }}>
+            {visits === null ? "..." : `${visits} osób`}
+          </div>
+        </div>
+
+        <button
+          onClick={handleReset}
+          disabled={loading}
+          className="btn"
+          style={{
+            background: "linear-gradient(135deg, #ef4444, #dc2626)",
+            color: "#fff",
+            fontWeight: "600",
+            padding: "12px 24px",
+            borderRadius: "10px",
+            border: "none",
+            cursor: loading ? "not-allowed" : "pointer",
+            boxShadow: "0 4px 15px rgba(239, 68, 68, 0.4)",
+          }}
+        >
+          {loading ? "Resetowanie..." : "🔄 Zresetuj licznik wejść do 0"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function AdminResetDownloads() {
+  const [downloads, setDownloads] = useState<Record<string, number>>({});
+  const [loading, setLoading] = useState<string | null>(null);
+
+  const fetchDownloads = async () => {
+    try {
+      const res = await fetch("/api/public/site-ratings?type=analytics");
+      const data = await res.json();
+      if (data?.downloads) setDownloads(data.downloads);
+    } catch {}
+  };
+
+  useEffect(() => {
+    fetchDownloads();
+  }, []);
+
+  const handleReset = async (toolId: string, name: string) => {
+    if (!confirm(`Czy na pewno chcesz zresetować licznik pobrań dla: ${name}?`)) return;
+    setLoading(toolId);
+    try {
+      const res = await fetch(`/api/public/site-ratings?type=reset_downloads&toolId=${encodeURIComponent(toolId)}`);
+      const data = await res.json();
+      if (data?.ok) {
+        if (toolId === "all") {
+          setDownloads({});
+          toast.success("Zresetowano liczniki pobrań wszystkich programów do 0!");
+        } else {
+          setDownloads((prev) => ({ ...prev, [toolId]: 0 }));
+          toast.success(`Zresetowano pobrania dla: ${name}!`);
+        }
+      } else {
+        toast.error("Nie udało się zresetować pobrań.");
+      }
+    } catch {
+      toast.error("Błąd podczas resetowania.");
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  const programs = [
+    { id: "plan-zadan", name: "Plan Zadań", icon: "📋" },
+    { id: "narzedzia-systemowe", name: "Narzędzia Systemowe", icon: "🛠️" },
+    { id: "czyszczenie-androida", name: "Czyszczenie Androida", icon: "📱" },
+  ];
+
+  return (
+    <div className="reveal visible" style={{ marginTop: "24px" }}>
+      <div style={{ marginBottom: "20px" }}>
+        <h3 style={{ margin: 0, fontSize: "20px", color: "#fff" }}>Reset Pobrań</h3>
+        <p className="text-dim" style={{ margin: "4px 0 0 0", fontSize: "14px" }}>
+          Wybierz dany program, aby wyzerować jego licznik pobrań.
+        </p>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "16px" }}>
+        {programs.map((prog) => {
+          const count = downloads[prog.id] || 0;
+          const isBusy = loading === prog.id;
+          return (
+            <div
+              key={prog.id}
+              className="glass"
+              style={{
+                padding: "24px",
+                borderRadius: "14px",
+                border: "1px solid rgba(255, 255, 255, 0.1)",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                gap: "18px",
+              }}
+            >
+              <div>
+                <div style={{ fontSize: "28px", marginBottom: "8px" }}>{prog.icon}</div>
+                <h4 style={{ margin: "0 0 6px 0", fontSize: "17px", color: "#fff" }}>{prog.name}</h4>
+                <div style={{ fontSize: "24px", fontWeight: "700", color: "#06b6d4" }}>
+                  {count} pobrań
+                </div>
+              </div>
+
+              <button
+                onClick={() => handleReset(prog.id, prog.name)}
+                disabled={isBusy}
+                className="btn"
+                style={{
+                  background: "rgba(239, 68, 68, 0.15)",
+                  color: "#f87171",
+                  border: "1px solid rgba(239, 68, 68, 0.3)",
+                  borderRadius: "8px",
+                  padding: "10px 16px",
+                  fontWeight: "600",
+                  cursor: isBusy ? "not-allowed" : "pointer",
+                  transition: "all 0.2s ease",
+                }}
+              >
+                {isBusy ? "Resetowanie..." : "🗑️ Wyzeruj pobrania"}
+              </button>
+            </div>
+          );
+        })}
+      </div>
+
+      <div style={{ marginTop: "24px", textAlign: "right" }}>
+        <button
+          onClick={() => handleReset("all", "wszystkie programy")}
+          disabled={loading === "all"}
+          className="btn"
+          style={{
+            background: "linear-gradient(135deg, #ef4444, #b91c1c)",
+            color: "#fff",
+            padding: "10px 20px",
+            borderRadius: "8px",
+            border: "none",
+            fontWeight: "600",
+            cursor: loading === "all" ? "not-allowed" : "pointer",
+          }}
+        >
+          {loading === "all" ? "Resetowanie..." : "⚡ Resetuj wszystkie programy naraz"}
+        </button>
+      </div>
+    </div>
+  );
+}
