@@ -149,6 +149,11 @@ const ApiPublicOrderNotifyRoute = ApiPublicOrderNotifyRouteImport.update({
   path: '/api/public/order-notify',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicSiteRatingsRoute = ApiPublicSiteRatingsRouteImport.update({
+  id: '/api/public/site-ratings',
+  path: '/api/public/site-ratings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -163,8 +168,6 @@ export interface FileRoutesByFullPath {
   '/panel-klienta': typeof PanelKlientaRoute
   '/pizza': typeof PizzaRoute
   '/programy': typeof ProgramyRoute
-  '/programy': typeof ProgramyRoute
-  '/programy': typeof ProgramyRoute
   '/register': typeof RegisterRoute
   '/retro': typeof RetroRoute
   '/sekret': typeof SekretRoute
@@ -175,7 +178,7 @@ export interface FileRoutesByFullPath {
   '/admin/czaty': typeof AdminCzatyRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/api/chat': typeof ApiChatRoute
-  '/api/public/order-notify': typeof ApiPublicOrderNotifyRoute,
+  '/api/public/order-notify': typeof ApiPublicOrderNotifyRoute
   '/api/public/site-ratings': typeof ApiPublicSiteRatingsRoute
 }
 export interface FileRoutesByTo {
@@ -191,8 +194,6 @@ export interface FileRoutesByTo {
   '/panel-klienta': typeof PanelKlientaRoute
   '/pizza': typeof PizzaRoute
   '/programy': typeof ProgramyRoute
-  '/programy': typeof ProgramyRoute
-  '/programy': typeof ProgramyRoute
   '/register': typeof RegisterRoute
   '/retro': typeof RetroRoute
   '/sekret': typeof SekretRoute
@@ -203,7 +204,7 @@ export interface FileRoutesByTo {
   '/admin/czaty': typeof AdminCzatyRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/api/chat': typeof ApiChatRoute
-  '/api/public/order-notify': typeof ApiPublicOrderNotifyRoute,
+  '/api/public/order-notify': typeof ApiPublicOrderNotifyRoute
   '/api/public/site-ratings': typeof ApiPublicSiteRatingsRoute
 }
 export interface FileRoutesById {
@@ -220,8 +221,6 @@ export interface FileRoutesById {
   '/panel-klienta': typeof PanelKlientaRoute
   '/pizza': typeof PizzaRoute
   '/programy': typeof ProgramyRoute
-  '/programy': typeof ProgramyRoute
-  '/programy': typeof ProgramyRoute
   '/register': typeof RegisterRoute
   '/retro': typeof RetroRoute
   '/sekret': typeof SekretRoute
@@ -232,7 +231,7 @@ export interface FileRoutesById {
   '/admin/czaty': typeof AdminCzatyRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/api/chat': typeof ApiChatRoute
-  '/api/public/order-notify': typeof ApiPublicOrderNotifyRoute,
+  '/api/public/order-notify': typeof ApiPublicOrderNotifyRoute
   '/api/public/site-ratings': typeof ApiPublicSiteRatingsRoute
 }
 export interface FileRouteTypes {
@@ -261,6 +260,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/api/chat'
     | '/api/public/order-notify'
+    | '/api/public/site-ratings'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -286,6 +286,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/api/chat'
     | '/api/public/order-notify'
+    | '/api/public/site-ratings'
   id:
     | '__root__'
     | '/'
@@ -311,6 +312,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/api/chat'
     | '/api/public/order-notify'
+    | '/api/public/site-ratings'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -325,6 +327,7 @@ export interface RootRouteChildren {
   PanelAdminRoute: typeof PanelAdminRoute
   PanelKlientaRoute: typeof PanelKlientaRoute
   PizzaRoute: typeof PizzaRoute
+  ProgramyRoute: typeof ProgramyRoute
   RegisterRoute: typeof RegisterRoute
   RetroRoute: typeof RetroRoute
   SekretRoute: typeof SekretRoute
@@ -333,6 +336,7 @@ export interface RootRouteChildren {
   ZgloszenieRoute: typeof ZgloszenieRoute
   ApiChatRoute: typeof ApiChatRoute
   ApiPublicOrderNotifyRoute: typeof ApiPublicOrderNotifyRoute
+  ApiPublicSiteRatingsRoute: typeof ApiPublicSiteRatingsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -414,6 +418,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PizzaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/programy': {
+      id: '/programy'
+      path: '/programy'
+      fullPath: '/programy'
+      preLoaderRoute: typeof ProgramyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/register': {
       id: '/register'
       path: '/register'
@@ -491,6 +502,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicOrderNotifyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/site-ratings': {
+      id: '/api/public/site-ratings'
+      path: '/api/public/site-ratings'
+      fullPath: '/api/public/site-ratings'
+      preLoaderRoute: typeof ApiPublicSiteRatingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -520,7 +538,6 @@ const rootRouteChildren: RootRouteChildren = {
   PanelAdminRoute: PanelAdminRoute,
   PanelKlientaRoute: PanelKlientaRoute,
   PizzaRoute: PizzaRoute,
-  ProgramyRoute,
   ProgramyRoute: ProgramyRoute,
   RegisterRoute: RegisterRoute,
   RetroRoute: RetroRoute,
@@ -530,6 +547,7 @@ const rootRouteChildren: RootRouteChildren = {
   ZgloszenieRoute: ZgloszenieRoute,
   ApiChatRoute: ApiChatRoute,
   ApiPublicOrderNotifyRoute: ApiPublicOrderNotifyRoute,
+  ApiPublicSiteRatingsRoute: ApiPublicSiteRatingsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
