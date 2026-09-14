@@ -132,6 +132,7 @@ export function ReviewForm({ onSubmitted }: { onSubmitted?: () => void }) {
   const [rating, setRating] = useState(5);
   const [content, setContent] = useState("");
   const [serviceType, setServiceType] = useState<string>("");
+  const [otherServiceType, setOtherServiceType] = useState<string>("");
   const [extraService, setExtraService] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -165,10 +166,14 @@ export function ReviewForm({ onSubmitted }: { onSubmitted?: () => void }) {
     if (!c) return toast.error("Treść opinii nie może być pusta");
     if (rating < 1 || rating > 5) return toast.error("Ocena musi być od 1 do 5");
     setSubmitting(true);
+    let baseService = serviceType;
+    if (serviceType === "Inna" && otherServiceType.trim()) {
+      baseService = `Inne - ${otherServiceType.trim()}`;
+    }
     let finalService: string | null = null;
-    if (serviceType) {
+    if (baseService) {
       const extra = extraService.trim();
-      finalService = extra ? `${serviceType} + ${extra}` : `${serviceType} + nie ma nic dodatkowego`;
+      finalService = extra ? `${baseService} + ${extra}` : `${baseService} + nie ma nic dodatkowego`;
     } else if (extraService.trim()) {
       finalService = extraService.trim();
     }
@@ -191,6 +196,7 @@ export function ReviewForm({ onSubmitted }: { onSubmitted?: () => void }) {
     setContent("");
     setRating(5);
     setServiceType("");
+    setOtherServiceType("");
     setExtraService("");
     onSubmitted?.();
   };
@@ -233,6 +239,18 @@ export function ReviewForm({ onSubmitted }: { onSubmitted?: () => void }) {
           </div>
         </label>
       </div>
+      {serviceType === "Inna" && (
+        <label style={{ display: "grid", gap: 6, fontSize: 12 }}>
+          <span className="text-dim">Jaki to typ usługi? (opcjonalnie, maks. 100 znaków)</span>
+          <input
+            className="form-control"
+            value={otherServiceType}
+            onChange={(e) => setOtherServiceType(e.target.value)}
+            placeholder="np. naprawa telefonu, czyszczenie konsoli..."
+            maxLength={100}
+          />
+        </label>
+      )}
       <label style={{ display: "grid", gap: 6, fontSize: 12 }}>
         <span className="text-dim">Twoja opinia</span>
         <textarea className="form-control" rows={5} maxLength={2000} value={content} onChange={(e) => setContent(e.target.value)} required />
@@ -358,6 +376,7 @@ export function AdminReviews() {
   const [newLastName, setNewLastName] = useState("");
   const [newRating, setNewRating] = useState(5);
   const [newServiceType, setNewServiceType] = useState("");
+  const [newOtherServiceType, setNewOtherServiceType] = useState("");
   const [newExtraService, setNewExtraService] = useState("");
   const [newContent, setNewContent] = useState("");
   const [newDate, setNewDate] = useState("");
@@ -378,10 +397,14 @@ export function AdminReviews() {
 
     setIsAdding(true);
     const reviewDate = newDate ? new Date(newDate).toISOString() : new Date().toISOString();
+    let baseService = newServiceType;
+    if (newServiceType === "Inna" && newOtherServiceType.trim()) {
+      baseService = `Inne - ${newOtherServiceType.trim()}`;
+    }
     let finalService: string | null = null;
-    if (newServiceType) {
+    if (baseService) {
       const extra = newExtraService.trim();
-      finalService = extra ? `${newServiceType} + ${extra}` : `${newServiceType} + nie ma nic dodatkowego`;
+      finalService = extra ? `${baseService} + ${extra}` : `${baseService} + nie ma nic dodatkowego`;
     } else if (newExtraService.trim()) {
       finalService = newExtraService.trim();
     }
@@ -406,6 +429,7 @@ export function AdminReviews() {
     setNewLastName("");
     setNewRating(5);
     setNewServiceType("");
+    setNewOtherServiceType("");
     setNewExtraService("");
     setNewContent("");
     setNewDate("");
@@ -510,6 +534,18 @@ export function AdminReviews() {
               <input className="form-control" type="datetime-local" value={newDate} onChange={(e) => setNewDate(e.target.value)} />
             </div>
           </div>
+          {newServiceType === "Inna" && (
+            <label style={{ display: "grid", gap: 6, fontSize: 12 }}>
+              <span className="text-dim">Jaki to typ usługi? (opcjonalnie, maks. 100 znaków)</span>
+              <input
+                className="form-control"
+                value={newOtherServiceType}
+                onChange={(e) => setNewOtherServiceType(e.target.value)}
+                placeholder="np. naprawa telefonu, czyszczenie konsoli..."
+                maxLength={100}
+              />
+            </label>
+          )}
           <label style={{ display: "grid", gap: 6, fontSize: 12 }}>
             <span className="text-dim">Treść opinii</span>
             <textarea className="form-control" rows={3} value={newContent} onChange={(e) => setNewContent(e.target.value)} placeholder="Wpisz treść opinii..." maxLength={2000} required />
