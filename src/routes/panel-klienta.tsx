@@ -78,6 +78,7 @@ function PanelKlienta() {
   useEffect(() => {
     if (isRisky && !backupTouched) setBackup(true);
   }, [isRisky, backupTouched]);
+  const [files, setFiles] = useState<File[]>([]);
 
   const [tab, setTab] = useState<"tickets" | "review" | "secrets" | "account">("tickets");
   const [statusFilter, setStatusFilter] = useState<string>("all");
