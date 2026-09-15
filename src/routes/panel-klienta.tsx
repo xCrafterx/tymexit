@@ -148,13 +148,19 @@ function PanelKlienta() {
     }
     if (!session) return;
     setSubmitting(true);
+    const extrasNote = [
+      priority ? "⚡ Ekspresowy priorytet (+20 zł)" : null,
+      backup ? "💾 Kopia zapasowa / backup danych" : null,
+    ].filter(Boolean).join("\n");
     const { data: created, error } = await supabase
       .from("tickets")
       .insert({
         user_id: session.user.id,
         title: parsed.data.title,
-        description: parsed.data.description,
+        description: extrasNote ? `${parsed.data.description}\n\n--- OPCJE DODATKOWE ---\n${extrasNote}` : parsed.data.description,
+        is_priority: priority,
         service_type: (parsed.data.service_type === "Inne" || parsed.data.service_type === "Inna") && otherServiceType.trim() ? `Inne - ${otherServiceType.trim()}` : parsed.data.service_type,
+
         status: "oczekuje",
       })
       .select("id")
