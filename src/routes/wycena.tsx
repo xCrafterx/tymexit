@@ -47,6 +47,29 @@ const ISSUES: Record<DeviceType, IssueOption[]> = {
   ],
 };
 
+const DEVICE_LABELS: Record<DeviceType, string> = {
+  pc: "Komputer PC",
+  laptop: "Laptop",
+  software: "Programy / Zdalnie",
+  other: "Inne urządzenie",
+};
+
+const SERVICE_MAP: Record<string, string> = {
+  "pc-clean": "Czyszczenie i optymalizacja",
+  "pc-slow": "Instalacja systemu",
+  "pc-noboot": "Naprawa komputera",
+  "pc-build": "Komputer na zamówienie",
+  "pc-upgrade": "Modernizacja sprzętu",
+  "lap-clean": "Czyszczenie i optymalizacja",
+  "lap-repair": "Naprawa laptopa",
+  "lap-system": "Instalacja systemu",
+  "lap-ssd": "Modernizacja sprzętu",
+  "soft-remote": "Pomoc zdalna",
+  "soft-virus": "Czyszczenie i optymalizacja",
+  "soft-wifi": "Sieć Wi-Fi",
+  "other-diag": "Inna",
+};
+
 function WycenaPage() {
   const navigate = useNavigate();
   const [device, setDevice] = useState<DeviceType>("pc");
@@ -64,15 +87,20 @@ function WycenaPage() {
       backupData ? "kopia zapasowa danych" : null,
       expressDelivery ? "tryb ekspresowy" : null,
     ].filter(Boolean).join(", ");
-    const desc = `Wycena z kalkulatora: ${activeIssue?.name || "Naprawa"}${extras ? ` (+ ${extras})` : ""}. Szacowany koszt: ${totalPrice} zł.`;
+    const deviceLabel = DEVICE_LABELS[device];
+    const desc = `Wycena z kalkulatora TymekIT\nUrządzenie: ${deviceLabel}\nUsterka: ${activeIssue?.name || "Naprawa"}${extras ? `\nDodatki: ${extras}` : ""}\nSzacowany koszt: od ${totalPrice} zł.\n\nOpis problemu: `;
     navigate({
       to: "/zgloszenie",
       search: {
-        service: activeIssue?.name || "Naprawa",
-        desc: desc,
+        service: SERVICE_MAP[activeIssue?.id || ""] || "Inna",
+        title: `${deviceLabel} — ${activeIssue?.name || "Naprawa"}`,
+        desc,
+        priority: expressDelivery ? "1" : undefined,
+        backup: backupData ? "1" : undefined,
       } as any,
     });
   };
+
 
   return (
     <div style={{ maxWidth: 940, margin: "0 auto", padding: "40px 18px 80px", color: "var(--text)" }}>

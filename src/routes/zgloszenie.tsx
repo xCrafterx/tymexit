@@ -23,8 +23,31 @@ export const Route = createFileRoute("/zgloszenie")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  validateSearch: (s: Record<string, unknown>): {
+    service?: string;
+    title?: string;
+    desc?: string;
+    priority?: boolean;
+    backup?: boolean;
+  } => ({
+    service: typeof s.service === "string" ? s.service : undefined,
+    title: typeof s.title === "string" ? s.title : undefined,
+    desc: typeof s.desc === "string" ? s.desc : undefined,
+    priority: s.priority === "1" || s.priority === true || undefined,
+    backup: s.backup === "1" || s.backup === true || undefined,
+  }),
+
   component: ZgloszeniePage,
 });
+
+// Usługi, przy których istnieje ryzyko utraty danych
+const RISKY_SERVICES = [
+  "Instalacja systemu",
+  "Modernizacja sprzętu",
+  "Naprawa laptopa",
+  "Naprawa komputera",
+];
+
 
 const SERVICES = [
   "Naprawa laptopa",
@@ -55,9 +78,13 @@ const schema = z.object({
 function ZgloszeniePage() {
   const { session, user } = useAuth();
   const navigate = useNavigate();
+  const search = Route.useSearch();
   const [submitting, setSubmitting] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [otherServiceType, setOtherServiceType] = useState("");
+  const [priority, setPriority] = useState(!!search.priority);
+  const [backup, setBackup] = useState(!!search.backup);
+  const [backupTouched, setBackupTouched] = useState(!!search.backup);
   useEffect(() => {
     if (user?.email) {
       setForm((f) => ({ ...f, client_email: f.client_email || user.email || "" }));
@@ -69,14 +96,22 @@ function ZgloszeniePage() {
     client_phone: "",
     client_email: "",
     password: "",
-    title: "",
-    service_type: "",
-    description: "",
+    title: search.title ?? "",
+    service_type: search.service && SERVICES.includes(search.service) ? search.service : "",
+    description: search.desc ?? "",
   });
+
+  const isRisky = RISKY_SERVICES.includes(form.service_type);
+
+  // Sugeruj backup automatycznie przy usługach ryzykownych
+  useEffect(() => {
+    if (isRisky && !backupTouched) setBackup(true);
+  }, [isRisky, backupTouched]);
 
   const set = (k: keyof typeof form) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
   ) => setForm((f) => ({ ...f, [k]: e.target.value }));
+
 
   const pickFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     const picked = Array.from(e.target.files ?? []);
@@ -170,13 +205,20 @@ function ZgloszeniePage() {
     // Zapisujemy dane techniczne na końcu opisu
     const techMetadata = `\n\n--- METADATA ---\nIP: ${clientIp}\nPrzeglądarka: ${browserInfo}\nData: ${sentTime}`;
 
+    const extrasNote = [
+      priority ? "⚡ Ekspresowy priorytet (+20 zł)" : null,
+      backup ? "💾 Kopia zapasowa / backup danych" : null,
+    ].filter(Boolean).join("\n");
+
     const { data: created, error: ticketErr } = await supabase
       .from("tickets")
       .insert({
         user_id: userId,
         title: d.title,
-        description: d.description,
+        description: extrasNote ? `${d.description}\n\n--- OPCJE DODATKOWE ---\n${extrasNote}` : d.description,
+        is_priority: priority,
         service_type: d.service_type === "Inna" && otherServiceType.trim() ? `Inne - ${otherServiceType.trim()}` : d.service_type,
+
         status: "oczekuje",
         client_name: d.client_name,
         client_phone: d.client_phone,
@@ -392,6 +434,41 @@ function ZgloszeniePage() {
                 </ul>
               )}
             </div>
+
+            <div className="glass" style={{ padding: 18, borderRadius: 16, display: "grid", gap: 12, marginBottom: 16 }}>
+              <label style={{ display: "flex", gap: 12, alignItems: "flex-start", cursor: "pointer" }}>
+                <input type="checkbox" checked={priority} onChange={(e) => setPriority(e.target.checked)} style={{ width: 18, height: 18, marginTop: 3, accentColor: "var(--brand)" }} />
+                <span>
+                  <strong>Ekspresowy priorytet (+20 zł)</strong>
+                  <span style={{ display: "block", fontSize: 13, color: "var(--text-dim)" }}>
+                    Szybka diagnoza i realizacja poza kolejką.
+                  </span>
+                </span>
+              </label>
+
+              <label style={{ display: "flex", gap: 12, alignItems: "flex-start", cursor: "pointer" }}>
+                <input
+                  type="checkbox"
+                  checked={backup}
+                  onChange={(e) => { setBackup(e.target.checked); setBackupTouched(true); }}
+                  style={{ width: 18, height: 18, marginTop: 3, accentColor: "var(--brand)" }}
+                />
+                <span>
+                  <strong>Kopia zapasowa / backup danych (+20 zł)</strong>
+                  <span style={{ display: "block", fontSize: 13, color: "var(--text-dim)" }}>
+                    Zabezpieczę Twoje zdjęcia, dokumenty i pliki przed rozpoczęciem prac.
+                  </span>
+                </span>
+              </label>
+
+              {isRisky && (
+                <div style={{ padding: "10px 14px", borderRadius: 12, background: "rgba(245, 176, 66, .12)", border: "1px solid rgba(245, 176, 66, .38)", color: "#f5b042", fontSize: 13 }}>
+                  ⚠️ Wybrana usługa niesie ryzyko utraty danych (np. reinstalacja systemu, formatowanie,
+                  wymiana dysku). Zalecam zaznaczenie kopii zapasowej.
+                </div>
+              )}
+            </div>
+
 
             <button
               type="submit"

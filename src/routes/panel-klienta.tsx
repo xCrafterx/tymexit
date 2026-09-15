@@ -50,6 +50,14 @@ const SERVICES = [
   "Inne",
 ];
 
+// Usługi z ryzykiem utraty danych
+const RISKY_SERVICES = [
+  "Instalacja Windows",
+  "Modernizacja PC",
+  "Naprawa laptopa",
+  "Naprawa komputera",
+];
+
 const ticketSchema = z.object({
   title: z.string().trim().min(3, "Tytuł min. 3 znaki").max(120, "Tytuł max. 120 znaków"),
   service_type: z.string().refine((v) => SERVICES.includes(v), "Wybierz typ usługi"),
@@ -63,7 +71,15 @@ function PanelKlienta() {
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({ title: "", service_type: SERVICES[0], description: "" });
   const [otherServiceType, setOtherServiceType] = useState("");
+  const [priority, setPriority] = useState(false);
+  const [backup, setBackup] = useState(false);
+  const [backupTouched, setBackupTouched] = useState(false);
+  const isRisky = RISKY_SERVICES.includes(form.service_type);
+  useEffect(() => {
+    if (isRisky && !backupTouched) setBackup(true);
+  }, [isRisky, backupTouched]);
   const [files, setFiles] = useState<File[]>([]);
+
   const [tab, setTab] = useState<"tickets" | "review" | "secrets" | "account">("tickets");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [openChats, setOpenChats] = useState<Record<string, boolean>>({});
@@ -132,13 +148,19 @@ function PanelKlienta() {
     }
     if (!session) return;
     setSubmitting(true);
+    const extrasNote = [
+      priority ? "⚡ Ekspresowy priorytet (+20 zł)" : null,
+      backup ? "💾 Kopia zapasowa / backup danych" : null,
+    ].filter(Boolean).join("\n");
     const { data: created, error } = await supabase
       .from("tickets")
       .insert({
         user_id: session.user.id,
         title: parsed.data.title,
-        description: parsed.data.description,
+        description: extrasNote ? `${parsed.data.description}\n\n--- OPCJE DODATKOWE ---\n${extrasNote}` : parsed.data.description,
+        is_priority: priority,
         service_type: (parsed.data.service_type === "Inne" || parsed.data.service_type === "Inna") && otherServiceType.trim() ? `Inne - ${otherServiceType.trim()}` : parsed.data.service_type,
+
         status: "oczekuje",
       })
       .select("id")
@@ -178,6 +200,10 @@ function PanelKlienta() {
     toast.success("Zgłoszenie wysłane");
     setForm({ title: "", service_type: SERVICES[0], description: "" });
     setFiles([]);
+    setPriority(false);
+    setBackup(false);
+    setBackupTouched(false);
+
     fetchTickets();
     setSubmitting(false);
   };
@@ -346,6 +372,34 @@ function PanelKlienta() {
                     </div>
                   )}
                 </div>
+
+                <div style={{ padding: 16, borderRadius: 14, border: "1px solid var(--border)", background: "var(--surface)", display: "grid", gap: 12, marginBottom: 16 }}>
+                  <label style={{ display: "flex", gap: 12, alignItems: "flex-start", cursor: "pointer" }}>
+                    <input type="checkbox" checked={priority} onChange={(e) => setPriority(e.target.checked)} style={{ width: 18, height: 18, marginTop: 3, accentColor: "var(--brand)" }} />
+                    <span>
+                      <strong>Ekspresowy priorytet (+20 zł)</strong>
+                      <span style={{ display: "block", fontSize: 13, color: "var(--text-dim)" }}>Szybka diagnoza i realizacja poza kolejką.</span>
+                    </span>
+                  </label>
+                  <label style={{ display: "flex", gap: 12, alignItems: "flex-start", cursor: "pointer" }}>
+                    <input
+                      type="checkbox"
+                      checked={backup}
+                      onChange={(e) => { setBackup(e.target.checked); setBackupTouched(true); }}
+                      style={{ width: 18, height: 18, marginTop: 3, accentColor: "var(--brand)" }}
+                    />
+                    <span>
+                      <strong>Kopia zapasowa / backup danych (+20 zł)</strong>
+                      <span style={{ display: "block", fontSize: 13, color: "var(--text-dim)" }}>Zabezpieczę Twoje zdjęcia, dokumenty i pliki przed rozpoczęciem prac.</span>
+                    </span>
+                  </label>
+                  {isRisky && (
+                    <div style={{ padding: "10px 14px", borderRadius: 12, background: "rgba(245, 176, 66, .12)", border: "1px solid rgba(245, 176, 66, .38)", color: "#f5b042", fontSize: 13 }}>
+                      ⚠️ Ta usługa niesie ryzyko utraty danych (reinstalacja systemu, formatowanie, wymiana dysku). Zalecam kopię zapasową.
+                    </div>
+                  )}
+                </div>
+
 
                 <button
                   type="submit"
