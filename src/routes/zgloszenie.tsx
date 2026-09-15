@@ -428,6 +428,41 @@ function ZgloszeniePage() {
               )}
             </div>
 
+            <div className="glass" style={{ padding: 18, borderRadius: 16, display: "grid", gap: 12, marginBottom: 16 }}>
+              <label style={{ display: "flex", gap: 12, alignItems: "flex-start", cursor: "pointer" }}>
+                <input type="checkbox" checked={priority} onChange={(e) => setPriority(e.target.checked)} style={{ width: 18, height: 18, marginTop: 3, accentColor: "var(--brand)" }} />
+                <span>
+                  <strong>Ekspresowy priorytet (+20 zł)</strong>
+                  <span style={{ display: "block", fontSize: 13, color: "var(--text-dim)" }}>
+                    Szybka diagnoza i realizacja poza kolejką.
+                  </span>
+                </span>
+              </label>
+
+              <label style={{ display: "flex", gap: 12, alignItems: "flex-start", cursor: "pointer" }}>
+                <input
+                  type="checkbox"
+                  checked={backup}
+                  onChange={(e) => { setBackup(e.target.checked); setBackupTouched(true); }}
+                  style={{ width: 18, height: 18, marginTop: 3, accentColor: "var(--brand)" }}
+                />
+                <span>
+                  <strong>Kopia zapasowa / backup danych (+20 zł)</strong>
+                  <span style={{ display: "block", fontSize: 13, color: "var(--text-dim)" }}>
+                    Zabezpieczę Twoje zdjęcia, dokumenty i pliki przed rozpoczęciem prac.
+                  </span>
+                </span>
+              </label>
+
+              {isRisky && (
+                <div style={{ padding: "10px 14px", borderRadius: 12, background: "rgba(245, 176, 66, .12)", border: "1px solid rgba(245, 176, 66, .38)", color: "#f5b042", fontSize: 13 }}>
+                  ⚠️ Wybrana usługa niesie ryzyko utraty danych (np. reinstalacja systemu, formatowanie,
+                  wymiana dysku). Zalecam zaznaczenie kopii zapasowej.
+                </div>
+              )}
+            </div>
+
+
             <button
               type="submit"
               className="btn btn-primary"
