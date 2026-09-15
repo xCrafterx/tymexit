@@ -23,8 +23,24 @@ export const Route = createFileRoute("/zgloszenie")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  validateSearch: (s: Record<string, unknown>) => ({
+    service: typeof s.service === "string" ? s.service : undefined,
+    title: typeof s.title === "string" ? s.title : undefined,
+    desc: typeof s.desc === "string" ? s.desc : undefined,
+    priority: s.priority === "1" || s.priority === true,
+    backup: s.backup === "1" || s.backup === true,
+  }),
   component: ZgloszeniePage,
 });
+
+// Usługi, przy których istnieje ryzyko utraty danych
+const RISKY_SERVICES = [
+  "Instalacja systemu",
+  "Modernizacja sprzętu",
+  "Naprawa laptopa",
+  "Naprawa komputera",
+];
+
 
 const SERVICES = [
   "Naprawa laptopa",
