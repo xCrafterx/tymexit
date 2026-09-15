@@ -71,7 +71,14 @@ function PanelKlienta() {
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({ title: "", service_type: SERVICES[0], description: "" });
   const [otherServiceType, setOtherServiceType] = useState("");
-  const [files, setFiles] = useState<File[]>([]);
+  const [priority, setPriority] = useState(false);
+  const [backup, setBackup] = useState(false);
+  const [backupTouched, setBackupTouched] = useState(false);
+  const isRisky = RISKY_SERVICES.includes(form.service_type);
+  useEffect(() => {
+    if (isRisky && !backupTouched) setBackup(true);
+  }, [isRisky, backupTouched]);
+
   const [tab, setTab] = useState<"tickets" | "review" | "secrets" | "account">("tickets");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [openChats, setOpenChats] = useState<Record<string, boolean>>({});
