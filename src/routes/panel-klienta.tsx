@@ -200,6 +200,10 @@ function PanelKlienta() {
     toast.success("Zgłoszenie wysłane");
     setForm({ title: "", service_type: SERVICES[0], description: "" });
     setFiles([]);
+    setPriority(false);
+    setBackup(false);
+    setBackupTouched(false);
+
     fetchTickets();
     setSubmitting(false);
   };
