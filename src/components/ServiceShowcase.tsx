@@ -10,7 +10,7 @@ export function AvailabilityWidget() {
       style={{
         position: "fixed",
         bottom: 24,
-        left: 24,
+        right: 24,
         zIndex: 9998,
         display: "flex",
         alignItems: "center",
