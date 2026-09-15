@@ -71,9 +71,13 @@ const schema = z.object({
 function ZgloszeniePage() {
   const { session, user } = useAuth();
   const navigate = useNavigate();
+  const search = Route.useSearch();
   const [submitting, setSubmitting] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [otherServiceType, setOtherServiceType] = useState("");
+  const [priority, setPriority] = useState(!!search.priority);
+  const [backup, setBackup] = useState(!!search.backup);
+  const [backupTouched, setBackupTouched] = useState(!!search.backup);
   useEffect(() => {
     if (user?.email) {
       setForm((f) => ({ ...f, client_email: f.client_email || user.email || "" }));
@@ -85,14 +89,22 @@ function ZgloszeniePage() {
     client_phone: "",
     client_email: "",
     password: "",
-    title: "",
-    service_type: "",
-    description: "",
+    title: search.title ?? "",
+    service_type: search.service && SERVICES.includes(search.service) ? search.service : "",
+    description: search.desc ?? "",
   });
+
+  const isRisky = RISKY_SERVICES.includes(form.service_type);
+
+  // Sugeruj backup automatycznie przy usługach ryzykownych
+  useEffect(() => {
+    if (isRisky && !backupTouched) setBackup(true);
+  }, [isRisky, backupTouched]);
 
   const set = (k: keyof typeof form) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
   ) => setForm((f) => ({ ...f, [k]: e.target.value }));
+
 
   const pickFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
     const picked = Array.from(e.target.files ?? []);
