@@ -60,7 +60,11 @@ function WycenaPage() {
   let totalPrice = (activeIssue?.priceValue || 50) + (backupData ? 20 : 0) + (expressDelivery ? 20 : 0);
 
   const handleGoToOrder = () => {
-    const desc = ;
+    const extras = [
+      backupData ? "kopia zapasowa danych" : null,
+      expressDelivery ? "tryb ekspresowy" : null,
+    ].filter(Boolean).join(", ");
+    const desc = `Wycena z kalkulatora: ${activeIssue?.name || "Naprawa"}${extras ? ` (+ ${extras})` : ""}. Szacowany koszt: ${totalPrice} zł.`;
     navigate({
       to: "/zgloszenie",
       search: {

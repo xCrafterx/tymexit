@@ -5,6 +5,7 @@ import { SiteRatingPrompt } from "@/components/SiteRatingPrompt";
 import { VisitorCounterBadge } from "@/components/VisitorCounterBadge";
 import { SiteRatingAllegro } from "@/components/SiteRatingAllegro";
 import { supabase } from "@/integrations/supabase/client";
+import { AvailabilityWidget, WeeklySlotsBanner, LiveRepairStats, BeforeAfterSlider, DiagnosticTerminal } from "@/components/ServiceShowcase";
 
 
 export const Route = createFileRoute("/")({

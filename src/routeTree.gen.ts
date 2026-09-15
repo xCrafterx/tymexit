@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as KawaRouteImport } from './routes/kawa'
 import { Route as KontaktRouteImport } from './routes/kontakt'
 import { Route as LoginRouteImport } from './routes/login'
@@ -25,10 +26,9 @@ import { Route as RegisterRouteImport } from './routes/register'
 import { Route as RetroRouteImport } from './routes/retro'
 import { Route as SekretRouteImport } from './routes/sekret'
 import { Route as UslugiRouteImport } from './routes/uslugi'
+import { Route as WycenaRouteImport } from './routes/wycena'
 import { Route as ZamowRouteImport } from './routes/zamow'
 import { Route as ZgloszenieRouteImport } from './routes/zgloszenie'
-import { Route as WycenaRouteImport } from './routes/wycena'
-import { Route as FaqRouteImport } from './routes/faq'
 import { Route as AdminChatRouteImport } from './routes/admin.chat'
 import { Route as AdminCzatyRouteImport } from './routes/admin.czaty'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
@@ -44,6 +44,11 @@ const IndexRoute = IndexRouteImport.update({
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
 const KawaRoute = KawaRouteImport.update({
@@ -116,6 +121,11 @@ const UslugiRoute = UslugiRouteImport.update({
   path: '/uslugi',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WycenaRoute = WycenaRouteImport.update({
+  id: '/wycena',
+  path: '/wycena',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ZamowRoute = ZamowRouteImport.update({
   id: '/zamow',
   path: '/zamow',
@@ -124,16 +134,6 @@ const ZamowRoute = ZamowRouteImport.update({
 const ZgloszenieRoute = ZgloszenieRouteImport.update({
   id: '/zgloszenie',
   path: '/zgloszenie',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const WycenaRoute = WycenaRouteImport.update({
-  id: '/wycena',
-  path: '/wycena',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FaqRoute = FaqRouteImport.update({
-  id: '/faq',
-  path: '/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminChatRoute = AdminChatRouteImport.update({
@@ -170,6 +170,7 @@ const ApiPublicSiteRatingsRoute = ApiPublicSiteRatingsRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/faq': typeof FaqRoute
   '/kawa': typeof KawaRoute
   '/kontakt': typeof KontaktRoute
   '/login': typeof LoginRoute
@@ -184,12 +185,9 @@ export interface FileRoutesByFullPath {
   '/retro': typeof RetroRoute
   '/sekret': typeof SekretRoute
   '/uslugi': typeof UslugiRoute
+  '/wycena': typeof WycenaRoute
   '/zamow': typeof ZamowRoute
   '/zgloszenie': typeof ZgloszenieRoute
-  '/wycena': typeof WycenaRoute
-  '/faq': typeof FaqRoute
-  '/wycena': typeof WycenaRoute
-  '/faq': typeof FaqRoute
   '/admin/chat': typeof AdminChatRoute
   '/admin/czaty': typeof AdminCzatyRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -200,6 +198,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/faq': typeof FaqRoute
   '/kawa': typeof KawaRoute
   '/kontakt': typeof KontaktRoute
   '/login': typeof LoginRoute
@@ -214,12 +213,9 @@ export interface FileRoutesByTo {
   '/retro': typeof RetroRoute
   '/sekret': typeof SekretRoute
   '/uslugi': typeof UslugiRoute
+  '/wycena': typeof WycenaRoute
   '/zamow': typeof ZamowRoute
   '/zgloszenie': typeof ZgloszenieRoute
-  '/wycena': typeof WycenaRoute
-  '/faq': typeof FaqRoute
-  '/wycena': typeof WycenaRoute
-  '/faq': typeof FaqRoute
   '/admin/chat': typeof AdminChatRoute
   '/admin/czaty': typeof AdminCzatyRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -231,6 +227,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/faq': typeof FaqRoute
   '/kawa': typeof KawaRoute
   '/kontakt': typeof KontaktRoute
   '/login': typeof LoginRoute
@@ -245,12 +242,9 @@ export interface FileRoutesById {
   '/retro': typeof RetroRoute
   '/sekret': typeof SekretRoute
   '/uslugi': typeof UslugiRoute
+  '/wycena': typeof WycenaRoute
   '/zamow': typeof ZamowRoute
   '/zgloszenie': typeof ZgloszenieRoute
-  '/wycena': typeof WycenaRoute
-  '/faq': typeof FaqRoute
-  '/wycena': typeof WycenaRoute
-  '/faq': typeof FaqRoute
   '/admin/chat': typeof AdminChatRoute
   '/admin/czaty': typeof AdminCzatyRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -263,6 +257,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/faq'
     | '/kawa'
     | '/kontakt'
     | '/login'
@@ -277,10 +272,9 @@ export interface FileRouteTypes {
     | '/retro'
     | '/sekret'
     | '/uslugi'
+    | '/wycena'
     | '/zamow'
     | '/zgloszenie'
-    | '/wycena'
-    | '/faq'
     | '/admin/chat'
     | '/admin/czaty'
     | '/admin/dashboard'
@@ -291,6 +285,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
+    | '/faq'
     | '/kawa'
     | '/kontakt'
     | '/login'
@@ -305,10 +300,9 @@ export interface FileRouteTypes {
     | '/retro'
     | '/sekret'
     | '/uslugi'
+    | '/wycena'
     | '/zamow'
     | '/zgloszenie'
-    | '/wycena'
-    | '/faq'
     | '/admin/chat'
     | '/admin/czaty'
     | '/admin/dashboard'
@@ -319,6 +313,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/faq'
     | '/kawa'
     | '/kontakt'
     | '/login'
@@ -333,10 +328,9 @@ export interface FileRouteTypes {
     | '/retro'
     | '/sekret'
     | '/uslugi'
+    | '/wycena'
     | '/zamow'
     | '/zgloszenie'
-    | '/wycena'
-    | '/faq'
     | '/admin/chat'
     | '/admin/czaty'
     | '/admin/dashboard'
@@ -348,6 +342,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
+  FaqRoute: typeof FaqRoute
   KawaRoute: typeof KawaRoute
   KontaktRoute: typeof KontaktRoute
   LoginRoute: typeof LoginRoute
@@ -362,10 +357,9 @@ export interface RootRouteChildren {
   RetroRoute: typeof RetroRoute
   SekretRoute: typeof SekretRoute
   UslugiRoute: typeof UslugiRoute
+  WycenaRoute: typeof WycenaRoute
   ZamowRoute: typeof ZamowRoute
-  ZgloszenieRoute: typeof ZgloszenieRoute,
-  WycenaRoute: typeof WycenaRoute,
-  FaqRoute: typeof FaqRoute
+  ZgloszenieRoute: typeof ZgloszenieRoute
   ApiChatRoute: typeof ApiChatRoute
   ApiPublicOrderNotifyRoute: typeof ApiPublicOrderNotifyRoute
   ApiPublicSiteRatingsRoute: typeof ApiPublicSiteRatingsRoute
@@ -385,6 +379,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/kawa': {
@@ -485,6 +486,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UslugiRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/wycena': {
+      id: '/wycena'
+      path: '/wycena'
+      fullPath: '/wycena'
+      preLoaderRoute: typeof WycenaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/zamow': {
       id: '/zamow'
       path: '/zamow'
@@ -561,6 +569,7 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
+  FaqRoute: FaqRoute,
   KawaRoute: KawaRoute,
   KontaktRoute: KontaktRoute,
   LoginRoute: LoginRoute,
@@ -575,6 +584,7 @@ const rootRouteChildren: RootRouteChildren = {
   RetroRoute: RetroRoute,
   SekretRoute: SekretRoute,
   UslugiRoute: UslugiRoute,
+  WycenaRoute: WycenaRoute,
   ZamowRoute: ZamowRoute,
   ZgloszenieRoute: ZgloszenieRoute,
   ApiChatRoute: ApiChatRoute,
