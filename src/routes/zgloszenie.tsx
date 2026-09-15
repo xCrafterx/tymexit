@@ -198,13 +198,20 @@ function ZgloszeniePage() {
     // Zapisujemy dane techniczne na końcu opisu
     const techMetadata = `\n\n--- METADATA ---\nIP: ${clientIp}\nPrzeglądarka: ${browserInfo}\nData: ${sentTime}`;
 
+    const extrasNote = [
+      priority ? "⚡ Ekspresowy priorytet (+20 zł)" : null,
+      backup ? "💾 Kopia zapasowa / backup danych" : null,
+    ].filter(Boolean).join("\n");
+
     const { data: created, error: ticketErr } = await supabase
       .from("tickets")
       .insert({
         user_id: userId,
         title: d.title,
-        description: d.description,
+        description: extrasNote ? `${d.description}\n\n--- OPCJE DODATKOWE ---\n${extrasNote}` : d.description,
+        is_priority: priority,
         service_type: d.service_type === "Inna" && otherServiceType.trim() ? `Inne - ${otherServiceType.trim()}` : d.service_type,
+
         status: "oczekuje",
         client_name: d.client_name,
         client_phone: d.client_phone,
