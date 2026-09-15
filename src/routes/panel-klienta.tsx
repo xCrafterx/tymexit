@@ -50,6 +50,14 @@ const SERVICES = [
   "Inne",
 ];
 
+// Usługi z ryzykiem utraty danych
+const RISKY_SERVICES = [
+  "Instalacja Windows",
+  "Modernizacja PC",
+  "Naprawa laptopa",
+  "Naprawa komputera",
+];
+
 const ticketSchema = z.object({
   title: z.string().trim().min(3, "Tytuł min. 3 znaki").max(120, "Tytuł max. 120 znaków"),
   service_type: z.string().refine((v) => SERVICES.includes(v), "Wybierz typ usługi"),
