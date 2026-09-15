@@ -64,15 +64,20 @@ function WycenaPage() {
       backupData ? "kopia zapasowa danych" : null,
       expressDelivery ? "tryb ekspresowy" : null,
     ].filter(Boolean).join(", ");
-    const desc = `Wycena z kalkulatora: ${activeIssue?.name || "Naprawa"}${extras ? ` (+ ${extras})` : ""}. Szacowany koszt: ${totalPrice} zł.`;
+    const deviceLabel = DEVICE_LABELS[device];
+    const desc = `Wycena z kalkulatora TymekIT\nUrządzenie: ${deviceLabel}\nUsterka: ${activeIssue?.name || "Naprawa"}${extras ? `\nDodatki: ${extras}` : ""}\nSzacowany koszt: od ${totalPrice} zł.\n\nOpis problemu: `;
     navigate({
       to: "/zgloszenie",
       search: {
-        service: activeIssue?.name || "Naprawa",
-        desc: desc,
+        service: SERVICE_MAP[activeIssue?.id || ""] || "Inna",
+        title: `${deviceLabel} — ${activeIssue?.name || "Naprawa"}`,
+        desc,
+        priority: expressDelivery ? "1" : undefined,
+        backup: backupData ? "1" : undefined,
       } as any,
     });
   };
+
 
   return (
     <div style={{ maxWidth: 940, margin: "0 auto", padding: "40px 18px 80px", color: "var(--text)" }}>
