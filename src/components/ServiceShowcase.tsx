@@ -92,7 +92,7 @@ export function WeeklySlotsBanner() {
         <span style={{ fontSize: 24 }}>🔥</span>
         <div>
           <div style={{ fontWeight: 800, color: "var(--text)", fontSize: 15 }}>
-            Obciążenie serwisu w tym tygodniu: <span style={{ color: "#f87171" }}>Zostały tylko 2 wolne terminy!</span>
+            Obciążenie serwisu w tym tygodniu: <span style={{ color: "#f87171" }}>Zostały tylko 3 wolne terminy!</span>
           </div>
           <div style={{ fontSize: 13, color: "var(--text-sec)" }}>
             Zgłoś komputer już teraz, aby diagnoza odbyła się jeszcze przed weekendem.
@@ -121,8 +121,8 @@ export function LiveRepairStats() {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 20 }}>
         {[
-          { icon: "💻", count: "185+", label: "Naprawionych urządzeń", sub: "Komputery, laptopy i konsole" },
-          { icon: "⭐", count: "100%", label: "Zadowolonych opinii", sub: "Średnia ocen 5.0 w Google i serwisie" },
+          { icon: "💻", count: "10+", label: "Naprawionych urządzeń", sub: "Komputery, laptopy i konsole" },
+          { icon: "⭐", count: "100%", label: "Zadowolonych opinii", sub: "Średnia ocen 5.0 w serwisie" },
           { icon: "⏱️", count: "~24h", label: "Średni czas diagnozy", sub: "Szybka informacja o usterce i cenie" },
           { icon: "🛡️", count: "30 dni", label: "Gwarancji na usługę", sub: "Pewność i bezpieczeństwo naprawy" },
         ].map((item, idx) => (
