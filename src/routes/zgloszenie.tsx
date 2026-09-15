@@ -23,13 +23,20 @@ export const Route = createFileRoute("/zgloszenie")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  validateSearch: (s: Record<string, unknown>) => ({
+  validateSearch: (s: Record<string, unknown>): {
+    service?: string;
+    title?: string;
+    desc?: string;
+    priority?: boolean;
+    backup?: boolean;
+  } => ({
     service: typeof s.service === "string" ? s.service : undefined,
     title: typeof s.title === "string" ? s.title : undefined,
     desc: typeof s.desc === "string" ? s.desc : undefined,
-    priority: s.priority === "1" || s.priority === true,
-    backup: s.backup === "1" || s.backup === true,
+    priority: s.priority === "1" || s.priority === true || undefined,
+    backup: s.backup === "1" || s.backup === true || undefined,
   }),
+
   component: ZgloszeniePage,
 });
 
