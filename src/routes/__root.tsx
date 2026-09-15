@@ -23,10 +23,10 @@ function NotFoundComponent() {
           powstało napisz do mnie!
         </p>
         <div className="notfound-actions">
-          <Link to="/" className="btn notfound-btn-primary">
+          <Link to="/" className="btn btn-primary">
             Wróć na stronę główną
           </Link>
-          <Link to="/zgloszenie" className="btn notfound-btn-ghost">
+          <Link to="/zgloszenie" className="btn btn-ghost">
             Napisz do mnie
           </Link>
         </div>
