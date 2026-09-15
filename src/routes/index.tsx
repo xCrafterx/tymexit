@@ -332,6 +332,21 @@ function Index() {
                   "Pomoc przy aktualizacjach i instalacjach",
                 ],
               },
+              {
+                h: "Odzyskiwanie danych",
+                p: "od 80 zł",
+                d: "Profesonalne i dokładne odzyskiwanie",
+                items: [
+                  "Odzyskiwanie danych z SSD, HDD, pendrive oraz kart SD",
+                  "Odzyskiwanie przy użyciu profesjonalnych programów DMDE oraz EaseUS",
+                  "Bezpłatne skanowanie nośnika w celu sprawdzenia możliwości odzysku",
+                  "Odzyskiwanie przypadkowo usuniętych plików i folderów",
+                  "Odzyskiwanie danych po przypadkowym sformatowaniu nośnika",
+                  "",
+                  "Odzyskane dane przekazywane na wskazany przez klienta nośnik",
+                  "Nie zapisujemy nowych danych na uszkodzonym nośniku",
+                ],
+              },
             ].map((c, i) => {
               const isPopular = popular.has(c.h);
               return (
