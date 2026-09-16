@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 
-const VISITED_KEY = "tymekit_visitor_logged_v1";
 
 export function VisitorCounterBadge() {
   const [count, setCount] = useState<number | null>(null);
@@ -18,13 +17,7 @@ export function VisitorCounterBadge() {
         }
       } catch {}
 
-      // 2. Jeśli ta przeglądarka już została policzona, nie wysyłaj ponownego zgłoszenia
-      const alreadyLogged = localStorage.getItem(VISITED_KEY);
-      if (alreadyLogged) {
-        return;
-      }
-
-      // 3. Pobierz IP i wyślij pierwsze unikalne wejście
+      // 2. Pobierz IP i zarejestruj wizytę (serwer sam pilnuje unikalności i odrzuca boty)
       try {
         let clientIp = "";
         try {
@@ -39,12 +32,13 @@ export function VisitorCounterBadge() {
         const res = await fetch("/api/public/site-ratings", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ type: "visit", clientIp: clientIp || undefined }),
+          body: JSON.stringify({
+            type: "visit",
+            clientIp: clientIp || undefined,
+            path: window.location.pathname,
+          }),
         });
         const data = await res.json();
-        if (data?.ok) {
-          localStorage.setItem(VISITED_KEY, "1");
-        }
         if (mounted && typeof data.visits === "number") {
           setCount(Math.max(1, data.visits));
         }

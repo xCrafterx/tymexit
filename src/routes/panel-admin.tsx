@@ -19,6 +19,7 @@ import { AdminLiveChats } from "@/routes/admin.czaty";
 import { AdminReviews } from "@/components/Reviews";
 import { PopularServicesAdmin } from "@/components/PopularServicesAdmin";
 import { PanelTabs, type PanelTabGroup } from "@/components/PanelTabs";
+import { AdminVisitLogs } from "@/components/AdminVisitLogs";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -72,7 +73,7 @@ export function PanelAdmin() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("all");
   const [editing, setEditing] = useState<Record<string, { note: string; saving: boolean }>>({});
-  const [tab, setTab] = useState<"tickets" | "form_logs" | "site_ratings" | "trash" | "chats" | "reviews" | "popular" | "secrets" | "eggs" | "account" | "reset_visitors" | "reset_downloads">("tickets");
+  const [tab, setTab] = useState<"tickets" | "form_logs" | "visit_logs" | "site_ratings" | "trash" | "chats" | "reviews" | "popular" | "secrets" | "eggs" | "account" | "reset_visitors" | "reset_downloads">("tickets");
   const [confirm, setConfirm] = useState<ConfirmAction>(null);
   const [acting, setActing] = useState(false);
   const [openChats, setOpenChats] = useState<Record<string, boolean>>({});
@@ -237,6 +238,7 @@ export function PanelAdmin() {
                 items: [
                   { key: "tickets", label: "Zgłoszenia", icon: "📋", badge: active.length, badgeVariant: "success", excludeFromGroupBadge: true },
                   { key: "form_logs", label: "Logi formularzy", icon: "🌐", badgeDot: tickets.some((t) => t.source === "formularz") },
+                  { key: "visit_logs", label: "Logi odwiedzin", icon: "🛰" },
                   { key: "chats", label: "Czat na żywo", icon: "💬" },
                   { key: "trash", label: "Kosz", icon: "🗑", badge: trashed.length, badgeVariant: "danger", excludeFromGroupBadge: true },
                 ],
@@ -435,7 +437,7 @@ export function PanelAdmin() {
                 </div>
               )}
             </div>
-          ) : tab === "chats" ? <AdminLiveChats /> : tab === "reviews" ? <AdminReviews /> : tab === "popular" ? <PopularServicesAdmin /> : tab === "secrets" ? <MySecrets /> : tab === "eggs" ? <AllEasterEggs /> : tab === "account" ? <AccountSettings /> : tab === "reset_visitors" ? <AdminResetVisitors /> : tab === "reset_downloads" ? <AdminResetDownloads /> : tab === "trash" ? (
+          ) : tab === "visit_logs" ? <AdminVisitLogs /> : tab === "chats" ? <AdminLiveChats /> : tab === "reviews" ? <AdminReviews /> : tab === "popular" ? <PopularServicesAdmin /> : tab === "secrets" ? <MySecrets /> : tab === "eggs" ? <AllEasterEggs /> : tab === "account" ? <AccountSettings /> : tab === "reset_visitors" ? <AdminResetVisitors /> : tab === "reset_downloads" ? <AdminResetDownloads /> : tab === "trash" ? (
             <>
               <div className="reveal visible">
                 <span className="eyebrow" style={{ borderColor: "rgba(239, 68, 68, 0.3)" }}><span className="dot" style={{ background: "#ef4444", boxShadow: "0 0 14px #ef4444", animation: "redBadgePulse 2s ease-in-out infinite" }}></span> Kosz ({trashed.length})</span>

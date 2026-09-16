@@ -1,6 +1,73 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
+const BOT_PATTERNS = [
+  "bot", "crawl", "spider", "slurp", "scrap", "curl", "wget", "python-requests",
+  "httpclient", "headless", "phantomjs", "puppeteer", "playwright", "lighthouse",
+  "preview", "monitor", "uptime", "facebookexternalhit", "embedly", "pingdom",
+  "archiver", "feedfetcher", "semrush", "ahrefs", "mj12", "dotbot", "petalbot",
+  "yandex", "baiduspider", "bingpreview", "duckduckbot", "applebot", "gptbot",
+];
+
+function isBotUserAgent(ua: string): boolean {
+  const s = (ua || "").toLowerCase();
+  if (!s) return true;
+  return BOT_PATTERNS.some((p) => s.includes(p));
+}
+
+function describeUserAgent(ua: string): { browser: string; device: string } {
+  const s = ua || "";
+  let browser = "Nieznana przeglądarka";
+  if (/edg\//i.test(s)) browser = "Microsoft Edge";
+  else if (/opr\/|opera/i.test(s)) browser = "Opera";
+  else if (/chrome\//i.test(s) && !/chromium/i.test(s)) browser = "Chrome";
+  else if (/firefox\//i.test(s)) browser = "Firefox";
+  else if (/safari\//i.test(s)) browser = "Safari";
+
+  let device = "Komputer";
+  if (/ipad|tablet/i.test(s)) device = "Tablet";
+  else if (/mobi|iphone|android/i.test(s)) device = "Telefon";
+
+  let os = "";
+  if (/windows nt/i.test(s)) os = "Windows";
+  else if (/android/i.test(s)) os = "Android";
+  else if (/iphone|ipad|ios/i.test(s)) os = "iOS";
+  else if (/mac os x/i.test(s)) os = "macOS";
+  else if (/linux/i.test(s)) os = "Linux";
+
+  return { browser, device: os ? `${device} · ${os}` : device };
+}
+
+function getRequestIp(request: Request): string {
+  const h = request.headers;
+  const fwd = h.get("cf-connecting-ip") || h.get("x-real-ip") || h.get("x-forwarded-for") || "";
+  return fwd.split(",")[0]?.trim() || "";
+}
+
+async function lookupGeo(ip: string): Promise<{ country?: string; region?: string; city?: string }> {
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 2500);
+    const res = await fetch(`https://ipapi.co/${encodeURIComponent(ip)}/json/`, { signal: ctrl.signal });
+    clearTimeout(timer);
+    const data: any = await res.json();
+    if (!data || data.error) return {};
+    return {
+      country: data.country_name || undefined,
+      region: data.region || undefined,
+      city: data.city || undefined,
+    };
+  } catch {
+    return {};
+  }
+}
+
+async function isIgnoredIp(ip: string): Promise<boolean> {
+  if (!ip) return false;
+  const { data } = await supabaseAdmin.from("ignored_ips").select("id").eq("ip", ip).limit(1);
+  return !!(data && data.length > 0);
+}
+
 export const Route = createFileRoute("/api/public/site-ratings")({
   server: {
     handlers: {
@@ -111,10 +178,20 @@ export const Route = createFileRoute("/api/public/site-ratings")({
             body = await request.json();
           } catch {}
 
-          // 1. Rejestracja unikalnej wizyty (1 na IP)
+          // 1. Rejestracja unikalnej wizyty (1 na IP) + szczegółowy log odwiedzin
           if (body.type === "visit") {
-            const clientIp = String(body.clientIp || "").trim();
-            if (clientIp && clientIp !== "Nieznane IP") {
+            const userAgent = request.headers.get("user-agent") || "";
+            const clientIp = String(body.clientIp || "").trim() || getRequestIp(request);
+
+            // Boty i crawlery nie są logowane ani liczone
+            if (isBotUserAgent(userAgent)) {
+              return new Response(JSON.stringify({ ok: false, bot: true }), {
+                status: 200,
+                headers: { "Content-Type": "application/json" },
+              });
+            }
+
+            if (clientIp && clientIp !== "Nieznane IP" && !(await isIgnoredIp(clientIp))) {
               const { data: existing } = await supabaseAdmin
                 .from("tickets")
                 .select("id")
@@ -132,6 +209,30 @@ export const Route = createFileRoute("/api/public/site-ratings")({
                   client_name: "Odwiedzający",
                   client_email: clientIp,
                   source: "odwiedziny_strony",
+                });
+              }
+
+              // Log szczegółowy — maks. 1 wpis na IP na 5 minut
+              const since = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+              const { data: recent } = await supabaseAdmin
+                .from("site_visit_logs")
+                .select("id")
+                .eq("ip", clientIp)
+                .gte("created_at", since)
+                .limit(1);
+
+              if (!recent || recent.length === 0) {
+                const geo = await lookupGeo(clientIp);
+                const { browser, device } = describeUserAgent(userAgent);
+                await supabaseAdmin.from("site_visit_logs").insert({
+                  ip: clientIp,
+                  user_agent: userAgent.slice(0, 500),
+                  browser,
+                  device,
+                  country: geo.country ?? null,
+                  region: geo.region ?? null,
+                  city: geo.city ?? null,
+                  path: String(body.path || "/").slice(0, 300),
                 });
               }
             }

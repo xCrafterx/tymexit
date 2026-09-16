@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      ignored_ips: {
+        Row: {
+          created_at: string
+          id: string
+          ip: string
+          note: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip: string
+          note?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip?: string
+          note?: string | null
+        }
+        Relationships: []
+      }
       popular_services: {
         Row: {
           created_at: string
@@ -104,6 +125,45 @@ export type Database = {
           service_type?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      site_visit_logs: {
+        Row: {
+          browser: string | null
+          city: string | null
+          country: string | null
+          created_at: string
+          device: string | null
+          id: string
+          ip: string
+          path: string | null
+          region: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          browser?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          device?: string | null
+          id?: string
+          ip: string
+          path?: string | null
+          region?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          browser?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          device?: string | null
+          id?: string
+          ip?: string
+          path?: string | null
+          region?: string | null
+          user_agent?: string | null
         }
         Relationships: []
       }
