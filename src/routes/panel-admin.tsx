@@ -19,6 +19,7 @@ import { AdminLiveChats } from "@/routes/admin.czaty";
 import { AdminReviews } from "@/components/Reviews";
 import { PopularServicesAdmin } from "@/components/PopularServicesAdmin";
 import { PanelTabs, type PanelTabGroup } from "@/components/PanelTabs";
+import { AdminVisitLogs } from "@/components/AdminVisitLogs";
 import {
   AlertDialog,
   AlertDialogAction,
