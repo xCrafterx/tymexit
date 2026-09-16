@@ -18,13 +18,7 @@ export function VisitorCounterBadge() {
         }
       } catch {}
 
-      // 2. Jeśli ta przeglądarka już została policzona, nie wysyłaj ponownego zgłoszenia
-      const alreadyLogged = localStorage.getItem(VISITED_KEY);
-      if (alreadyLogged) {
-        return;
-      }
-
-      // 3. Pobierz IP i wyślij pierwsze unikalne wejście
+      // 2. Pobierz IP i zarejestruj wizytę (serwer sam pilnuje unikalności i odrzuca boty)
       try {
         let clientIp = "";
         try {
