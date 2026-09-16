@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 
-const VISITED_KEY = "tymekit_visitor_logged_v1";
 
 export function VisitorCounterBadge() {
   const [count, setCount] = useState<number | null>(null);
