@@ -178,10 +178,20 @@ export const Route = createFileRoute("/api/public/site-ratings")({
             body = await request.json();
           } catch {}
 
-          // 1. Rejestracja unikalnej wizyty (1 na IP)
+          // 1. Rejestracja unikalnej wizyty (1 na IP) + szczegółowy log odwiedzin
           if (body.type === "visit") {
-            const clientIp = String(body.clientIp || "").trim();
-            if (clientIp && clientIp !== "Nieznane IP") {
+            const userAgent = request.headers.get("user-agent") || "";
+            const clientIp = String(body.clientIp || "").trim() || getRequestIp(request);
+
+            // Boty i crawlery nie są logowane ani liczone
+            if (isBotUserAgent(userAgent)) {
+              return new Response(JSON.stringify({ ok: false, bot: true }), {
+                status: 200,
+                headers: { "Content-Type": "application/json" },
+              });
+            }
+
+            if (clientIp && clientIp !== "Nieznane IP" && !(await isIgnoredIp(clientIp))) {
               const { data: existing } = await supabaseAdmin
                 .from("tickets")
                 .select("id")
@@ -199,6 +209,30 @@ export const Route = createFileRoute("/api/public/site-ratings")({
                   client_name: "Odwiedzający",
                   client_email: clientIp,
                   source: "odwiedziny_strony",
+                });
+              }
+
+              // Log szczegółowy — maks. 1 wpis na IP na 5 minut
+              const since = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+              const { data: recent } = await supabaseAdmin
+                .from("site_visit_logs")
+                .select("id")
+                .eq("ip", clientIp)
+                .gte("created_at", since)
+                .limit(1);
+
+              if (!recent || recent.length === 0) {
+                const geo = await lookupGeo(clientIp);
+                const { browser, device } = describeUserAgent(userAgent);
+                await supabaseAdmin.from("site_visit_logs").insert({
+                  ip: clientIp,
+                  user_agent: userAgent.slice(0, 500),
+                  browser,
+                  device,
+                  country: geo.country ?? null,
+                  region: geo.region ?? null,
+                  city: geo.city ?? null,
+                  path: String(body.path || "/").slice(0, 300),
                 });
               }
             }
