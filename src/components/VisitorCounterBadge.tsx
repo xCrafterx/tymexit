@@ -33,12 +33,13 @@ export function VisitorCounterBadge() {
         const res = await fetch("/api/public/site-ratings", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ type: "visit", clientIp: clientIp || undefined }),
+          body: JSON.stringify({
+            type: "visit",
+            clientIp: clientIp || undefined,
+            path: window.location.pathname,
+          }),
         });
         const data = await res.json();
-        if (data?.ok) {
-          localStorage.setItem(VISITED_KEY, "1");
-        }
         if (mounted && typeof data.visits === "number") {
           setCount(Math.max(1, data.visits));
         }
