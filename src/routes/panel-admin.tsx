@@ -437,7 +437,7 @@ export function PanelAdmin() {
                 </div>
               )}
             </div>
-          ) : tab === "chats" ? <AdminLiveChats /> : tab === "reviews" ? <AdminReviews /> : tab === "popular" ? <PopularServicesAdmin /> : tab === "secrets" ? <MySecrets /> : tab === "eggs" ? <AllEasterEggs /> : tab === "account" ? <AccountSettings /> : tab === "reset_visitors" ? <AdminResetVisitors /> : tab === "reset_downloads" ? <AdminResetDownloads /> : tab === "trash" ? (
+          ) : tab === "visit_logs" ? <AdminVisitLogs /> : tab === "chats" ? <AdminLiveChats /> : tab === "reviews" ? <AdminReviews /> : tab === "popular" ? <PopularServicesAdmin /> : tab === "secrets" ? <MySecrets /> : tab === "eggs" ? <AllEasterEggs /> : tab === "account" ? <AccountSettings /> : tab === "reset_visitors" ? <AdminResetVisitors /> : tab === "reset_downloads" ? <AdminResetDownloads /> : tab === "trash" ? (
             <>
               <div className="reveal visible">
                 <span className="eyebrow" style={{ borderColor: "rgba(239, 68, 68, 0.3)" }}><span className="dot" style={{ background: "#ef4444", boxShadow: "0 0 14px #ef4444", animation: "redBadgePulse 2s ease-in-out infinite" }}></span> Kosz ({trashed.length})</span>
