@@ -14,7 +14,8 @@ import { printTicketProtocol } from "@/components/PrintProtocol";
 import { openProtonMail } from "@/lib/protonMail";
 import { ReputationBadge } from "@/components/ReputationBadge";
 import { ALL_STATUSES, STATUS_META, DELETABLE_STATUSES, type TicketStatus } from "@/lib/ticket-status";
-import { notifyMessage } from "@/lib/notify";
+import { notifyMessage, notifyNewTicket, notifyNewReview } from "@/lib/notify";
+import { AdminAccounts } from "@/components/AdminAccounts";
 import { AdminLiveChats } from "@/routes/admin.czaty";
 import { AdminReviews } from "@/components/Reviews";
 import { PopularServicesAdmin } from "@/components/PopularServicesAdmin";
@@ -73,7 +74,7 @@ export function PanelAdmin() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("all");
   const [editing, setEditing] = useState<Record<string, { note: string; saving: boolean }>>({});
-  const [tab, setTab] = useState<"tickets" | "form_logs" | "visit_logs" | "site_ratings" | "trash" | "chats" | "reviews" | "popular" | "secrets" | "eggs" | "account" | "reset_visitors" | "reset_downloads">("tickets");
+  const [tab, setTab] = useState<"tickets" | "form_logs" | "visit_logs" | "accounts" | "site_ratings" | "trash" | "chats" | "reviews" | "popular" | "secrets" | "eggs" | "account" | "reset_visitors" | "reset_downloads">("tickets");
   const [confirm, setConfirm] = useState<ConfirmAction>(null);
   const [acting, setActing] = useState(false);
   const [openChats, setOpenChats] = useState<Record<string, boolean>>({});
@@ -107,6 +108,37 @@ export function PanelAdmin() {
           if (m.sender_id !== session.user.id) {
             notifyMessage(`Nowa wiadomość w zgłoszeniu #${m.ticket_id.slice(0, 8)}`);
           }
+        },
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [session]);
+
+  // Realtime: nowe zgłoszenia, oceny strony i opinie — głośny sygnał "plum plum"
+  useEffect(() => {
+    if (!session) return;
+    const ch = supabase
+      .channel("admin_new_activity")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "tickets" },
+        (payload) => {
+          const t = payload.new as Ticket;
+          if (["odwiedziny_strony", "pobranie_programu"].includes(t.source || "")) return;
+          if (t.source === "ocena_strony") {
+            notifyNewReview(`Nowa ocena strony: ${t.title}`);
+          } else {
+            notifyNewTicket(`Nowe zgłoszenie: ${t.title}`);
+          }
+          setTickets((prev) => (prev.some((x) => x.id === t.id) ? prev : [t, ...prev]));
+        },
+      )
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "reviews" },
+        (payload) => {
+          const r = payload.new as { first_name?: string; last_name?: string };
+          notifyNewReview(`Nowa opinia od: ${[r.first_name, r.last_name].filter(Boolean).join(" ") || "klienta"}`);
         },
       )
       .subscribe();
@@ -239,6 +271,7 @@ export function PanelAdmin() {
                   { key: "tickets", label: "Zgłoszenia", icon: "📋", badge: active.length, badgeVariant: "success", excludeFromGroupBadge: true },
                   { key: "form_logs", label: "Logi formularzy", icon: "🌐", badgeDot: tickets.some((t) => t.source === "formularz") },
                   { key: "visit_logs", label: "Logi odwiedzin", icon: "🛰" },
+                  { key: "accounts", label: "Konta klientów", icon: "👥" },
                   { key: "chats", label: "Czat na żywo", icon: "💬" },
                   { key: "trash", label: "Kosz", icon: "🗑", badge: trashed.length, badgeVariant: "danger", excludeFromGroupBadge: true },
                 ],
@@ -437,7 +470,7 @@ export function PanelAdmin() {
                 </div>
               )}
             </div>
-          ) : tab === "visit_logs" ? <AdminVisitLogs /> : tab === "chats" ? <AdminLiveChats /> : tab === "reviews" ? <AdminReviews /> : tab === "popular" ? <PopularServicesAdmin /> : tab === "secrets" ? <MySecrets /> : tab === "eggs" ? <AllEasterEggs /> : tab === "account" ? <AccountSettings /> : tab === "reset_visitors" ? <AdminResetVisitors /> : tab === "reset_downloads" ? <AdminResetDownloads /> : tab === "trash" ? (
+          ) : tab === "visit_logs" ? <AdminVisitLogs /> : tab === "accounts" ? <AdminAccounts /> : tab === "chats" ? <AdminLiveChats /> : tab === "reviews" ? <AdminReviews /> : tab === "popular" ? <PopularServicesAdmin /> : tab === "secrets" ? <MySecrets /> : tab === "eggs" ? <AllEasterEggs /> : tab === "account" ? <AccountSettings /> : tab === "reset_visitors" ? <AdminResetVisitors /> : tab === "reset_downloads" ? <AdminResetDownloads /> : tab === "trash" ? (
             <>
               <div className="reveal visible">
                 <span className="eyebrow" style={{ borderColor: "rgba(239, 68, 68, 0.3)" }}><span className="dot" style={{ background: "#ef4444", boxShadow: "0 0 14px #ef4444", animation: "redBadgePulse 2s ease-in-out infinite" }}></span> Kosz ({trashed.length})</span>
