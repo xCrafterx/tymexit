@@ -101,6 +101,12 @@ export const deleteClientAccount = createServerFn({ method: "POST" })
     const { data: isTargetAdmin } = await supabaseAdmin.rpc("has_role", { _user_id: data.userId, _role: "admin" });
     if (isTargetAdmin) throw new Error("Nie można usunąć konta administratora");
 
+    // Usuwamy powiązane dane, aby klucze obce nie zablokowały usunięcia konta
+    await supabaseAdmin.from("reviews").delete().eq("user_id", data.userId);
+    await supabaseAdmin.from("support_chats").delete().eq("user_id", data.userId);
+    await supabaseAdmin.from("tickets").delete().eq("user_id", data.userId);
+    await supabaseAdmin.from("profiles").delete().eq("id", data.userId);
+
     const { error } = await supabaseAdmin.auth.admin.deleteUser(data.userId);
     if (error) throw new Error(error.message);
     return { ok: true };
