@@ -114,6 +114,37 @@ export function PanelAdmin() {
     return () => { supabase.removeChannel(ch); };
   }, [session]);
 
+  // Realtime: nowe zgłoszenia, oceny strony i opinie — głośny sygnał "plum plum"
+  useEffect(() => {
+    if (!session) return;
+    const ch = supabase
+      .channel("admin_new_activity")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "tickets" },
+        (payload) => {
+          const t = payload.new as Ticket;
+          if (["odwiedziny_strony", "pobranie_programu"].includes(t.source || "")) return;
+          if (t.source === "ocena_strony") {
+            notifyNewReview(`Nowa ocena strony: ${t.title}`);
+          } else {
+            notifyNewTicket(`Nowe zgłoszenie: ${t.title}`);
+          }
+          setTickets((prev) => (prev.some((x) => x.id === t.id) ? prev : [t, ...prev]));
+        },
+      )
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "reviews" },
+        (payload) => {
+          const r = payload.new as { first_name?: string; last_name?: string };
+          notifyNewReview(`Nowa opinia od: ${[r.first_name, r.last_name].filter(Boolean).join(" ") || "klienta"}`);
+        },
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [session]);
+
   const active = useMemo(() => tickets.filter((t) => !t.deleted_at && !["ocena_strony", "odwiedziny_strony", "pobranie_programu"].includes(t.source || "")), [tickets]);
   const trashed = useMemo(() => tickets.filter((t) => !!t.deleted_at), [tickets]);
 
