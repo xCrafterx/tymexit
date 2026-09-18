@@ -271,6 +271,7 @@ export function PanelAdmin() {
                   { key: "tickets", label: "Zgłoszenia", icon: "📋", badge: active.length, badgeVariant: "success", excludeFromGroupBadge: true },
                   { key: "form_logs", label: "Logi formularzy", icon: "🌐", badgeDot: tickets.some((t) => t.source === "formularz") },
                   { key: "visit_logs", label: "Logi odwiedzin", icon: "🛰" },
+                  { key: "accounts", label: "Konta klientów", icon: "👥" },
                   { key: "chats", label: "Czat na żywo", icon: "💬" },
                   { key: "trash", label: "Kosz", icon: "🗑", badge: trashed.length, badgeVariant: "danger", excludeFromGroupBadge: true },
                 ],
