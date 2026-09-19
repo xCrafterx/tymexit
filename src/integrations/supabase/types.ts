@@ -55,8 +55,10 @@ export type Database = {
           client_level: string
           created_at: string
           email: string | null
+          first_name: string | null
           id: string
           is_blacklisted: boolean
+          last_name: string | null
           notes: string | null
           reputation_score: number
           role: string
@@ -66,8 +68,10 @@ export type Database = {
           client_level?: string
           created_at?: string
           email?: string | null
+          first_name?: string | null
           id: string
           is_blacklisted?: boolean
+          last_name?: string | null
           notes?: string | null
           reputation_score?: number
           role?: string
@@ -77,8 +81,10 @@ export type Database = {
           client_level?: string
           created_at?: string
           email?: string | null
+          first_name?: string | null
           id?: string
           is_blacklisted?: boolean
+          last_name?: string | null
           notes?: string | null
           reputation_score?: number
           role?: string
