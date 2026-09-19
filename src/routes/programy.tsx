@@ -43,7 +43,6 @@ const TOOLS: ToolItem[] = [
     fileName: "PlanZadan.exe",
     exeUrl: "https://github.com/xCrafterx/tymexit/releases/download/TymexIT/PlanZadan.exe",
     iconSrc: "/youtube.ico",
-    ),
   },
   {
     id: "narzedzia-systemowe",
