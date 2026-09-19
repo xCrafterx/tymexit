@@ -32,10 +32,11 @@ export const listClientAccounts = createServerFn({ method: "GET" })
     await assertAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const [{ data: profiles }, { data: tickets }, { data: reviews }, authList] = await Promise.all([
+    const [{ data: profiles }, { data: tickets }, { data: reviews }, { data: roleRows }, authList] = await Promise.all([
       supabaseAdmin.from("profiles").select("id,email,username,first_name,last_name,role,created_at,is_blacklisted"),
       supabaseAdmin.from("tickets").select("user_id,client_name,client_phone,source,deleted_at"),
       supabaseAdmin.from("reviews").select("user_id"),
+      supabaseAdmin.from("user_roles").select("user_id,role"),
       supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 1000 }),
     ]);
 
@@ -57,6 +58,11 @@ export const listClientAccounts = createServerFn({ method: "GET" })
     const reviewCounts = new Map<string, number>();
     (reviews ?? []).forEach((r: any) => {
       reviewCounts.set(r.user_id, (reviewCounts.get(r.user_id) ?? 0) + 1);
+    });
+
+    const roles = new Map<string, string>();
+    (roleRows ?? []).forEach((row: any) => {
+      if (row.role === "admin" || !roles.has(row.user_id)) roles.set(row.user_id, row.role);
     });
 
     return (profiles ?? []).map((p: any) => {
@@ -81,7 +87,7 @@ export const listClientAccounts = createServerFn({ method: "GET" })
         lastName,
         fullName: profileName ?? stats?.name ?? null,
         phone: stats?.phone ?? null,
-        role: p.role ?? "client",
+        role: roles.get(p.id) ?? p.role ?? "client",
         createdAt: p.created_at ?? au?.created_at ?? null,
         lastSignInAt: au?.last_sign_in_at ?? null,
         emailConfirmed: !!au?.email_confirmed_at,
