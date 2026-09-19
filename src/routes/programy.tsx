@@ -171,33 +171,32 @@ function ProgramyPage() {
                   textAlign: "center",
                 }}
               >
-                <div>
-                  {/* Ikona umieszczona ładnie nad badge Organizacja / Windows / Android */}
-                  <div
-                    style={{
-                      width: 68,
-                      height: 68,
-                      borderRadius: 18,
-                      background: "rgba(56, 189, 248, 0.08)",
-                      border: "1px solid rgba(56, 189, 248, 0.2)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      margin: "0 auto 16px",
-                      overflow: "hidden",
-                    }}
-                  >
-                    {tool.iconSrc ? (
-                      <img
-                        src={tool.iconSrc}
-                        alt={tool.title}
-                        style={{
-                          width: 44,
-                          height: 44,
-                          objectFit: "contain",
-                          filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.4))",
-                        }}
-                      />
+                <div
+  style={{
+    width: 68,
+    height: 68,
+    borderRadius: 18,
+    background: "rgba(56, 189, 248, 0.08)",
+    border: "1px solid rgba(56, 189, 248, 0.2)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    margin: "0 auto 16px",
+    overflow: "hidden",
+  }}
+>
+  {tool.iconSrc ? (
+    <img
+      src={tool.iconSrc}
+      alt={tool.title}
+      style={{
+        width: 58,    // zmień z 44 na np. 58 lub 60
+        height: 58,   // zmień z 44 na np. 58 lub 60
+        objectFit: "contain",
+        filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.4))",
+      }}
+    />
+
                     ) : (
                       <div style={{ color: "var(--brand, #38bdf8)" }}>{tool.iconSvg}</div>
                     )}
