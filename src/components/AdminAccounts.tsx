@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { listClientAccounts, deleteClientAccount, type AdminAccount } from "@/lib/admin-accounts.functions";
+import { listClientAccounts, deleteClientAccount, updateAccountDetails, type AdminAccount } from "@/lib/admin-accounts.functions";
 
 function fmt(d: string | null) {
   if (!d) return "—";
@@ -11,11 +11,16 @@ function fmt(d: string | null) {
 export function AdminAccounts() {
   const load = useServerFn(listClientAccounts);
   const remove = useServerFn(deleteClientAccount);
+  const updateDetails = useServerFn(updateAccountDetails);
   const [accounts, setAccounts] = useState<AdminAccount[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [onlySuspicious, setOnlySuspicious] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
+  const [editing, setEditing] = useState<string | null>(null);
+  const [editFirstName, setEditFirstName] = useState("");
+  const [editLastName, setEditLastName] = useState("");
+  const [editEmail, setEditEmail] = useState("");
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -48,6 +53,32 @@ export function AdminAccounts() {
       setAccounts((prev) => prev.filter((x) => x.id !== a.id));
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Nie udało się usunąć konta");
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const beginEdit = (a: AdminAccount) => {
+    const fallbackParts = (a.fullName ?? "").trim().split(/\s+/);
+    setEditFirstName(a.firstName ?? fallbackParts.shift() ?? "");
+    setEditLastName(a.lastName ?? fallbackParts.join(" "));
+    setEditEmail(a.email ?? "");
+    setEditing(a.id);
+  };
+
+  const handleSave = async (a: AdminAccount) => {
+    setBusy(a.id);
+    try {
+      const changed = await updateDetails({
+        data: { userId: a.id, firstName: editFirstName, lastName: editLastName, email: editEmail },
+      });
+      setAccounts((prev) => prev.map((item) => item.id === a.id
+        ? { ...item, ...changed, suspicious: item.suspicious.filter((flag) => flag !== "Brak imienia i nazwiska") }
+        : item));
+      setEditing(null);
+      toast.success("Dane konta zostały zmienione");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Nie udało się zmienić danych konta");
     } finally {
       setBusy(null);
     }
@@ -100,12 +131,21 @@ export function AdminAccounts() {
                 <div>
                   <h4 style={{ margin: 0, color: "#fff", fontSize: 17 }}>
                     {a.fullName || a.username || "Brak imienia i nazwiska"}
-                    {a.role === "admin" && <span style={{ marginLeft: 8, fontSize: 11, color: "#a78bfa" }}>ADMIN</span>}
+                    {a.role === "admin" && <span className="admin-account-badge">ADMINISTRATOR</span>}
                   </h4>
                   <p style={{ margin: "4px 0 0", color: "#67e8f9", fontSize: 14 }}>✉️ {a.email ?? "brak e-maila"}</p>
                   {a.phone && <p style={{ margin: "2px 0 0", color: "rgba(255,255,255,.7)", fontSize: 13 }}>📞 {a.phone}</p>}
                 </div>
-                {a.role !== "admin" && (
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-start" }}>
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-outline"
+                    disabled={busy === a.id}
+                    onClick={() => editing === a.id ? setEditing(null) : beginEdit(a)}
+                  >
+                    {editing === a.id ? "Anuluj" : "✎ Zmień dane"}
+                  </button>
+                  {a.role !== "admin" && (
                   <button
                     type="button"
                     className="btn btn-sm"
@@ -115,8 +155,32 @@ export function AdminAccounts() {
                   >
                     {busy === a.id ? "Usuwanie…" : "🗑️ Usuń konto"}
                   </button>
-                )}
+                  )}
+                </div>
               </div>
+
+              {editing === a.id && (
+                <form
+                  className="admin-account-edit"
+                  onSubmit={(event) => { event.preventDefault(); void handleSave(a); }}
+                >
+                  <div className="form-group">
+                    <label htmlFor={`first-name-${a.id}`}>Imię</label>
+                    <input id={`first-name-${a.id}`} className="form-control" required maxLength={80} value={editFirstName} onChange={(event) => setEditFirstName(event.target.value)} />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor={`last-name-${a.id}`}>Nazwisko</label>
+                    <input id={`last-name-${a.id}`} className="form-control" required maxLength={100} value={editLastName} onChange={(event) => setEditLastName(event.target.value)} />
+                  </div>
+                  <div className="form-group admin-account-edit__email">
+                    <label htmlFor={`email-${a.id}`}>Adres e-mail</label>
+                    <input id={`email-${a.id}`} className="form-control" type="email" required maxLength={254} value={editEmail} onChange={(event) => setEditEmail(event.target.value)} />
+                  </div>
+                  <button type="submit" className="btn btn-primary" disabled={busy === a.id}>
+                    {busy === a.id ? "Zapisywanie…" : "Zapisz zmiany"}
+                  </button>
+                </form>
+              )}
 
               <div style={{ background: "rgba(0,0,0,.25)", borderRadius: 8, padding: 12, display: "grid", gap: 6, fontSize: 13, color: "rgba(255,255,255,.75)" }}>
                 <div><strong>🔑 Hasło:</strong> zaszyfrowane — niemożliwe do podejrzenia</div>
