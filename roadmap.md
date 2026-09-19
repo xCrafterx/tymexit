@@ -1,0 +1,4 @@
+- [ ] Dodać edycję imienia, nazwiska i e-maila wszystkich kont w panelu administratora.
+- [ ] Zmienić oznaczenie admina na mocno świecące „ADMINISTRATOR”.
+- [ ] Zweryfikować kompilację i widok mobilny zmian kont.
+- [ ] Wskazać użytkownikowi dokładne miejsce podmiany pliku ikona.ico w „Moje Programy”.
