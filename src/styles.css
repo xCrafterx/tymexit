@@ -886,3 +886,47 @@ textarea.form-control { min-height: 140px; resize: vertical; }
   .notfound-actions { flex-direction: column; width: 100%; }
   .notfound-actions .btn { width: 100%; justify-content: center; }
 }
+
+/* ===== Admin account management ===== */
+.admin-account-badge {
+  display: inline-flex;
+  margin-left: 10px;
+  padding: 3px 8px;
+  border: 1px solid color-mix(in oklab, var(--danger) 65%, transparent);
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--danger) 22%, transparent);
+  color: var(--danger);
+  font-size: 10px;
+  font-weight: 900;
+  vertical-align: middle;
+  animation: admin-account-glow 1.35s ease-in-out infinite;
+}
+.admin-account-edit {
+  display: grid;
+  grid-template-columns: minmax(130px, .7fr) minmax(160px, 1fr) minmax(230px, 1.4fr) auto;
+  gap: 12px;
+  align-items: end;
+  padding: 14px;
+  border: 1px solid color-mix(in oklab, var(--brand) 30%, transparent);
+  border-radius: 8px;
+  background: color-mix(in oklab, var(--surface-2) 86%, transparent);
+}
+.admin-account-edit .form-group { margin: 0; min-width: 0; }
+.admin-account-edit .btn { min-height: 44px; }
+@keyframes admin-account-glow {
+  0%, 100% { text-shadow: 0 0 4px color-mix(in oklab, var(--danger) 45%, transparent); box-shadow: 0 0 6px color-mix(in oklab, var(--danger) 28%, transparent); }
+  50% { text-shadow: 0 0 8px var(--danger), 0 0 20px var(--danger); box-shadow: 0 0 12px color-mix(in oklab, var(--danger) 80%, transparent), 0 0 30px color-mix(in oklab, var(--danger) 55%, transparent); }
+}
+@media (max-width: 900px) {
+  .admin-account-edit { grid-template-columns: 1fr 1fr; }
+  .admin-account-edit__email { grid-column: 1 / -1; }
+}
+@media (max-width: 560px) {
+  .admin-account-badge { display: flex; width: fit-content; margin: 7px 0 0; }
+  .admin-account-edit { grid-template-columns: minmax(0, 1fr); }
+  .admin-account-edit__email { grid-column: auto; }
+  .admin-account-edit .btn { width: 100%; justify-content: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .admin-account-badge { animation: none; }
+}

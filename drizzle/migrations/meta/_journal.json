@@ -50,6 +50,13 @@
       "when": 1789757713821,
       "tag": "0006_tymekit_realtime_tickets_reviews",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1789812593841,
+      "tag": "0007_add_profile_names_for_admin_editing",
+      "breakpoints": true
     }
   ]
 }

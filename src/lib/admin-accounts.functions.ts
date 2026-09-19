@@ -5,6 +5,8 @@ export type AdminAccount = {
   id: string;
   email: string | null;
   username: string | null;
+  firstName: string | null;
+  lastName: string | null;
   fullName: string | null;
   phone: string | null;
   role: string;
@@ -30,10 +32,11 @@ export const listClientAccounts = createServerFn({ method: "GET" })
     await assertAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const [{ data: profiles }, { data: tickets }, { data: reviews }, authList] = await Promise.all([
-      supabaseAdmin.from("profiles").select("id,email,username,role,created_at,is_blacklisted"),
+    const [{ data: profiles }, { data: tickets }, { data: reviews }, { data: roleRows }, authList] = await Promise.all([
+      supabaseAdmin.from("profiles").select("id,email,username,first_name,last_name,role,created_at,is_blacklisted"),
       supabaseAdmin.from("tickets").select("user_id,client_name,client_phone,source,deleted_at"),
       supabaseAdmin.from("reviews").select("user_id"),
+      supabaseAdmin.from("user_roles").select("user_id,role"),
       supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 1000 }),
     ]);
 
@@ -57,24 +60,34 @@ export const listClientAccounts = createServerFn({ method: "GET" })
       reviewCounts.set(r.user_id, (reviewCounts.get(r.user_id) ?? 0) + 1);
     });
 
+    const roles = new Map<string, string>();
+    (roleRows ?? []).forEach((row: any) => {
+      if (row.role === "admin" || !roles.has(row.user_id)) roles.set(row.user_id, row.role);
+    });
+
     return (profiles ?? []).map((p: any) => {
       const au = authUsers.get(p.id);
       const stats = ticketStats.get(p.id);
       const email: string | null = p.email ?? au?.email ?? null;
+      const firstName: string | null = p.first_name?.trim() || null;
+      const lastName: string | null = p.last_name?.trim() || null;
+      const profileName = [firstName, lastName].filter(Boolean).join(" ") || null;
       const suspicious: string[] = [];
       if (!au?.email_confirmed_at) suspicious.push("Email niepotwierdzony");
       if (!au?.last_sign_in_at) suspicious.push("Nigdy się nie zalogował");
       if (!(stats?.count ?? 0) && !(reviewCounts.get(p.id) ?? 0)) suspicious.push("Brak aktywności");
       if (email && /^(test|abc|asd|qwe|xxx|aaa|fake|spam)/i.test(email)) suspicious.push("Podejrzany adres e-mail");
-      if (!stats?.name) suspicious.push("Brak imienia i nazwiska");
+      if (!profileName && !stats?.name) suspicious.push("Brak imienia i nazwiska");
 
       return {
         id: p.id,
         email,
         username: p.username ?? null,
-        fullName: stats?.name ?? null,
+        firstName,
+        lastName,
+        fullName: profileName ?? stats?.name ?? null,
         phone: stats?.phone ?? null,
-        role: p.role ?? "client",
+        role: roles.get(p.id) ?? p.role ?? "client",
         createdAt: p.created_at ?? au?.created_at ?? null,
         lastSignInAt: au?.last_sign_in_at ?? null,
         emailConfirmed: !!au?.email_confirmed_at,
@@ -85,6 +98,52 @@ export const listClientAccounts = createServerFn({ method: "GET" })
         suspicious,
       };
     }).sort((a, b) => (b.createdAt ?? "").localeCompare(a.createdAt ?? ""));
+  });
+
+export const updateAccountDetails = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { userId: string; firstName: string; lastName: string; email: string }) => {
+    const userId = input?.userId?.trim();
+    const firstName = input?.firstName?.trim();
+    const lastName = input?.lastName?.trim();
+    const email = input?.email?.trim().toLowerCase();
+    if (!userId) throw new Error("Brak identyfikatora konta");
+    if (!firstName || firstName.length > 80) throw new Error("Podaj poprawne imię");
+    if (!lastName || lastName.length > 100) throw new Error("Podaj poprawne nazwisko");
+    if (!email || email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("Podaj poprawny adres e-mail");
+    return { userId, firstName, lastName, email };
+  })
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { data: target, error: targetError } = await supabaseAdmin.auth.admin.getUserById(data.userId);
+    if (targetError || !target.user) throw new Error("Nie znaleziono tego konta");
+
+    if ((target.user.email ?? "").toLowerCase() !== data.email) {
+      const { error: authError } = await supabaseAdmin.auth.admin.updateUserById(data.userId, {
+        email: data.email,
+        email_confirm: true,
+      });
+      if (authError) {
+        if (/already|registered|exists/i.test(authError.message)) throw new Error("Ten adres e-mail jest już zajęty");
+        throw new Error(authError.message);
+      }
+    }
+
+    const { error: profileError } = await supabaseAdmin
+      .from("profiles")
+      .update({ email: data.email, first_name: data.firstName, last_name: data.lastName })
+      .eq("id", data.userId);
+    if (profileError) throw new Error(profileError.message);
+
+    return {
+      id: data.userId,
+      email: data.email,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      fullName: `${data.firstName} ${data.lastName}`,
+    };
   });
 
 export const deleteClientAccount = createServerFn({ method: "POST" })
