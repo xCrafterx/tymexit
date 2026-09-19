@@ -42,11 +42,7 @@ const TOOLS: ToolItem[] = [
     details: "Program tworzy overlay i wiele innych rzeczy",
     fileName: "PlanZadan.exe",
     exeUrl: "https://github.com/xCrafterx/tymexit/releases/download/TymexIT/PlanZadan.exe",
-    iconSvg: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 32, height: 32 }}>
-        <path d="M9 11l3 3L22 4" />
-        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
-      </svg>
+    iconSrc: "/youtube.ico",
     ),
   },
   {
