@@ -84,7 +84,67 @@ export const Route = createFileRoute("/api/public/site-ratings")({
       GET: async ({ request }: { request: Request }) => {
         try {
           const url = new URL(request.url);
-                    if (url.searchParams.get("type") === "reset_visits") {
+          if (url.searchParams.get("type") === "history") {
+            const rows: { created_at: string; source: string }[] = [];
+            for (let from = 0; ; from += 1000) {
+              const { data } = await supabaseAdmin
+                .from("tickets")
+                .select("created_at, source")
+                .in("source", ["odwiedziny_strony", "pobranie_programu"])
+                .is("deleted_at", null)
+                .order("created_at", { ascending: true })
+                .range(from, from + 999);
+              rows.push(...((data || []) as any));
+              if (!data || data.length < 1000) break;
+            }
+            const map: Record<string, { visits: number; downloads: number }> = {};
+            rows.forEach((r) => {
+              const d = r.created_at.slice(0, 10);
+              map[d] = map[d] || { visits: 0, downloads: 0 };
+              if (r.source === "odwiedziny_strony") map[d].visits++;
+              else map[d].downloads++;
+            });
+            const days: { date: string; visits: number; downloads: number }[] = [];
+            if (rows.length) {
+              const start = new Date(rows[0].created_at.slice(0, 10) + "T00:00:00Z");
+              const end = new Date(new Date().toISOString().slice(0, 10) + "T00:00:00Z");
+              for (let t = start.getTime(); t <= end.getTime(); t += 86400000) {
+                const key = new Date(t).toISOString().slice(0, 10);
+                days.push({ date: key, ...(map[key] || { visits: 0, downloads: 0 }) });
+              }
+            }
+            return new Response(JSON.stringify({ days }), { status: 200, headers: { "Content-Type": "application/json" } });
+          }
+          if (url.searchParams.get("type") === "set_count") {
+            const kind = url.searchParams.get("kind");
+            const target = Math.max(0, Math.min(100000, parseInt(url.searchParams.get("value") || "0", 10) || 0));
+            const toolId = url.searchParams.get("toolId") || "";
+            const source = kind === "downloads" ? "pobranie_programu" : "odwiedziny_strony";
+            if (kind === "downloads" && !toolId) throw new Error("Brak programu");
+            let q = supabaseAdmin.from("tickets").select("id").eq("source", source).is("deleted_at", null);
+            if (kind === "downloads") q = q.eq("service_type", `pobranie_${toolId}`);
+            const { data: existing } = await q.order("created_at", { ascending: false }).limit(100000);
+            const current = existing?.length || 0;
+            if (current > target) {
+              const ids = (existing || []).slice(0, current - target).map((r: any) => r.id);
+              for (let i = 0; i < ids.length; i += 200) {
+                await supabaseAdmin.from("tickets").delete().in("id", ids.slice(i, i + 200));
+              }
+            } else if (current < target) {
+              const owner = await getOwnerId();
+              const add = Array.from({ length: target - current }, () => {
+                const tag = `manual-${crypto.randomUUID()}`;
+                return kind === "downloads"
+                  ? { user_id: owner, title: `[Pobranie] ${toolId}`, description: "Wartość ustawiona ręcznie", service_type: `pobranie_${toolId}`, status: "oczekuje", client_name: `Pobranie: ${toolId}`, client_email: tag, source }
+                  : { user_id: owner, title: "[Odwiedziny] ręcznie", description: "Wartość ustawiona ręcznie", service_type: "odwiedziny", status: "oczekuje", client_name: "Odwiedzający", client_email: tag, source };
+              });
+              for (let i = 0; i < add.length; i += 500) {
+                await supabaseAdmin.from("tickets").insert(add.slice(i, i + 500) as any);
+              }
+            }
+            return new Response(JSON.stringify({ ok: true, value: target }), { status: 200, headers: { "Content-Type": "application/json" } });
+          }
+          if (url.searchParams.get("type") === "reset_visits") {
             await supabaseAdmin.from("tickets").delete().eq("source", "odwiedziny_strony");
             return new Response(JSON.stringify({ ok: true, visits: 0 }), {
               status: 200,
