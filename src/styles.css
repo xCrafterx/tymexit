@@ -926,3 +926,16 @@ textarea.form-control { min-height: 140px; resize: vertical; }
 @media (prefers-reduced-motion: reduce) {
   .admin-account-badge { animation: none; }
 }
+
+/* Jaskrawoniebieskie liczniki zakładek */
+.panel-tabs__badge:not(.panel-tabs__badge--danger):not(.panel-tabs__badge--success) {
+  background: #38bdf8 !important;
+  color: #04121f !important;
+  font-weight: 800;
+  box-shadow: 0 0 10px #38bdf8, 0 0 22px rgba(56, 189, 248, 0.7);
+  animation: cyanBadgePulse 1.6s ease-in-out infinite;
+}
+@keyframes cyanBadgePulse {
+  0%, 100% { box-shadow: 0 0 6px #38bdf8, 0 0 12px rgba(56, 189, 248, 0.5); }
+  50% { box-shadow: 0 0 14px #7dd3fc, 0 0 32px rgba(56, 189, 248, 0.95); }
+}
