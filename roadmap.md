@@ -2,3 +2,6 @@
 - [x] Zmienić oznaczenie admina na mocno świecące „ADMINISTRATOR”.
 - [x] Zweryfikować kompilację i widok mobilny zmian kont.
 - [x] Wskazać użytkownikowi dokładne miejsce podmiany pliku ikona.ico w „Moje Programy”.
+- [x] Naprawić licznik odwiedzin (usunąć filtr botów) i licznik pobrań.
+- [x] Naprawić błąd oceny strony (tickets_user_id_fkey).
+- [x] Jasnoniebieskie liczniki przy zakładkach panelu admina (konta, czaty, zgłoszenia, opinie, oceny, logi).

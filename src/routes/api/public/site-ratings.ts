@@ -62,6 +62,16 @@ async function lookupGeo(ip: string): Promise<{ country?: string; region?: strin
   }
 }
 
+let cachedOwnerId: string | null = null;
+async function getOwnerId(): Promise<string> {
+  if (cachedOwnerId) return cachedOwnerId;
+  const { data } = await supabaseAdmin.from("user_roles").select("user_id").eq("role", "admin").limit(1);
+  const id = data?.[0]?.user_id;
+  if (!id) throw new Error("Brak konta administratora");
+  cachedOwnerId = id;
+  return id;
+}
+
 async function isIgnoredIp(ip: string): Promise<boolean> {
   if (!ip) return false;
   const { data } = await supabaseAdmin.from("ignored_ips").select("id").eq("ip", ip).limit(1);
@@ -181,17 +191,12 @@ export const Route = createFileRoute("/api/public/site-ratings")({
           // 1. Rejestracja unikalnej wizyty (1 na IP) + szczegółowy log odwiedzin
           if (body.type === "visit") {
             const userAgent = request.headers.get("user-agent") || "";
-            const clientIp = String(body.clientIp || "").trim() || getRequestIp(request);
+            const rawIp = String(body.clientIp || "").trim();
+            const clientIp = (rawIp && rawIp !== "Nieznane IP" ? rawIp : "") || getRequestIp(request) || "nieznane";
 
             // Boty i crawlery nie są logowane ani liczone
-            if (isBotUserAgent(userAgent)) {
-              return new Response(JSON.stringify({ ok: false, bot: true }), {
-                status: 200,
-                headers: { "Content-Type": "application/json" },
-              });
-            }
 
-            if (clientIp && clientIp !== "Nieznane IP" && !(await isIgnoredIp(clientIp))) {
+            if (!(await isIgnoredIp(clientIp))) {
               const { data: existing } = await supabaseAdmin
                 .from("tickets")
                 .select("id")
@@ -201,7 +206,7 @@ export const Route = createFileRoute("/api/public/site-ratings")({
 
               if (!existing || existing.length === 0) {
                 await supabaseAdmin.from("tickets").insert({
-                  user_id: "10bfa389-afad-426e-887d-c98c2145a466",
+                  user_id: await getOwnerId(),
                   title: `[Odwiedziny] ${clientIp}`,
                   description: `Unikalna wizyta ze strony głównej. IP: ${clientIp}`,
                   service_type: "odwiedziny",
@@ -252,8 +257,9 @@ export const Route = createFileRoute("/api/public/site-ratings")({
           // 2. Rejestracja unikalnego pobrania programu (1 na IP dla danego programu)
           if (body.type === "download") {
             const toolId = String(body.toolId || "").trim();
-            const clientIp = String(body.clientIp || "").trim();
-            if (toolId && clientIp && clientIp !== "Nieznane IP") {
+            let clientIp = String(body.clientIp || "").trim();
+            if (!clientIp || clientIp === "Nieznane IP") clientIp = getRequestIp(request) || `anon-${crypto.randomUUID()}`;
+            if (toolId) {
               const serviceType = `pobranie_${toolId}`;
               const { data: existing } = await supabaseAdmin
                 .from("tickets")
@@ -265,7 +271,7 @@ export const Route = createFileRoute("/api/public/site-ratings")({
 
               if (!existing || existing.length === 0) {
                 await supabaseAdmin.from("tickets").insert({
-                  user_id: "10bfa389-afad-426e-887d-c98c2145a466",
+                  user_id: await getOwnerId(),
                   title: `[Pobranie] ${toolId}`,
                   description: `Unikalne pobranie programu ${toolId} z IP: ${clientIp}`,
                   service_type: serviceType,
@@ -299,7 +305,8 @@ export const Route = createFileRoute("/api/public/site-ratings")({
             );
           }
 
-          const clientIp = String(body.clientIp || "Nieznane IP").trim();
+          const rawRatingIp = String(body.clientIp || "").trim();
+          const clientIp = (rawRatingIp && rawRatingIp !== "Nieznane IP" ? rawRatingIp : "") || getRequestIp(request) || "Nieznane IP";
           const comment = String(body.comment || "").slice(0, 1000).trim();
           const browser = String(body.browser || "").slice(0, 300);
 
@@ -325,7 +332,7 @@ export const Route = createFileRoute("/api/public/site-ratings")({
           const fullDesc = (comment || "(brak komentarza)") + techMetadata;
 
           const { error: insertErr } = await supabaseAdmin.from("tickets").insert({
-            user_id: "10bfa389-afad-426e-887d-c98c2145a466",
+            user_id: await getOwnerId(),
             title: `[Ocena strony] ${rating}/10`,
             description: fullDesc,
             service_type: "ocena_strony",

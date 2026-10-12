@@ -78,6 +78,20 @@ export function PanelAdmin() {
   const [confirm, setConfirm] = useState<ConfirmAction>(null);
   const [acting, setActing] = useState(false);
   const [openChats, setOpenChats] = useState<Record<string, boolean>>({});
+  const [counts, setCounts] = useState({ accounts: 0, chats: 0, reviews: 0 });
+  useEffect(() => {
+    const load = async () => {
+      const [a, c, r] = await Promise.all([
+        supabase.from("profiles").select("id", { count: "exact", head: true }),
+        supabase.from("support_chats").select("id", { count: "exact", head: true }).eq("status", "open"),
+        supabase.from("reviews").select("id", { count: "exact", head: true }),
+      ]);
+      setCounts({ accounts: a.count ?? 0, chats: c.count ?? 0, reviews: r.count ?? 0 });
+    };
+    load();
+    const id = window.setInterval(load, 30000);
+    return () => window.clearInterval(id);
+  }, []);
 
   const fetchTickets = async () => {
     setLoading(true);
@@ -268,11 +282,11 @@ export function PanelAdmin() {
                 label: "Obsługa klienta",
                 icon: "🛠",
                 items: [
-                  { key: "tickets", label: "Zgłoszenia", icon: "📋", badge: active.length, badgeVariant: "success", excludeFromGroupBadge: true },
-                  { key: "form_logs", label: "Logi formularzy", icon: "🌐", badgeDot: tickets.some((t) => t.source === "formularz") },
+                  { key: "tickets", label: "Zgłoszenia", icon: "📋", badge: active.length, excludeFromGroupBadge: true },
+                  { key: "form_logs", label: "Logi formularzy", icon: "🌐", badge: tickets.filter((t) => t.source === "formularz" && !t.deleted_at).length, excludeFromGroupBadge: true },
                   { key: "visit_logs", label: "Logi odwiedzin", icon: "🛰" },
-                  { key: "accounts", label: "Konta klientów", icon: "👥" },
-                  { key: "chats", label: "Czat na żywo", icon: "💬" },
+                  { key: "accounts", label: "Konta klientów", icon: "👥", badge: counts.accounts, excludeFromGroupBadge: true },
+                  { key: "chats", label: "Czat na żywo", icon: "💬", badge: counts.chats, excludeFromGroupBadge: true },
                   { key: "trash", label: "Kosz", icon: "🗑", badge: trashed.length, badgeVariant: "danger", excludeFromGroupBadge: true },
                 ],
               },
@@ -281,8 +295,8 @@ export function PanelAdmin() {
                 label: "Społeczność",
                 icon: "✨",
                 items: [
-                  { key: "reviews", label: "Opinie", icon: "⭐" },
-                  { key: "site_ratings", label: "Oceny strony", icon: "📊", badge: tickets.filter((t) => t.source === "ocena_strony").length || undefined },
+                  { key: "reviews", label: "Opinie", icon: "⭐", badge: counts.reviews, excludeFromGroupBadge: true },
+                  { key: "site_ratings", label: "Oceny strony", icon: "📊", badge: tickets.filter((t) => t.source === "ocena_strony" && !t.deleted_at).length, excludeFromGroupBadge: true },
                   { key: "popular", label: "Popularne usługi", icon: "★" },
                 ],
               },
