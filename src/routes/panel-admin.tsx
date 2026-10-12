@@ -851,7 +851,13 @@ function AdminResetVisitors() {
         >
           {loading ? "Resetowanie..." : "🔄 Zresetuj licznik wejść do 0"}
         </button>
+
+        <div style={{ marginTop: 24, paddingTop: 20, borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+          <h4 style={{ margin: "0 0 12px", color: "#fff" }}>✏️ Ustaw niestandardową wartość</h4>
+          <CustomCountForm label="👥 Odwiedzający" kind="visits" current={visits} onDone={(v) => setVisits(v)} />
+        </div>
       </div>
+      <AdminTrafficChart />
     </div>
   );
 }
@@ -977,6 +983,112 @@ function AdminResetDownloads() {
           {loading === "all" ? "Resetowanie..." : "⚡ Resetuj wszystkie programy naraz"}
         </button>
       </div>
+
+      <div className="glass" style={{ marginTop: 24, padding: 24, borderRadius: 14, border: "1px solid rgba(255,255,255,0.1)" }}>
+        <h4 style={{ margin: "0 0 12px", color: "#fff" }}>✏️ Ustaw niestandardową liczbę pobrań</h4>
+        <div style={{ display: "grid", gap: 12 }}>
+          {programs.map((p) => (
+            <CustomCountForm
+              key={p.id}
+              label={`${p.icon} ${p.name}`}
+              kind="downloads"
+              toolId={p.id}
+              current={downloads[p.id] || 0}
+              onDone={(v) => setDownloads((prev) => ({ ...prev, [p.id]: v }))}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CustomCountForm({ label, kind, toolId, current, onDone }: { label: string; kind: "visits" | "downloads"; toolId?: string; current: number | null; onDone: (v: number) => void }) {
+  const [value, setValue] = useState("");
+  const [busy, setBusy] = useState(false);
+  const save = async () => {
+    const n = parseInt(value, 10);
+    if (isNaN(n) || n < 0) return toast.error("Podaj liczbę 0 lub większą.");
+    setBusy(true);
+    try {
+      const qs = new URLSearchParams({ type: "set_count", kind, value: String(n), ...(toolId ? { toolId } : {}) });
+      const res = await fetch(`/api/public/site-ratings?${qs}`);
+      const data = await res.json();
+      if (!data?.ok) throw new Error(data?.error || "Błąd");
+      onDone(n);
+      setValue("");
+      toast.success(`Ustawiono: ${n}`);
+    } catch (e: any) {
+      toast.error(e?.message || "Nie udało się ustawić wartości.");
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+      <span style={{ color: "#fff", minWidth: 180, flex: 1 }}>{label} <small className="text-dim">(teraz: {current ?? "..."})</small></span>
+      <input className="form-control" type="number" min={0} placeholder="np. 10" value={value} onChange={(e) => setValue(e.target.value)} style={{ width: 120 }} />
+      <button className="btn btn-primary" onClick={save} disabled={busy}>{busy ? "Zapisuję..." : "Ustaw"}</button>
+    </div>
+  );
+}
+
+function AdminTrafficChart() {
+  const [days, setDays] = useState<{ date: string; visits: number; downloads: number }[] | null>(null);
+  const [cumulative, setCumulative] = useState(true);
+  useEffect(() => {
+    fetch("/api/public/site-ratings?type=history").then((r) => r.json()).then((d) => setDays(d.days || [])).catch(() => setDays([]));
+  }, []);
+
+  const series = useMemo(() => {
+    if (!days) return [];
+    let v = 0, d = 0;
+    return days.map((x) => {
+      v += x.visits; d += x.downloads;
+      return { date: x.date, visits: cumulative ? v : x.visits, downloads: cumulative ? d : x.downloads };
+    });
+  }, [days, cumulative]);
+
+  const W = 800, H = 280, P = 36;
+  const max = Math.max(1, ...series.map((s) => Math.max(s.visits, s.downloads)));
+  const x = (i: number) => P + (series.length <= 1 ? (W - 2 * P) / 2 : (i * (W - 2 * P)) / (series.length - 1));
+  const y = (v: number) => H - P - (v / max) * (H - 2 * P);
+  const path = (k: "visits" | "downloads") => series.map((s, i) => `${i ? "L" : "M"}${x(i)},${y(s[k])}`).join(" ");
+  const totV = days?.reduce((a, b) => a + b.visits, 0) ?? 0;
+  const totD = days?.reduce((a, b) => a + b.downloads, 0) ?? 0;
+
+  return (
+    <div className="glass reveal visible" style={{ marginTop: 24, padding: 24, borderRadius: 14, border: "1px solid rgba(255,255,255,0.1)" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
+        <div>
+          <h3 style={{ margin: 0, color: "#fff" }}>📈 Odwiedziny i pobrania od początku</h3>
+          <p className="text-dim" style={{ margin: "4px 0 0", fontSize: 14 }}>
+            <span style={{ color: "#22d3ee" }}>● Odwiedziny: {totV}</span> · <span style={{ color: "#a78bfa" }}>● Pobrania: {totD}</span>
+            {days && days.length > 0 && <> · od {new Date(days[0].date).toLocaleDateString("pl-PL")}</>}
+          </p>
+        </div>
+        <button className="btn btn-ghost" onClick={() => setCumulative((c) => !c)}>{cumulative ? "Pokaż dziennie" : "Pokaż łącznie"}</button>
+      </div>
+      {days === null ? <p className="text-dim">Ładowanie...</p> : series.length === 0 ? <p className="text-dim">Brak danych.</p> : (
+        <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: "auto", marginTop: 16 }}>
+          {[0, 0.25, 0.5, 0.75, 1].map((f) => (
+            <g key={f}>
+              <line x1={P} x2={W - P} y1={y(max * f)} y2={y(max * f)} stroke="rgba(255,255,255,0.08)" />
+              <text x={P - 6} y={y(max * f) + 4} fill="rgba(255,255,255,0.5)" fontSize="11" textAnchor="end">{Math.round(max * f)}</text>
+            </g>
+          ))}
+          <path d={path("visits")} fill="none" stroke="#22d3ee" strokeWidth="2.5" />
+          <path d={path("downloads")} fill="none" stroke="#a78bfa" strokeWidth="2.5" />
+          {series.map((s, i) => (
+            <g key={s.date}>
+              <circle cx={x(i)} cy={y(s.visits)} r="3" fill="#22d3ee"><title>{`${s.date}: ${s.visits} odwiedzin`}</title></circle>
+              <circle cx={x(i)} cy={y(s.downloads)} r="3" fill="#a78bfa"><title>{`${s.date}: ${s.downloads} pobrań`}</title></circle>
+            </g>
+          ))}
+          <text x={P} y={H - 10} fill="rgba(255,255,255,0.5)" fontSize="11">{series[0].date}</text>
+          <text x={W - P} y={H - 10} fill="rgba(255,255,255,0.5)" fontSize="11" textAnchor="end">{series[series.length - 1].date}</text>
+        </svg>
+      )}
     </div>
   );
 }
