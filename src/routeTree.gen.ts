@@ -16,6 +16,7 @@ import { Route as KawaRouteImport } from './routes/kawa'
 import { Route as KontaktRouteImport } from './routes/kontakt'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MatrixRouteImport } from './routes/matrix'
+import { Route as NajczestszeProblemyRouteImport } from './routes/najczestsze-problemy'
 import { Route as OMnieRouteImport } from './routes/o-mnie'
 import { Route as OpinieRouteImport } from './routes/opinie'
 import { Route as PanelAdminRouteImport } from './routes/panel-admin'
@@ -69,6 +70,11 @@ const LoginRoute = LoginRouteImport.update({
 const MatrixRoute = MatrixRouteImport.update({
   id: '/matrix',
   path: '/matrix',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NajczestszeProblemyRoute = NajczestszeProblemyRouteImport.update({
+  id: '/najczestsze-problemy',
+  path: '/najczestsze-problemy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OMnieRoute = OMnieRouteImport.update({
@@ -175,6 +181,7 @@ export interface FileRoutesByFullPath {
   '/kontakt': typeof KontaktRoute
   '/login': typeof LoginRoute
   '/matrix': typeof MatrixRoute
+  '/najczestsze-problemy': typeof NajczestszeProblemyRoute
   '/o-mnie': typeof OMnieRoute
   '/opinie': typeof OpinieRoute
   '/panel-admin': typeof PanelAdminRoute
@@ -203,6 +210,7 @@ export interface FileRoutesByTo {
   '/kontakt': typeof KontaktRoute
   '/login': typeof LoginRoute
   '/matrix': typeof MatrixRoute
+  '/najczestsze-problemy': typeof NajczestszeProblemyRoute
   '/o-mnie': typeof OMnieRoute
   '/opinie': typeof OpinieRoute
   '/panel-admin': typeof PanelAdminRoute
@@ -232,6 +240,7 @@ export interface FileRoutesById {
   '/kontakt': typeof KontaktRoute
   '/login': typeof LoginRoute
   '/matrix': typeof MatrixRoute
+  '/najczestsze-problemy': typeof NajczestszeProblemyRoute
   '/o-mnie': typeof OMnieRoute
   '/opinie': typeof OpinieRoute
   '/panel-admin': typeof PanelAdminRoute
@@ -262,6 +271,7 @@ export interface FileRouteTypes {
     | '/kontakt'
     | '/login'
     | '/matrix'
+    | '/najczestsze-problemy'
     | '/o-mnie'
     | '/opinie'
     | '/panel-admin'
@@ -290,6 +300,7 @@ export interface FileRouteTypes {
     | '/kontakt'
     | '/login'
     | '/matrix'
+    | '/najczestsze-problemy'
     | '/o-mnie'
     | '/opinie'
     | '/panel-admin'
@@ -318,6 +329,7 @@ export interface FileRouteTypes {
     | '/kontakt'
     | '/login'
     | '/matrix'
+    | '/najczestsze-problemy'
     | '/o-mnie'
     | '/opinie'
     | '/panel-admin'
@@ -347,6 +359,7 @@ export interface RootRouteChildren {
   KontaktRoute: typeof KontaktRoute
   LoginRoute: typeof LoginRoute
   MatrixRoute: typeof MatrixRoute
+  NajczestszeProblemyRoute: typeof NajczestszeProblemyRoute
   OMnieRoute: typeof OMnieRoute
   OpinieRoute: typeof OpinieRoute
   PanelAdminRoute: typeof PanelAdminRoute
@@ -414,6 +427,13 @@ declare module '@tanstack/react-router' {
       path: '/matrix'
       fullPath: '/matrix'
       preLoaderRoute: typeof MatrixRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/najczestsze-problemy': {
+      id: '/najczestsze-problemy'
+      path: '/najczestsze-problemy'
+      fullPath: '/najczestsze-problemy'
+      preLoaderRoute: typeof NajczestszeProblemyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/o-mnie': {
@@ -574,6 +594,7 @@ const rootRouteChildren: RootRouteChildren = {
   KontaktRoute: KontaktRoute,
   LoginRoute: LoginRoute,
   MatrixRoute: MatrixRoute,
+  NajczestszeProblemyRoute: NajczestszeProblemyRoute,
   OMnieRoute: OMnieRoute,
   OpinieRoute: OpinieRoute,
   PanelAdminRoute: PanelAdminRoute,

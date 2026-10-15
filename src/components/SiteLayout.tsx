@@ -100,6 +100,23 @@ function Nav({ onOpenMenu }: { onOpenMenu: () => void }) {
         <li>
           <Link to="/programy" className={isActive("/programy") ? "active" : ""} style={{ whiteSpace: "nowrap", padding: "8px 10px" }}>Moje Programy</Link>
         </li>
+        <li className="nav-rgb-separator" aria-hidden>
+          <span
+            style={{
+              display: "inline-block",
+              width: "6px",
+              height: "32px",
+              borderRadius: "4px",
+              background: "linear-gradient(180deg, #ff007a, #7928ca, #0070f3, #00dfd8, #00ff88, #ffea00, #ff007a)",
+              backgroundSize: "100% 300%",
+              animation: "navRgbWaveDown 1.1s linear infinite",
+              boxShadow: "0 0 10px rgba(0, 223, 216, 0.8), 0 0 18px rgba(121, 40, 202, 0.6)"
+            }}
+          />
+        </li>
+        <li>
+          <Link to="/najczestsze-problemy" className="nav-problems-link" style={{ whiteSpace: "nowrap", padding: "8px 10px" }}>Najczęstsze problemy</Link>
+        </li>
       </ul>
       )}
       <div className="nav-actions">
@@ -173,6 +190,7 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
         <a key={h} href={h} className={isActive(h) ? "active" : ""} onClick={onClose}>{l}</a>
       ))}
       <Link to="/programy" className={isActive("/programy") ? "active" : ""} onClick={onClose}>Moje Programy</Link>
+      <Link to="/najczestsze-problemy" className="nav-problems-link" onClick={onClose}>⚡ Najczęstsze problemy</Link>
       <Link to="/wycena" className={isActive("/wycena") ? "active" : ""} onClick={onClose}>Kalkulator Wyceny</Link>
       <Link to="/faq" className={isActive("/faq") ? "active" : ""} onClick={onClose}>FAQ & Pomoc</Link>
       <Link to="/zgloszenie" className={isActive("/zgloszenie") ? "active" : ""} onClick={onClose}>Zgłoś problem</Link>
