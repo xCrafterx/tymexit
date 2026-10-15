@@ -939,3 +939,11 @@ textarea.form-control { min-height: 140px; resize: vertical; }
   0%, 100% { box-shadow: 0 0 6px #38bdf8, 0 0 12px rgba(56, 189, 248, 0.5); }
   50% { box-shadow: 0 0 14px #7dd3fc, 0 0 32px rgba(56, 189, 248, 0.95); }
 }
+
+/* Terminal: rozwiń więcej */
+.terminal-more-btn{margin-top:8px;background:transparent;border:1px solid rgba(255,43,61,.5);color:#ff2b3d;font-family:monospace;font-weight:700;font-size:12.5px;padding:6px 12px;border-radius:8px;cursor:pointer;text-shadow:0 0 8px rgba(255,43,61,.9);animation:redShine 1.6s ease-in-out infinite}
+@keyframes redShine{0%,100%{box-shadow:0 0 6px rgba(255,43,61,.4)}50%{box-shadow:0 0 18px rgba(255,43,61,.9);text-shadow:0 0 14px #ff2b3d}}
+/* Najczęstsze problemy */
+.nav-problems-link{color:#ff3b4f!important;font-weight:700;text-shadow:0 0 10px rgba(255,43,61,.8);animation:redShine 1.8s ease-in-out infinite;border-radius:8px}
+.problems-title{font-size:clamp(30px,6vw,48px);font-weight:800;color:#ff2b3d;text-shadow:0 0 18px rgba(255,43,61,.7);margin-bottom:12px}
+.problems-num{flex-shrink:0;width:30px;height:30px;border-radius:50%;display:inline-grid;place-items:center;background:rgba(255,43,61,.15);color:#ff3b4f;font-weight:800;border:1px solid rgba(255,43,61,.5)}
