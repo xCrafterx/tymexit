@@ -5,3 +5,5 @@
 - [x] Naprawić licznik odwiedzin (usunąć filtr botów) i licznik pobrań.
 - [x] Naprawić błąd oceny strony (tickets_user_id_fkey).
 - [x] Jasnoniebieskie liczniki przy zakładkach panelu admina (konta, czaty, zgłoszenia, opinie, oceny, logi).
+- [x] Strona „Najczęstsze problemy” + link z separatorem RGB.
+- [x] Interaktywna konsola z komendami na stronie głównej.
