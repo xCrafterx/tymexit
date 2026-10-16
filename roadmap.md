@@ -1,9 +1,6 @@
-- [x] Dodać edycję imienia, nazwiska i e-maila wszystkich kont w panelu administratora.
-- [x] Zmienić oznaczenie admina na mocno świecące „ADMINISTRATOR”.
-- [x] Zweryfikować kompilację i widok mobilny zmian kont.
-- [x] Wskazać użytkownikowi dokładne miejsce podmiany pliku ikona.ico w „Moje Programy”.
-- [x] Naprawić licznik odwiedzin (usunąć filtr botów) i licznik pobrań.
-- [x] Naprawić błąd oceny strony (tickets_user_id_fkey).
-- [x] Jasnoniebieskie liczniki przy zakładkach panelu admina (konta, czaty, zgłoszenia, opinie, oceny, logi).
-- [x] Strona „Najczęstsze problemy” + link z separatorem RGB.
-- [x] Interaktywna konsola z komendami na stronie głównej.
+- [x] Konsola: kategorie Windows/Linux, systeminfo (i5-14400F, RTX 5050, 2TB), treści plików, archiwum ZIP, matrix w konsoli, rpg, dźwięk klawiatury, bench, Tab.
+- [ ] Admin: protokół przyjęcia PDF (1), kalkulator marży (3), czarna lista telefonów/e-maili (4), kody rabatowe z własnym kodem i % (5).
+- [ ] Strona główna: pasek ostatnich napraw (1), kalkulator czasu naprawy (3), widget WhatsApp/telefon (4).
+- [ ] Najczęstsze problemy: usunąć podwójny układ strony, wyszukiwarka, Pomogło/Nie pomogło z licznikami, schematy kroków.
+- [ ] Pasek górny: „Wyloguj” wystaje na 960–1250px, linki nie działają.
+- [ ] Admin: finanse, gotowe odpowiedzi czatu, kalendarz, eksport CSV, magazyn +1/-1, ranking podstron.
