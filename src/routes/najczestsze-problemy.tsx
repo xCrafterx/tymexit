@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/najczestsze-problemy")({
   head: () => ({
@@ -124,17 +125,29 @@ function ProblemsPage() {
   const [open, setOpen] = useState<number | null>(0);
   const [q, setQ] = useState("");
   const [votes, setVotes] = useState<Record<string, { up: number; down: number; mine?: "up" | "down" }>>({});
+  const voterId = () => {
+    let id = localStorage.getItem("tymekit_voter_id");
+    if (!id) { id = crypto.randomUUID(); localStorage.setItem("tymekit_voter_id", id); }
+    return id;
+  };
   useEffect(() => {
-    try { setVotes(JSON.parse(localStorage.getItem("tymekit_problem_votes") || "{}")); } catch { /* ignore */ }
-  }, []);
-  const vote = (key: string, dir: "up" | "down") => {
-    setVotes((prev) => {
-      const cur = prev[key] || { up: 0, down: 0 };
-      if (cur.mine) return prev;
-      const next = { ...prev, [key]: { ...cur, [dir]: cur[dir] + 1, mine: dir } };
-      localStorage.setItem("tymekit_problem_votes", JSON.stringify(next));
-      return next;
+    const me = voterId();
+    supabase.from("problem_votes").select("problem_key, vote, voter_id").then(({ data }) => {
+      const acc: Record<string, { up: number; down: number; mine?: "up" | "down" }> = {};
+      for (const r of data || []) {
+        const cur = (acc[r.problem_key] ||= { up: 0, down: 0 });
+        if (r.vote === "up") cur.up++; else cur.down++;
+        if (r.voter_id === me) cur.mine = r.vote as "up" | "down";
+      }
+      setVotes(acc);
     });
+  }, []);
+  const vote = async (key: string, dir: "up" | "down") => {
+    const cur = votes[key] || { up: 0, down: 0 };
+    if (cur.mine) return;
+    setVotes((prev) => ({ ...prev, [key]: { ...cur, [dir]: cur[dir] + 1, mine: dir } }));
+    const { error } = await supabase.from("problem_votes").insert({ problem_key: key, vote: dir, voter_id: voterId() });
+    if (error && error.code !== "23505") setVotes((prev) => ({ ...prev, [key]: cur }));
   };
   const term = q.trim().toLowerCase();
   const list = PROBLEMS.map((p, i) => ({ p, i })).filter(({ p }) =>
