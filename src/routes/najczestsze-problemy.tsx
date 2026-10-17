@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { SiteLayout } from "@/components/SiteLayout";
+import { useEffect, useState } from "react";
 
 export const Route = createFileRoute("/najczestsze-problemy")({
   head: () => ({
@@ -123,15 +122,42 @@ const PROBLEMS: { q: string; why: string; steps: string[] }[] = [
 
 function ProblemsPage() {
   const [open, setOpen] = useState<number | null>(0);
+  const [q, setQ] = useState("");
+  const [votes, setVotes] = useState<Record<string, { up: number; down: number; mine?: "up" | "down" }>>({});
+  useEffect(() => {
+    try { setVotes(JSON.parse(localStorage.getItem("tymekit_problem_votes") || "{}")); } catch { /* ignore */ }
+  }, []);
+  const vote = (key: string, dir: "up" | "down") => {
+    setVotes((prev) => {
+      const cur = prev[key] || { up: 0, down: 0 };
+      if (cur.mine) return prev;
+      const next = { ...prev, [key]: { ...cur, [dir]: cur[dir] + 1, mine: dir } };
+      localStorage.setItem("tymekit_problem_votes", JSON.stringify(next));
+      return next;
+    });
+  };
+  const term = q.trim().toLowerCase();
+  const list = PROBLEMS.map((p, i) => ({ p, i })).filter(({ p }) =>
+    !term || (p.q + " " + p.why + " " + p.steps.join(" ")).toLowerCase().includes(term));
   return (
-    <SiteLayout>
       <main className="container" style={{ paddingTop: 120, paddingBottom: 80, maxWidth: 900 }}>
         <h1 className="problems-title">Najczęstsze problemy</h1>
-        <p className="text-dim" style={{ marginBottom: 28, lineHeight: 1.7 }}>
+        <p className="text-dim" style={{ marginBottom: 20, lineHeight: 1.7 }}>
           Proste rzeczy, które możesz zrobić sam w domu w kilka minut — bez dzwonienia do serwisu. Kliknij problem, aby zobaczyć rozwiązanie.
         </p>
+        <input
+          type="search"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="🔍 Szukaj problemu, np. internet, dźwięk, wolny komputer…"
+          aria-label="Szukaj problemu"
+          style={{ width: "100%", padding: "14px 16px", marginBottom: 20, borderRadius: 14, border: "1px solid var(--border)", background: "var(--surface)", color: "inherit", fontSize: 15 }}
+        />
         <div style={{ display: "grid", gap: 12 }}>
-          {PROBLEMS.map((p, i) => (
+          {list.length === 0 && <p className="text-dim">Nic nie znaleziono — spróbuj innego słowa albo zgłoś problem niżej.</p>}
+          {list.map(({ p, i }) => {
+            const v = votes[p.q] || { up: 0, down: 0 };
+            return (
             <div key={p.q} className="card" style={{ padding: 0, overflow: "hidden" }}>
               <button
                 type="button"
@@ -149,16 +175,20 @@ function ProblemsPage() {
                   <ol style={{ paddingLeft: 18, display: "grid", gap: 6 }}>
                     {p.steps.map((s) => <li key={s}>{s}</li>)}
                   </ol>
+                  <div style={{ display: "flex", gap: 10, marginTop: 14, flexWrap: "wrap", alignItems: "center" }}>
+                    <button type="button" className="btn btn-ghost" disabled={!!v.mine} onClick={() => vote(p.q, "up")}>👍 Pomogło ({v.up})</button>
+                    <button type="button" className="btn btn-ghost" disabled={!!v.mine} onClick={() => vote(p.q, "down")}>👎 Nie pomogło ({v.down})</button>
+                    {v.mine && <span className="text-dim" style={{ fontSize: 13 }}>Dzięki za ocenę!</span>}
+                  </div>
                 </div>
               )}
             </div>
-          ))}
+          );})}
         </div>
         <div className="card" style={{ marginTop: 28, textAlign: "center", padding: 24 }}>
           <p style={{ marginBottom: 14 }}>Nie pomogło? Spokojnie — zajmę się tym.</p>
           <Link to="/zgloszenie" className="btn btn-primary">Zgłoś problem</Link>
         </div>
       </main>
-    </SiteLayout>
   );
 }

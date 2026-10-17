@@ -151,7 +151,7 @@ img { max-width: 100%; display: block; }
 
 .nav-burger { display: none; width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; padding: 0; align-items: center; justify-content: center; }
 .nav-burger svg { width: 16px; height: 16px; }
-@media (max-width: 960px) {
+@media (max-width: 1240px) {
   .nav {
     display: flex !important;
     align-items: center !important;
