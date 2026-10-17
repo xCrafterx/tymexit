@@ -33,7 +33,7 @@ function Nav({ onOpenMenu }: { onOpenMenu: () => void }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth <= 960);
+    const check = () => setIsMobile(window.innerWidth <= 1240);
     check();
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
@@ -80,7 +80,7 @@ function Nav({ onOpenMenu }: { onOpenMenu: () => void }) {
         <ul className="nav-links">
         {NAV_LINKS.map(([h, l]) => (
           <li key={h}>
-            <a href={h} className={isActive(h) ? "active" : ""} style={{ whiteSpace: "nowrap", padding: "8px 10px" }}>{l}</a>
+            <Link to={h} className={isActive(h) ? "active" : ""} style={{ whiteSpace: "nowrap", padding: "8px 10px" }}>{l}</Link>
           </li>
         ))}
         <li className="nav-rgb-separator" aria-hidden>
