@@ -187,7 +187,7 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
     <div className={`mobile-menu${open ? " is-open" : ""}`} aria-hidden={!open}>
       <button className="close" aria-label="Zamknij menu" onClick={onClose}>✕</button>
       {NAV_LINKS.map(([h, l]) => (
-        <a key={h} href={h} className={isActive(h) ? "active" : ""} onClick={onClose}>{l}</a>
+        <Link key={h} to={h} className={isActive(h) ? "active" : ""} onClick={onClose}>{l}</Link>
       ))}
       <Link to="/programy" className={isActive("/programy") ? "active" : ""} onClick={onClose}>Moje Programy</Link>
       <Link to="/najczestsze-problemy" className="nav-problems-link" onClick={onClose}>⚡ Najczęstsze problemy</Link>
