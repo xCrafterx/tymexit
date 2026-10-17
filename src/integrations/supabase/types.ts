@@ -50,6 +50,30 @@ export type Database = {
         }
         Relationships: []
       }
+      problem_votes: {
+        Row: {
+          created_at: string
+          id: string
+          problem_key: string
+          vote: string
+          voter_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          problem_key: string
+          vote: string
+          voter_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          problem_key?: string
+          vote?: string
+          voter_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           client_level: string
