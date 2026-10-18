@@ -303,6 +303,41 @@ export type Database = {
           },
         ]
       }
+      ticket_finances: {
+        Row: {
+          customer_price: number
+          other_cost: number
+          paid: boolean
+          parts_cost: number
+          ticket_id: string
+          updated_at: string
+        }
+        Insert: {
+          customer_price?: number
+          other_cost?: number
+          paid?: boolean
+          parts_cost?: number
+          ticket_id: string
+          updated_at?: string
+        }
+        Update: {
+          customer_price?: number
+          other_cost?: number
+          paid?: boolean
+          parts_cost?: number
+          ticket_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_finances_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: true
+            referencedRelation: "tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ticket_messages: {
         Row: {
           body: string
@@ -460,11 +495,39 @@ export type Database = {
         }
         Relationships: []
       }
+      workshop_parts: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          quantity: number
+          unit_cost: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          quantity?: number
+          unit_cost?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          quantity?: number
+          unit_cost?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      adjust_workshop_stock: {
+        Args: { _delta: number; _part_id: string }
+        Returns: number
+      }
       get_email_by_username: { Args: { _username: string }; Returns: string }
       has_role: {
         Args: {
