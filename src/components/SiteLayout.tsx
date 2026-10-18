@@ -33,7 +33,7 @@ function Nav({ onOpenMenu }: { onOpenMenu: () => void }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth <= 1240);
+    const check = () => setIsMobile(window.innerWidth <= 1480);
     check();
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
