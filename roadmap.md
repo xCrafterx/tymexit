@@ -2,5 +2,5 @@
 - [ ] Admin: protokół przyjęcia PDF (1), kalkulator marży (3), czarna lista telefonów/e-maili (4), kody rabatowe z własnym kodem i % (5).
 - [ ] Strona główna: pasek ostatnich napraw (1), kalkulator czasu naprawy (3), widget WhatsApp/telefon (4).
 - [x] Najczęstsze problemy: podwójny układ, wyszukiwarka, Pomogło/Nie pomogło z licznikami; [ ] schematy kroków, schematy kroków.
-- [x] Pasek górny: „Wyloguj” wystaje na 960–1250px, linki nie działają.
+- [x] Pasek górny: „Wyloguj” wystaje na 960–1250px, linki nie działają. Poszerzony pasek, zwijanie <1600px.
 - [ ] Admin: finanse, gotowe odpowiedzi czatu, kalendarz, eksport CSV, magazyn +1/-1, ranking podstron.
