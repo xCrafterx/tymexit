@@ -85,6 +85,7 @@ function ZgloszeniePage() {
   const [priority, setPriority] = useState(!!search.priority);
   const [backup, setBackup] = useState(!!search.backup);
   const [backupTouched, setBackupTouched] = useState(!!search.backup);
+  const [discountInput, setDiscountInput] = useState("");
   useEffect(() => {
     if (user?.email) {
       setForm((f) => ({ ...f, client_email: f.client_email || user.email || "" }));
@@ -489,6 +490,19 @@ function ZgloszeniePage() {
                   <span style={{ display: "block", fontSize: 13, color: "var(--text-dim)" }}>
                     Zabezpieczę Twoje zdjęcia, dokumenty i pliki przed rozpoczęciem prac.
                   </span>
+                </span>
+              </label>
+
+              <label style={{ display: "grid", gap: 6, fontSize: 13, color: "var(--text-dim)" }}>
+                <strong style={{ color: "inherit" }}>Kod rabatowy (opcjonalnie)</strong>
+                <input
+                  className="form-control"
+                  maxLength={30}
+                  value={discountInput}
+                  onChange={(e) => setDiscountInput(e.target.value.toUpperCase())}
+                  placeholder="np. LATO10"
+                />
+                Jeśli masz kod od serwisu, wpisz go tutaj — rabat zostanie naliczony przy rozliczeniu.
                 </span>
               </label>
 
