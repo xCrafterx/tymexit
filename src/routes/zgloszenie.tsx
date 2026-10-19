@@ -503,7 +503,6 @@ function ZgloszeniePage() {
                   placeholder="np. LATO10"
                 />
                 Jeśli masz kod od serwisu, wpisz go tutaj — rabat zostanie naliczony przy rozliczeniu.
-                </span>
               </label>
 
               {isRisky && (
