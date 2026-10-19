@@ -947,3 +947,47 @@ textarea.form-control { min-height: 140px; resize: vertical; }
 .nav-problems-link{color:#ff3b4f!important;font-weight:700;text-shadow:0 0 10px rgba(255,43,61,.8);animation:redShine 1.8s ease-in-out infinite;border-radius:8px}
 .problems-title{font-size:clamp(30px,6vw,48px);font-weight:800;color:#ff2b3d;text-shadow:0 0 18px rgba(255,43,61,.7);margin-bottom:12px}
 .problems-num{flex-shrink:0;width:30px;height:30px;border-radius:50%;display:inline-grid;place-items:center;background:rgba(255,43,61,.15);color:#ff3b4f;font-weight:800;border:1px solid rgba(255,43,61,.5)}
+
+/* Workshop: magazyn, finanse, kalendarz */
+.workshop { margin-top: 24px; display: grid; gap: 20px; }
+.workshop-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.workshop-heading h2, .workshop-heading h3 { display: flex; align-items: center; gap: 10px; font-size: 1.15rem; margin: 0; }
+.workshop-heading h2 svg, .workshop-heading h3 svg { width: 20px; height: 20px; color: var(--primary, #22d3ee); }
+.workshop-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+.workshop-summary > div { background: rgba(13, 18, 34, 0.9); border: 1px solid rgba(148, 163, 184, 0.18); border-radius: 14px; padding: 14px 16px; display: grid; gap: 4px; }
+.workshop-summary span { font-size: 0.78rem; color: rgba(226, 232, 240, 0.55); }
+.workshop-summary strong { font-size: 1.2rem; color: #22d3ee; }
+.workshop-add { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 12px; align-items: end; background: rgba(13, 18, 34, 0.9); border: 1px solid rgba(148, 163, 184, 0.18); border-radius: 14px; padding: 16px; }
+.workshop-add label, .workshop-filters label, .workshop-money-fields label, .workshop-schedule-row label { display: grid; gap: 6px; font-size: 0.8rem; color: rgba(226, 232, 240, 0.65); }
+.workshop-list { display: grid; gap: 10px; }
+.workshop-part, .workshop-finance-row, .workshop-schedule-row { background: rgba(13, 18, 34, 0.9); border: 1px solid rgba(148, 163, 184, 0.18); border-radius: 14px; padding: 14px 16px; }
+.workshop-part { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.workshop-part small, .workshop-row-title small { display: block; color: rgba(226, 232, 240, 0.5); font-size: 0.75rem; margin-top: 2px; }
+.workshop-stock { display: flex; align-items: center; gap: 8px; }
+.workshop-stock output { min-width: 40px; text-align: center; font-weight: 700; color: #22d3ee; font-size: 1.05rem; }
+.workshop-filters { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; background: rgba(13, 18, 34, 0.9); border: 1px solid rgba(148, 163, 184, 0.18); border-radius: 14px; padding: 14px 16px; }
+.workshop-filters label { flex: 1 1 150px; }
+.workshop-check { display: flex !important; flex-direction: row; align-items: center; gap: 8px; font-size: 0.85rem; }
+.workshop-finance-row { display: grid; gap: 12px; }
+.workshop-row-title h3 { margin: 0; font-size: 0.98rem; }
+.workshop-money-fields { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; align-items: end; }
+.workshop-profit { display: grid; gap: 6px; font-size: 0.8rem; color: rgba(226, 232, 240, 0.65); }
+.workshop-profit strong { font-size: 1.05rem; color: #10b981; }
+.workshop-profit strong.workshop-loss { color: #ef4444; }
+.workshop-row-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.workshop-row-actions .text-dim { font-size: 0.78rem; }
+.workshop-calendar-toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.workshop-calendar-toolbar h3 { margin: 0; font-size: 1rem; text-transform: capitalize; }
+.workshop-calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.workshop-weekday { text-align: center; font-size: 0.72rem; color: rgba(226, 232, 240, 0.5); padding: 4px 0; }
+.workshop-day { display: grid !important; gap: 2px; justify-items: center; padding: 8px 4px !important; border-radius: 10px; min-height: 52px; }
+.workshop-day small { font-size: 0.65rem; color: #22d3ee; min-height: 0.8em; }
+.workshop-day.is-selected { background: rgba(34, 211, 238, 0.15) !important; outline: 1px solid #22d3ee; }
+.workshop-schedule-row { display: grid; grid-template-columns: 1.5fr 1fr 1fr auto; gap: 10px; align-items: end; }
+.workshop-schedule-row strong { display: block; font-size: 0.9rem; }
+.workshop-schedule-row small { display: block; color: rgba(226, 232, 240, 0.5); font-size: 0.72rem; margin-top: 2px; }
+@media (max-width: 900px) {
+  .workshop-add, .workshop-money-fields, .workshop-schedule-row { grid-template-columns: 1fr; }
+  .workshop-calendar-grid { gap: 3px; }
+  .workshop-day { min-height: 44px; font-size: 0.8rem; }
+}

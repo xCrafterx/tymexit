@@ -85,6 +85,7 @@ function ZgloszeniePage() {
   const [priority, setPriority] = useState(!!search.priority);
   const [backup, setBackup] = useState(!!search.backup);
   const [backupTouched, setBackupTouched] = useState(!!search.backup);
+  const [discountInput, setDiscountInput] = useState("");
   useEffect(() => {
     if (user?.email) {
       setForm((f) => ({ ...f, client_email: f.client_email || user.email || "" }));
@@ -144,6 +145,35 @@ function ZgloszeniePage() {
     }
     const d = parsed.data;
     setSubmitting(true);
+
+    // 0. Czarna lista telefonów i e-maili
+    try {
+      const [{ data: phoneBlocked }, { data: emailBlocked }] = await Promise.all([
+        supabase.rpc("is_blacklisted_contact", { _kind: "phone", _value: d.client_phone }),
+        supabase.rpc("is_blacklisted_contact", { _kind: "email", _value: d.client_email }),
+      ]);
+      if (phoneBlocked || emailBlocked) {
+        toast.error("Nie można przyjąć zgłoszenia z tych danych kontaktowych.");
+        setSubmitting(false);
+        return;
+      }
+    } catch { /* brak odpowiedzi nie blokuje formularza */ }
+
+    // 0b. Kod rabatowy (opcjonalny)
+    let discountCode: string | null = null;
+    let discountPercent = 0;
+    if (discountInput.trim()) {
+      const { data: percent } = await supabase.rpc("validate_discount_code", { _code: discountInput.trim() });
+      if (percent) {
+        discountCode = discountInput.trim().toUpperCase();
+        discountPercent = percent;
+      } else {
+        toast.error("Podany kod rabatowy jest nieprawidłowy lub nieaktywny.");
+        setSubmitting(false);
+        return;
+      }
+    }
+
 
     // 1. Konto klienta (lub istniejąca sesja zalogowanego użytkownika/admina)
     let userId: string | null = session?.user?.id ?? null;
@@ -224,6 +254,8 @@ function ZgloszeniePage() {
         client_phone: d.client_phone,
         client_email: d.client_email,
         source: "formularz",
+        discount_code: discountCode,
+        discount_percent: discountPercent,
       })
       .select("id")
       .single();
@@ -459,6 +491,18 @@ function ZgloszeniePage() {
                     Zabezpieczę Twoje zdjęcia, dokumenty i pliki przed rozpoczęciem prac.
                   </span>
                 </span>
+              </label>
+
+              <label style={{ display: "grid", gap: 6, fontSize: 13, color: "var(--text-dim)" }}>
+                <strong style={{ color: "inherit" }}>Kod rabatowy (opcjonalnie)</strong>
+                <input
+                  className="form-control"
+                  maxLength={30}
+                  value={discountInput}
+                  onChange={(e) => setDiscountInput(e.target.value.toUpperCase())}
+                  placeholder="np. LATO10"
+                />
+                Jeśli masz kod od serwisu, wpisz go tutaj — rabat zostanie naliczony przy rozliczeniu.
               </label>
 
               {isRisky && (

@@ -71,6 +71,13 @@
       "when": 1792324025609,
       "tag": "0009_admin_workshop_inventory_finance",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1792424165183,
+      "tag": "0010_admin_canned_blacklist_discounts",
+      "breakpoints": true
     }
   ]
 }
