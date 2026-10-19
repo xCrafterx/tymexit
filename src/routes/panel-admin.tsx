@@ -74,7 +74,7 @@ export function PanelAdmin() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("all");
   const [editing, setEditing] = useState<Record<string, { note: string; saving: boolean }>>({});
-  const [tab, setTab] = useState<"tickets" | "form_logs" | "visit_logs" | "accounts" | "site_ratings" | "trash" | "chats" | "reviews" | "popular" | "secrets" | "eggs" | "account" | "reset_visitors" | "reset_downloads">("tickets");
+  const [tab, setTab] = useState<"tickets" | "form_logs" | "visit_logs" | "accounts" | "site_ratings" | "trash" | "chats" | "reviews" | "popular" | "secrets" | "eggs" | "account" | "reset_visitors" | "reset_downloads" | "inventory" | "finance" | "calendar">("tickets");
   const [confirm, setConfirm] = useState<ConfirmAction>(null);
   const [acting, setActing] = useState(false);
   const [openChats, setOpenChats] = useState<Record<string, boolean>>({});
@@ -288,6 +288,9 @@ export function PanelAdmin() {
                   { key: "accounts", label: "Konta klientów", icon: "👥", badge: counts.accounts, excludeFromGroupBadge: true },
                   { key: "chats", label: "Czat na żywo", icon: "💬", badge: counts.chats, excludeFromGroupBadge: true },
                   { key: "trash", label: "Kosz", icon: "🗑", badge: trashed.length, badgeVariant: "danger", excludeFromGroupBadge: true },
+                  { key: "inventory", label: "Magazyn części", icon: "📦" },
+                  { key: "finance", label: "Finanse i zysk", icon: "💰" },
+                  { key: "calendar", label: "Kalendarz zleceń", icon: "📅" },
                 ],
               },
               {
