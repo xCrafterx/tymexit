@@ -145,6 +145,35 @@ function ZgloszeniePage() {
     const d = parsed.data;
     setSubmitting(true);
 
+    // 0. Czarna lista telefonów i e-maili
+    try {
+      const [{ data: phoneBlocked }, { data: emailBlocked }] = await Promise.all([
+        supabase.rpc("is_blacklisted_contact", { _kind: "phone", _value: d.client_phone }),
+        supabase.rpc("is_blacklisted_contact", { _kind: "email", _value: d.client_email }),
+      ]);
+      if (phoneBlocked || emailBlocked) {
+        toast.error("Nie można przyjąć zgłoszenia z tych danych kontaktowych.");
+        setSubmitting(false);
+        return;
+      }
+    } catch { /* brak odpowiedzi nie blokuje formularza */ }
+
+    // 0b. Kod rabatowy (opcjonalny)
+    let discountCode: string | null = null;
+    let discountPercent = 0;
+    if (discountInput.trim()) {
+      const { data: percent } = await supabase.rpc("validate_discount_code", { _code: discountInput.trim() });
+      if (percent) {
+        discountCode = discountInput.trim().toUpperCase();
+        discountPercent = percent;
+      } else {
+        toast.error("Podany kod rabatowy jest nieprawidłowy lub nieaktywny.");
+        setSubmitting(false);
+        return;
+      }
+    }
+
+
     // 1. Konto klienta (lub istniejąca sesja zalogowanego użytkownika/admina)
     let userId: string | null = session?.user?.id ?? null;
 
@@ -224,6 +253,8 @@ function ZgloszeniePage() {
         client_phone: d.client_phone,
         client_email: d.client_email,
         source: "formularz",
+        discount_code: discountCode,
+        discount_percent: discountPercent,
       })
       .select("id")
       .single();
