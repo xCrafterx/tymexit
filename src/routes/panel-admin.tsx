@@ -296,6 +296,7 @@ export function PanelAdmin() {
                   { key: "canned", label: "Gotowe odpowiedzi", icon: "💬" },
                   { key: "blacklist", label: "Czarna lista", icon: "🚫" },
                   { key: "discounts", label: "Kody rabatowe", icon: "🏷" },
+                  { key: "ranking", label: "Ranking podstron", icon: "📈" },
                 ],
               },
               {
