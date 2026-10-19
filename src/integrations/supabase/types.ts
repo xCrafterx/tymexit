@@ -14,6 +14,75 @@ export type Database = {
   }
   public: {
     Tables: {
+      canned_responses: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          title: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          title: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      contact_blacklist: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          note: string | null
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind: string
+          note?: string | null
+          value: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          note?: string | null
+          value?: string
+        }
+        Relationships: []
+      }
+      discount_codes: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          id: string
+          percent: number
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          id?: string
+          percent: number
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          id?: string
+          percent?: number
+        }
+        Relationships: []
+      }
       ignored_ips: {
         Row: {
           created_at: string
@@ -424,6 +493,8 @@ export type Database = {
           created_at: string
           deleted_at: string | null
           description: string
+          discount_code: string | null
+          discount_percent: number
           id: string
           is_priority: boolean
           preferred_date: string | null
@@ -443,6 +514,8 @@ export type Database = {
           created_at?: string
           deleted_at?: string | null
           description: string
+          discount_code?: string | null
+          discount_percent?: number
           id?: string
           is_priority?: boolean
           preferred_date?: string | null
@@ -462,6 +535,8 @@ export type Database = {
           created_at?: string
           deleted_at?: string | null
           description?: string
+          discount_code?: string | null
+          discount_percent?: number
           id?: string
           is_priority?: boolean
           preferred_date?: string | null
@@ -536,6 +611,11 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_blacklisted_contact: {
+        Args: { _kind: string; _value: string }
+        Returns: boolean
+      }
+      validate_discount_code: { Args: { _code: string }; Returns: number }
     }
     Enums: {
       app_role: "admin" | "client"
