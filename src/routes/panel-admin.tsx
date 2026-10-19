@@ -21,6 +21,7 @@ import { AdminReviews } from "@/components/Reviews";
 import { PopularServicesAdmin } from "@/components/PopularServicesAdmin";
 import { PanelTabs, type PanelTabGroup } from "@/components/PanelTabs";
 import { AdminVisitLogs } from "@/components/AdminVisitLogs";
+import { AdminWorkshop } from "@/components/AdminWorkshop";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -487,7 +488,7 @@ export function PanelAdmin() {
                 </div>
               )}
             </div>
-          ) : tab === "visit_logs" ? <AdminVisitLogs /> : tab === "accounts" ? <AdminAccounts /> : tab === "chats" ? <AdminLiveChats /> : tab === "reviews" ? <AdminReviews /> : tab === "popular" ? <PopularServicesAdmin /> : tab === "secrets" ? <MySecrets /> : tab === "eggs" ? <AllEasterEggs /> : tab === "account" ? <AccountSettings /> : tab === "reset_visitors" ? <AdminResetVisitors /> : tab === "reset_downloads" ? <AdminResetDownloads /> : tab === "trash" ? (
+          ) : tab === "visit_logs" ? <AdminVisitLogs /> : tab === "accounts" ? <AdminAccounts /> : tab === "chats" ? <AdminLiveChats /> : tab === "reviews" ? <AdminReviews /> : tab === "popular" ? <PopularServicesAdmin /> : tab === "secrets" ? <MySecrets /> : tab === "eggs" ? <AllEasterEggs /> : tab === "account" ? <AccountSettings /> : tab === "reset_visitors" ? <AdminResetVisitors /> : tab === "reset_downloads" ? <AdminResetDownloads /> : tab === "inventory" ? <AdminWorkshop view="inventory" /> : tab === "finance" ? <AdminWorkshop view="finance" /> : tab === "calendar" ? <AdminWorkshop view="calendar" /> : tab === "trash" ? (
             <>
               <div className="reveal visible">
                 <span className="eyebrow" style={{ borderColor: "rgba(239, 68, 68, 0.3)" }}><span className="dot" style={{ background: "#ef4444", boxShadow: "0 0 14px #ef4444", animation: "redBadgePulse 2s ease-in-out infinite" }}></span> Kosz ({trashed.length})</span>
