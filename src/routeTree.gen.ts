@@ -33,6 +33,7 @@ import { Route as ZgloszenieRouteImport } from './routes/zgloszenie'
 import { Route as AdminChatRouteImport } from './routes/admin.chat'
 import { Route as AdminCzatyRouteImport } from './routes/admin.czaty'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
+import { Route as ApiAdminAiRouteImport } from './routes/api/admin-ai'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as ApiPublicOrderNotifyRouteImport } from './routes/api/public/order-notify'
 import { Route as ApiPublicSiteRatingsRouteImport } from './routes/api/public/site-ratings'
@@ -157,6 +158,11 @@ const AdminDashboardRoute = AdminDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AdminRoute,
 } as any)
+const ApiAdminAiRoute = ApiAdminAiRouteImport.update({
+  id: '/api/admin-ai',
+  path: '/api/admin-ai',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiChatRoute = ApiChatRouteImport.update({
   id: '/api/chat',
   path: '/api/chat',
@@ -198,6 +204,7 @@ export interface FileRoutesByFullPath {
   '/admin/chat': typeof AdminChatRoute
   '/admin/czaty': typeof AdminCzatyRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/api/admin-ai': typeof ApiAdminAiRoute
   '/api/chat': typeof ApiChatRoute
   '/api/public/order-notify': typeof ApiPublicOrderNotifyRoute
   '/api/public/site-ratings': typeof ApiPublicSiteRatingsRoute
@@ -227,6 +234,7 @@ export interface FileRoutesByTo {
   '/admin/chat': typeof AdminChatRoute
   '/admin/czaty': typeof AdminCzatyRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/api/admin-ai': typeof ApiAdminAiRoute
   '/api/chat': typeof ApiChatRoute
   '/api/public/order-notify': typeof ApiPublicOrderNotifyRoute
   '/api/public/site-ratings': typeof ApiPublicSiteRatingsRoute
@@ -257,6 +265,7 @@ export interface FileRoutesById {
   '/admin/chat': typeof AdminChatRoute
   '/admin/czaty': typeof AdminCzatyRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/api/admin-ai': typeof ApiAdminAiRoute
   '/api/chat': typeof ApiChatRoute
   '/api/public/order-notify': typeof ApiPublicOrderNotifyRoute
   '/api/public/site-ratings': typeof ApiPublicSiteRatingsRoute
@@ -288,6 +297,7 @@ export interface FileRouteTypes {
     | '/admin/chat'
     | '/admin/czaty'
     | '/admin/dashboard'
+    | '/api/admin-ai'
     | '/api/chat'
     | '/api/public/order-notify'
     | '/api/public/site-ratings'
@@ -317,6 +327,7 @@ export interface FileRouteTypes {
     | '/admin/chat'
     | '/admin/czaty'
     | '/admin/dashboard'
+    | '/api/admin-ai'
     | '/api/chat'
     | '/api/public/order-notify'
     | '/api/public/site-ratings'
@@ -346,6 +357,7 @@ export interface FileRouteTypes {
     | '/admin/chat'
     | '/admin/czaty'
     | '/admin/dashboard'
+    | '/api/admin-ai'
     | '/api/chat'
     | '/api/public/order-notify'
     | '/api/public/site-ratings'
@@ -373,6 +385,7 @@ export interface RootRouteChildren {
   WycenaRoute: typeof WycenaRoute
   ZamowRoute: typeof ZamowRoute
   ZgloszenieRoute: typeof ZgloszenieRoute
+  ApiAdminAiRoute: typeof ApiAdminAiRoute
   ApiChatRoute: typeof ApiChatRoute
   ApiPublicOrderNotifyRoute: typeof ApiPublicOrderNotifyRoute
   ApiPublicSiteRatingsRoute: typeof ApiPublicSiteRatingsRoute
@@ -548,6 +561,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDashboardRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/api/admin-ai': {
+      id: '/api/admin-ai'
+      path: '/api/admin-ai'
+      fullPath: '/api/admin-ai'
+      preLoaderRoute: typeof ApiAdminAiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/chat': {
       id: '/api/chat'
       path: '/api/chat'
@@ -608,6 +628,7 @@ const rootRouteChildren: RootRouteChildren = {
   WycenaRoute: WycenaRoute,
   ZamowRoute: ZamowRoute,
   ZgloszenieRoute: ZgloszenieRoute,
+  ApiAdminAiRoute: ApiAdminAiRoute,
   ApiChatRoute: ApiChatRoute,
   ApiPublicOrderNotifyRoute: ApiPublicOrderNotifyRoute,
   ApiPublicSiteRatingsRoute: ApiPublicSiteRatingsRoute,
