@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { Link } from "@tanstack/react-router";
 
 export function SiteRatingPrompt() {
+  const [tipDismissed, setTipDismissed] = useState(false);
   const [hasRated, setHasRated] = useState(true);
   const [isDismissed, setIsDismissed] = useState(false);
   const [rating, setRating] = useState<number | null>(null);
@@ -63,6 +65,7 @@ export function SiteRatingPrompt() {
   };
 
   return (
+    <>
     <div
       className="site-rating-prompt"
       style={{
@@ -187,5 +190,53 @@ export function SiteRatingPrompt() {
         </div>
       </div>
     </div>
+    {!tipDismissed && (
+      <div
+        style={{
+          background: "linear-gradient(135deg, rgba(17, 24, 39, 0.95), rgba(30, 41, 59, 0.95))",
+          backdropFilter: "blur(16px)",
+          border: "1px solid rgba(6, 182, 212, 0.3)",
+          borderLeft: "4px solid #06b6d4",
+          borderRadius: "14px",
+          padding: "16px 20px",
+          margin: "0 auto 20px auto",
+          maxWidth: "960px",
+          boxShadow: "0 0 24px rgba(6, 182, 212, 0.15)",
+          position: "relative",
+          zIndex: 40,
+        }}
+      >
+        <button
+          onClick={() => setTipDismissed(true)}
+          title="Zamknij"
+          aria-label="Zamknij"
+          style={{ position: "absolute", top: 12, right: 12, background: "transparent", border: "none", color: "rgba(255,255,255,0.5)", fontSize: 18, cursor: "pointer", padding: "4px 8px", lineHeight: 1 }}
+        >
+          ✕
+        </button>
+        <h4 style={{ margin: "0 0 6px", paddingRight: 30, fontSize: 16, fontWeight: 600, color: "#fff" }}>
+          💡 Zanim ocenisz, rzuć okiem na inne zakątki serwisu!
+        </h4>
+        <p style={{ margin: "0 0 14px", fontSize: 13, color: "rgba(255,255,255,0.65)" }}>
+          Chciałbym, abyś przed wystawieniem oceny sprawdził też inne podstrony – dzięki temu Twoja opinia będzie pełniejsza.
+        </p>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          {[
+            { to: "/programy", label: "💾 Moje Programy" },
+            { to: "/najczestsze-problemy", label: "⚡ Najczęstsze problemy" },
+            { to: "/faq", label: "❓ FAQ" },
+          ].map((l) => (
+            <Link
+              key={l.to}
+              to={l.to}
+              style={{ padding: "8px 16px", borderRadius: 10, border: "1px solid rgba(168,85,247,0.4)", background: "rgba(255,255,255,0.05)", color: "#fff", fontSize: 13, fontWeight: 600, textDecoration: "none" }}
+            >
+              {l.label}
+            </Link>
+          ))}
+        </div>
+      </div>
+    )}
+    </>
   );
 }
