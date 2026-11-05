@@ -1004,3 +1004,4 @@ textarea.form-control { min-height: 140px; resize: vertical; }
 .mobile-menu.is-dropdown a { font-size: 17px; padding: 10px 0; }
 .mobile-menu.is-dropdown .close { top: 12px; right: 12px; width: 32px; height: 32px; font-size: 14px; }
 .mobile-menu.is-dropdown .mobile-menu-actions { grid-template-columns: 1fr 1fr; }
+.mobile-menu.is-dropdown .mobile-menu-actions a, .mobile-menu.is-dropdown .mobile-menu-actions button { font-size: 14px; }
