@@ -140,6 +140,37 @@ img { max-width: 100%; display: block; }
 .nav-links a:hover { color: var(--text); background: var(--surface-2); }
 .nav-links a.active { color: var(--text); background: var(--surface-2); }
 
+/* Kafelek logowania / panelu w pasku nawigacji */
+.nav-links a.nav-auth-tile {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 8px 16px; margin-left: 6px;
+  font-size: 13px; font-weight: 700; letter-spacing: .01em;
+  color: #04060c;
+  background: linear-gradient(135deg, #22d3ee 0%, #a78bfa 100%);
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 999px;
+  box-shadow: 0 0 16px rgba(34,211,238,.45), 0 0 24px rgba(167,139,250,.3), 0 6px 18px -8px rgba(34,211,238,.6);
+  transition: all .25s var(--ease);
+}
+.nav-links a.nav-auth-tile svg { width: 14px; height: 14px; }
+.nav-links a.nav-auth-tile:hover {
+  color: #04060c;
+  background: linear-gradient(135deg, #67e8f9 0%, #c4b5fd 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 0 24px rgba(34,211,238,.7), 0 0 34px rgba(167,139,250,.45), 0 8px 22px -8px rgba(34,211,238,.8);
+}
+
+/* Wąskie laptopy: pełne menu musi zmieścić się w pigułce paska */
+@media (max-width: 1400px) and (min-width: 1241px) {
+  .nav { padding: 12px 14px 12px 18px; }
+  .nav-links { gap: 0; }
+  .nav-links a { padding: 8px 8px !important; font-size: 13px; }
+  .nav-rgb-separator { padding: 0 4px; }
+  .nav-links a.nav-auth-tile { padding: 7px 12px; margin-left: 2px; font-size: 12px; }
+  .nav-actions { gap: 6px; }
+  .nav-desktop-action { padding: 9px 12px !important; font-size: 12px !important; }
+}
+
 .nav-actions { display: flex; align-items: center; gap: 10px; }
 .nav-rgb-separator { display: inline-flex; align-items: center; padding: 0 8px; user-select: none; }
 .theme-toggle { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%; background: var(--surface); border: 1px solid var(--border); color: var(--text); cursor: pointer; transition: all .25s var(--ease); }
