@@ -33,7 +33,7 @@ function Nav({ onOpenMenu }: { onOpenMenu: () => void }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth <= 1600);
+    const check = () => setIsMobile(window.innerWidth <= 1240);
     check();
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
@@ -129,30 +129,9 @@ function Nav({ onOpenMenu }: { onOpenMenu: () => void }) {
             <Link to="/zgloszenie" className="btn btn-ghost nav-desktop-action" style={{ padding: "10px 16px", fontSize: 13 }}>
               Zgłoś problem
             </Link>
-            {session ? (
-              <>
-                <Link
-                  to={role === "admin" ? "/panel-admin" : "/panel-klienta"}
-                  className="btn btn-ghost nav-desktop-action"
-                  style={{ padding: "10px 16px", fontSize: 13 }}
-                >
-                  Panel
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12l2-2 7 7 7-7 2 2"/></svg>
-                </Link>
-                <button onClick={handleLogout} className="btn btn-primary nav-desktop-action" style={{ padding: "10px 18px", fontSize: 13 }}>
-                Wyloguj
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-                </button>
-              </>
-            ) : (
-              <Link to="/login" className="btn btn-primary nav-desktop-action" style={{ padding: "10px 18px", fontSize: 13 }}>
-                Zaloguj
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-              </Link>
-            )}
           </>
         )}
-        <button className="nav-burger" aria-label="Otwórz menu" onClick={onOpenMenu} style={isMobile ? { display: "inline-flex" } : undefined}>
+        <button className="nav-burger" aria-label="Otwórz menu" onClick={onOpenMenu} style={{ display: "inline-flex" }}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
         </button>
       </div>
