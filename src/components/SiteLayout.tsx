@@ -143,11 +143,19 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { pathname, hash } = useLocation();
   const { session, role } = useAuth();
   const navigate = useNavigate();
+  const [wide, setWide] = useState(false);
 
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
+    const check = () => setWide(window.innerWidth > 1240);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = open && !wide ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
-  }, [open]);
+  }, [open, wide]);
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/" && !hash;
@@ -163,16 +171,18 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
   };
 
   return (
-    <div className={`mobile-menu${open ? " is-open" : ""}`} aria-hidden={!open}>
+    <>
+    {wide && open && <div className="more-menu-backdrop" onClick={onClose} />}
+    <div className={`mobile-menu${wide ? " is-dropdown" : ""}${open ? " is-open" : ""}`} aria-hidden={!open}>
       <button className="close" aria-label="Zamknij menu" onClick={onClose}>✕</button>
-      {NAV_LINKS.map(([h, l]) => (
+      {!wide && NAV_LINKS.map(([h, l]) => (
         <Link key={h} to={h} className={isActive(h) ? "active" : ""} onClick={onClose}>{l}</Link>
       ))}
-      <Link to="/programy" className={isActive("/programy") ? "active" : ""} onClick={onClose}>Moje Programy</Link>
-      <Link to="/najczestsze-problemy" className="nav-problems-link" onClick={onClose}>⚡ Najczęstsze problemy</Link>
+      {!wide && <Link to="/programy" className={isActive("/programy") ? "active" : ""} onClick={onClose}>Moje Programy</Link>}
+      {!wide && <Link to="/najczestsze-problemy" className="nav-problems-link" onClick={onClose}>⚡ Najczęstsze problemy</Link>}
       <Link to="/wycena" className={isActive("/wycena") ? "active" : ""} onClick={onClose}>Kalkulator Wyceny</Link>
       <Link to="/faq" className={isActive("/faq") ? "active" : ""} onClick={onClose}>FAQ & Pomoc</Link>
-      <Link to="/zgloszenie" className={isActive("/zgloszenie") ? "active" : ""} onClick={onClose}>Zgłoś problem</Link>
+      {!wide && <Link to="/zgloszenie" className={isActive("/zgloszenie") ? "active" : ""} onClick={onClose}>Zgłoś problem</Link>}
       <div className="mobile-menu-actions">
         {session ? (
           <>
@@ -187,6 +197,7 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
         )}
       </div>
     </div>
+    </>
   );
 }
 
