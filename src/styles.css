@@ -1050,3 +1050,7 @@ textarea.form-control { min-height: 140px; resize: vertical; }
   .panel-tabs { width: max-content; max-width: calc(100vw - 32px); left: 50%; translate: -50% 0; }
   .panel-tabs__bar { flex-wrap: wrap; }
 }
+@media (min-width: 721px) {
+  .panel-tabs__bar { gap: 4px; }
+  .panel-tabs__group-btn { padding: 10px 12px; gap: 7px; }
+}

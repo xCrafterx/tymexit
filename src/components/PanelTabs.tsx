@@ -23,6 +23,7 @@ type Props = {
   groups: PanelTabGroup[];
   active: PanelTabKey;
   onChange: (key: PanelTabKey) => void;
+  ready?: boolean;
 };
 
 const dangerPulseStyle = `
@@ -86,7 +87,7 @@ const dangerPulseStyle = `
 }
 `;
 
-export function PanelTabs({ groups, active, onChange }: Props) {
+export function PanelTabs({ groups, active, onChange, ready = true }: Props) {
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -104,7 +105,7 @@ export function PanelTabs({ groups, active, onChange }: Props) {
     try { setSeen(JSON.parse(localStorage.getItem("tymekit_seen_tabs") || "{}")); } catch { setSeen({}); }
   }, []);
   useEffect(() => {
-    if (!seen) return;
+    if (!seen || !ready) return;
     let changed = false;
     const next = { ...seen };
     for (const g of groups) for (const i of g.items) {
@@ -115,7 +116,7 @@ export function PanelTabs({ groups, active, onChange }: Props) {
     }
     if (changed) { setSeen(next); localStorage.setItem("tymekit_seen_tabs", JSON.stringify(next)); }
   });
-  const isNew = (i: PanelTabItem) => !!seen && typeof i.badge === "number" && seen[i.key] !== undefined && i.badge > seen[i.key] && i.key !== active;
+  const isNew = (i: PanelTabItem) => ready && !!seen && typeof i.badge === "number" && seen[i.key] !== undefined && i.badge > seen[i.key] && i.key !== active;
 
   const activeGroup = groups.find((g) => g.items.some((i) => i.key === active));
   const activeItem = activeGroup?.items.find((i) => i.key === active);

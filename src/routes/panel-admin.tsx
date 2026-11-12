@@ -82,6 +82,7 @@ export function PanelAdmin() {
   const [acting, setActing] = useState(false);
   const [openChats, setOpenChats] = useState<Record<string, boolean>>({});
   const [counts, setCounts] = useState({ accounts: 0, chats: 0, reviews: 0 });
+  const [countsLoaded, setCountsLoaded] = useState(false);
   useEffect(() => {
     const load = async () => {
       const [a, c, r] = await Promise.all([
@@ -90,6 +91,7 @@ export function PanelAdmin() {
         supabase.from("reviews").select("id", { count: "exact", head: true }),
       ]);
       setCounts({ accounts: a.count ?? 0, chats: c.count ?? 0, reviews: r.count ?? 0 });
+      setCountsLoaded(true);
     };
     load();
     const id = window.setInterval(load, 30000);
@@ -350,7 +352,7 @@ export function PanelAdmin() {
                 ],
               },
             ];
-            return <PanelTabs groups={groups} active={tab} onChange={(k) => setTab(k as typeof tab)} />;
+            return <PanelTabs ready={countsLoaded && !loading} groups={groups} active={tab} onChange={(k) => setTab(k as typeof tab)} />;
           })()}
 
           {tab === "form_logs" ? (
