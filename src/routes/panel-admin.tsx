@@ -282,21 +282,35 @@ export function PanelAdmin() {
             const groups: PanelTabGroup[] = [
               {
                 id: "obsluga",
-                label: "Obsługa klienta",
+                label: "Obsługa i zlecenia",
                 icon: "🛠",
                 items: [
                   { key: "tickets", label: "Zgłoszenia", icon: "📋", badge: active.length, excludeFromGroupBadge: true },
-                  { key: "form_logs", label: "Logi formularzy", icon: "🌐", badge: tickets.filter((t) => t.source === "formularz" && !t.deleted_at).length, excludeFromGroupBadge: true },
-                  { key: "visit_logs", label: "Logi odwiedzin", icon: "🛰" },
-                  { key: "accounts", label: "Konta klientów", icon: "👥", badge: counts.accounts, excludeFromGroupBadge: true },
                   { key: "chats", label: "Czat na żywo", icon: "💬", badge: counts.chats, excludeFromGroupBadge: true },
+                  { key: "calendar", label: "Kalendarz zleceń", icon: "📅" },
+                  { key: "accounts", label: "Konta klientów", icon: "👥", badge: counts.accounts, excludeFromGroupBadge: true },
                   { key: "trash", label: "Kosz", icon: "🗑", badge: trashed.length, badgeVariant: "danger", excludeFromGroupBadge: true },
+                ],
+              },
+              {
+                id: "warsztat",
+                label: "Warsztat i finanse",
+                icon: "🔧",
+                items: [
                   { key: "inventory", label: "Magazyn części", icon: "📦" },
                   { key: "finance", label: "Finanse i zysk", icon: "💰" },
-                  { key: "calendar", label: "Kalendarz zleceń", icon: "📅" },
+                  { key: "discounts", label: "Kody rabatowe", icon: "🏷" },
                   { key: "canned", label: "Gotowe odpowiedzi", icon: "💬" },
                   { key: "blacklist", label: "Czarna lista", icon: "🚫" },
-                  { key: "discounts", label: "Kody rabatowe", icon: "🏷" },
+                ],
+              },
+              {
+                id: "analityka",
+                label: "Ruch i analityka",
+                icon: "📈",
+                items: [
+                  { key: "visit_logs", label: "Logi odwiedzin", icon: "🛰" },
+                  { key: "form_logs", label: "Logi formularzy", icon: "🌐", badge: tickets.filter((t) => t.source === "formularz" && !t.deleted_at).length, excludeFromGroupBadge: true },
                   { key: "ranking", label: "Ranking podstron", icon: "📈" },
                 ],
               },
