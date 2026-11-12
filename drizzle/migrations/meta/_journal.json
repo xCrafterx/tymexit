@@ -78,6 +78,13 @@
       "when": 1792424165183,
       "tag": "0010_admin_canned_blacklist_discounts",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1794487964922,
+      "tag": "0011_problem_votes_tighten",
+      "breakpoints": true
     }
   ]
 }

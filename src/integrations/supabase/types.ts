@@ -604,6 +604,15 @@ export type Database = {
         Returns: number
       }
       get_email_by_username: { Args: { _username: string }; Returns: string }
+      get_problem_vote_counts: {
+        Args: { _voter_id: string }
+        Returns: {
+          down: number
+          mine: string
+          problem_key: string
+          up: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

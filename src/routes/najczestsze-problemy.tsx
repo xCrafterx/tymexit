@@ -132,12 +132,10 @@ function ProblemsPage() {
   };
   useEffect(() => {
     const me = voterId();
-    supabase.from("problem_votes").select("problem_key, vote, voter_id").then(({ data }) => {
+    supabase.rpc("get_problem_vote_counts", { _voter_id: me }).then(({ data }) => {
       const acc: Record<string, { up: number; down: number; mine?: "up" | "down" }> = {};
       for (const r of data || []) {
-        const cur = (acc[r.problem_key] ||= { up: 0, down: 0 });
-        if (r.vote === "up") cur.up++; else cur.down++;
-        if (r.voter_id === me) cur.mine = r.vote as "up" | "down";
+        acc[r.problem_key] = { up: Number(r.up), down: Number(r.down), mine: (r.mine as "up" | "down") || undefined };
       }
       setVotes(acc);
     });
