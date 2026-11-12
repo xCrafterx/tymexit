@@ -99,6 +99,24 @@ export function PanelTabs({ groups, active, onChange }: Props) {
     return () => document.removeEventListener("mousedown", onDoc);
   }, []);
 
+  const [seen, setSeen] = useState<Record<string, number> | null>(null);
+  useEffect(() => {
+    try { setSeen(JSON.parse(localStorage.getItem("tymekit_seen_tabs") || "{}")); } catch { setSeen({}); }
+  }, []);
+  useEffect(() => {
+    if (!seen) return;
+    let changed = false;
+    const next = { ...seen };
+    for (const g of groups) for (const i of g.items) {
+      if (typeof i.badge !== "number") continue;
+      if (next[i.key] === undefined || i.key === active || i.badge < next[i.key]) {
+        if (next[i.key] !== i.badge) { next[i.key] = i.badge; changed = true; }
+      }
+    }
+    if (changed) { setSeen(next); localStorage.setItem("tymekit_seen_tabs", JSON.stringify(next)); }
+  });
+  const isNew = (i: PanelTabItem) => !!seen && typeof i.badge === "number" && seen[i.key] !== undefined && i.badge > seen[i.key] && i.key !== active;
+
   const activeGroup = groups.find((g) => g.items.some((i) => i.key === active));
   const activeItem = activeGroup?.items.find((i) => i.key === active);
 
@@ -172,6 +190,7 @@ export function PanelTabs({ groups, active, onChange }: Props) {
                 <span className="panel-tabs__group-icon">{group.icon}</span>
                 <span className="panel-tabs__group-label">{group.label}</span>
                 {groupBadge > 0 && <span className="panel-tabs__badge">{groupBadge}</span>}
+                {group.items.some(isNew) && <span className="panel-tabs__new-dot" title="Nowe" />}
                 <svg className="panel-tabs__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6"/></svg>
               </button>
 
@@ -189,6 +208,7 @@ export function PanelTabs({ groups, active, onChange }: Props) {
                       >
                         <span className="panel-tabs__item-icon">{item.icon}</span>
                         <span className="panel-tabs__item-label">{item.label}</span>
+                        {isNew(item) && <span className="panel-tabs__new-dot" title="Nowe" />}
                         {item.badgeDot ? (
                           <span className="panel-tabs__badge-dot" />
                         ) : hasBadge ? (

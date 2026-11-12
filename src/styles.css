@@ -1043,3 +1043,10 @@ textarea.form-control { min-height: 140px; resize: vertical; }
   .nav-auth-tile .nav-auth-label { display: none; }
   .nav-auth-tile { padding: 8px !important; gap: 0 !important; }
 }
+
+.panel-tabs__new-dot { width: 10px; height: 10px; min-width: 10px; border-radius: 50%; background: #c8f000; box-shadow: 0 0 8px #c8f000, 0 0 16px rgba(200,240,0,.7); animation: ryobiBlink 1s ease-in-out infinite; }
+@keyframes ryobiBlink { 0%,100% { opacity: 1; transform: scale(1.1); } 50% { opacity: .25; transform: scale(.8); } }
+@media (min-width: 721px) {
+  .panel-tabs { width: max-content; max-width: calc(100vw - 32px); left: 50%; translate: -50% 0; }
+  .panel-tabs__bar { flex-wrap: wrap; }
+}
